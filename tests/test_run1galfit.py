@@ -1,5 +1,6 @@
 import unittest
 
+from context import parallel
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
