@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 '''
-GOAL: this program will run galfit on one galaxy
+GOAL: 
+- this program will run galfit on one galaxy
+- galfit is run once with generic input parameters, no convolution
+- the output is used as input for a second run, w/convolution enabled
 
 USAGE:
 This should be run from a directory that contains
@@ -25,7 +28,9 @@ import glob
 # galaxy to work with
 galid = sys.argv[1]
 
-HOME = os.getenv("HOME")
+# wavelength of images, like W3
+bandpass = sys.argv[2]
+
 # directory where galaxy folders are
 data_dir = os.getcwd()+'/'
 
@@ -34,10 +39,15 @@ data_dir = os.getcwd()+'/'
 os.chdir(data_dir+'/'+galid)
 
 
+# TODO: add code to generate galfit input for first run, no convolution, generic starting point
+
 # code to run galfit
 
 print('running galfit')
 os.system(f"galfit {galfit_input}")
-#os.system('rm *.lbr')
-    
+
+
+# TODO: read galfit output, and create new input to run with convolution
+
+
 os.chdir(data_dir)
