@@ -19,7 +19,7 @@ import glob
 HOME = os.getenv("HOME")
 
 
-def write_output(script_id, input_file, narray=1000, data_dir=None, submit=False):
+def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=None, submit=False):
     ''' copying python from Matt Bellis, commands from Ryan Decker '''
     output = ""
     output += "#!/bin/bash\n"
@@ -58,9 +58,13 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, submit=False
     else:
         print('please provide a valid data directory')
         return
+    if wavelength is None:
+        print('please provide a valid wavelength as input to slurm constructor function ')
+        return
+        
     output += s
     output += "#\n"
-    output += f"python {HOME}/github/mucho-galfit/parallel/run1galfit.py $LINE\n"
+    output += f"python {HOME}/github/mucho-galfit/parallel/run1galfit.py $LINE {wavelength}\n"
 
     outfname = f"JOB_{script_id}.sh"
 
@@ -85,7 +89,7 @@ import argparse
 parser = argparse.ArgumentParser(
     description='Program to create bash script to run galfit in parallel.  This uses the array option in slurm so that the processes are associated with the same process id, rather than submitting a bunch of individual jobs.  The script can be submitted by setting the --submit flag.')
 parser.add_argument('--wavelength',
-                    dest='wave',
+                    dest='wavelength',
                     default='W3',
                     options = ['W3'],
                     help='Wavelength of images to analyze')
@@ -101,7 +105,7 @@ args = parser.parse_args()
 cwd = os.getcwd()
 
 data_dir = f"{HOME}/research/wisesize/"
-script_id = "VFIDall"
+script_id = f"VFIDall-{args.wavelength}"
 
 print('data_dir = ', data_dir)
 print()
@@ -121,6 +125,7 @@ infile.close()
 # for d in dirlist:
 
 input_file = "Dirs.txt"
-write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, submit=args.submit)
+write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, wavelength=args.wavelength,
+             submit=args.submit)
 
 os.chdir(cwd)
