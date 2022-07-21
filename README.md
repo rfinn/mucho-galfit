@@ -19,7 +19,7 @@ then activate environment
 source venv/bin/activate
 ```
 
-# Install python requirements
+## Install python requirements
 
 ```
 pip3 install -r requirements.txt
