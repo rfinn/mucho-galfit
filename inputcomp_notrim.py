@@ -29,7 +29,7 @@ dummycat = Table.read(homedir+'/dummycat.fits',format='ascii')
 
 
 class galfit:
-    def __init__(self, galname=None, vfid=None, r25=None, band=3, image=None, sigma_image=None, psf_image=None, psf_oversampling=None, mask_image=None, xminfit=None, yminfit=None, xmaxfit=None, ymaxfit=None, convolution_size=None, magzp=None, pscale=None, galfile=None, convflag=1, constraintflag=1, fitallflag=0, ncomp=1, xobj=None, yobj=None, mag=None, rad=None, nsersic=None, BA=None, PA=None, fitmag=1, fitcenter=1, fitrad=1, fitBA=1, fitPA=1, fitn=1, first_time=0, asymmetry=0):
+    def __init__(self, galname=None, vfid=None, vfid_v1=None, r25=None, band=3, image=None, sigma_image=None, psf_image=None, psf_oversampling=None, mask_image=None, xminfit=None, yminfit=None, xmaxfit=None, ymaxfit=None, convolution_size=None, magzp=None, pscale=None, galfile=None, convflag=1, constraintflag=1, fitallflag=0, ncomp=1, xobj=None, yobj=None, mag=None, rad=None, nsersic=None, BA=None, PA=None, fitmag=1, fitcenter=1, fitrad=1, fitBA=1, fitPA=1, fitn=1, first_time=0, asymmetry=0):
         
         self.galname=galname
         self.vfid=vfid
@@ -38,6 +38,7 @@ class galfit:
         self.fitallflag=fitallflag
         
         if vfid in dummycat['central galaxy']:
+            
             self.ncomp = len(np.where(dummycat['central galaxy'] == vfid)[0]) + 1
         else:
             self.ncomp=ncomp
@@ -48,7 +49,8 @@ class galfit:
         self.image_rootname = self.galname+'-unwise-w'+str(self.band)
 
         #change directory, grab galaxy's image and mask FITS filenames
-        os.chdir('/mnt/astrophysics/wisesize/'+str(self.vfid))
+        #NOTE: WISESIZE DIRECTORIES ARE LABELED USING V1 VFIDs!
+        os.chdir('/mnt/astrophysics/wisesize/'+str(self.vfid_v1))
         im = glob.glob('*w3-img-m.fits')[0]
         self.image = im
         im_mask = glob.glob('*mask.fits')[0]
@@ -64,12 +66,12 @@ class galfit:
         #os.system('cp '+homedir+'/github/virgowise/wise_psfs/wise-w3-psf-wpro-09x09-05x05.fits .')
         #self.psf_image = 'wise-w3-psf-wpro-09x09-05x05.fits'
 
-        #'personalized' psfs according to coadd_id
+        #'personalized' w3-band psfs according to coadd_id
         #copies psf directory into gal_output...there will be as many as there are galaxies in the vf sample, so be prepared for an influx (pun unintended) of point spread functions.
         os.chdir('/mnt/astrophysics/kconger_wisesize/github/gal_output/')
         #print(+str(self.vfid)+' PSF now in gal_output directory.')
-        os.system('cp '+homedir+'/github/virgowise/sgacut_psfs/'+str(self.vfid)+'* .')
-        self.psf_image = glob.glob(str(self.vfid)+'*-psf.fits')[0]
+        os.system('cp '+homedir+'/github/virgowise/sgacut_psfs/'+str(self.vfid_v1)+'* .')
+        self.psf_image = glob.glob(str(self.vfid_v1)+'*-psf.fits')[0]
         
         #value from original script
         self.psf_oversampling=8
@@ -205,7 +207,7 @@ if __name__ == '__main__':
     
     for i in range(0,len(cat)):
     
-        gal = galfit(galname=cat['prefix'][i], vfid=cat['VFID'][i], r25 = cat['radius'][i], convflag=convflag, constraintflag=1, fitallflag=0, ncomp=1)
+        gal = galfit(galname=cat['prefix'][i], vfid=cat['VFID'][i], vfid_v1=cat['VFID_V1'][i], r25 = cat['radius'][i], convflag=convflag, constraintflag=1, fitallflag=0, ncomp=1)
         
         if gal.convflag == 1:
             ind = np.where(cat['galname'][i] == params['galname'])[0]
@@ -225,7 +227,7 @@ if __name__ == '__main__':
         gal.write_sersic(1,'sersic')
         
         if gal.vfid in dummycat['central galaxy']:
-            indices = np.where(dummycat['central galaxy'] == gal.vfid)[0]
+            np.where(dummycat['central galaxy'] == gal.vfid)[0]
             for i in range(0,len(indices)):
                 index = indices[i]
                 n = int(i)+2      #i begins at 0, and 1 is already taken
