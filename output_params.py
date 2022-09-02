@@ -25,6 +25,7 @@ from astropy.io import fits
 #have to call sample
 cat = Table.read(homedir+'/sgacut_coadd.fits')
 dummycat = Table.read(homedir+'/dummycat.fits',format='ascii')
+vf_v2 = Table.read(homedir+'/vf_v2_main.fits')
 vf = Table.read(homedir+'/vf_north_v1_main.fits')
 
 header = ['galname','xc','xc_err','yc','yc_err','mag','mag_err','re','re_err','nsersic','nsersic_err','BA','BA_err','PA','PA_er',
@@ -32,13 +33,17 @@ header = ['galname','xc','xc_err','yc','yc_err','mag','mag_err','re','re_err','n
     
 
 class output_galaxy:
-    def __init__(self,galname=None,vfid=None,outimage=None,convflag=None,band=3,ncomp=1):
+    def __init__(self,galname_v1=None,vfid_v1=None,galname_v2=None,vfid_v2=None,outimage=None,convflag=None,band=3,ncomp=1,v2=False):
         
-        self.galname=galname
-        self.vfid=vfid
+        self.galname=galname_v1
+        self.vfid=vfid_v1
         
-        if vfid in dummycat['central galaxy']:
-            self.ncomp = len(np.where(dummycat['central galaxy'] == vfid)[0]) + 1
+        if v2 == True:
+            self.vfid_v2 = vfid_v2
+            self.galname_v2 = galname_v2
+        
+        if vfid_v1 in dummycat['central galaxy']:
+            self.ncomp = len(np.where(dummycat['central galaxy'] == vfid_v1)[0]) + 1
         else:
             self.ncomp=ncomp
         
@@ -49,8 +54,12 @@ class output_galaxy:
         except:
             self.band = band
         
+        outimage = str(self.galname_v1)+'-unwise-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out.fits'
+          
         #os.chdir('/mnt/astrophysics/kconger_wisesize/github/gal_output')
-        outimage = str(self.galname)+'-unwise-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out.fits'
+        if v2 == True:
+            outimage = str(self.galname_v2+'-unwise-'+str(self.band+'-'+str(self.ncomp)+'Comp-galfit-out.fits'
+                   
         self.outimage=outimage
         
         
@@ -79,7 +88,7 @@ class output_galaxy:
             if n == 0:
                 temp.append(self.galname)
             else:
-                indices = np.where(dummycat['central galaxy'] == self.vfid)[0]  #find where external(s) have self.vfid as 'host'
+                indices = np.where(dummycat['central galaxy'] == self.vfid_v1)[0]  #find where external(s) have self.vfid as 'host'
                 index = indices[n-1]   #only want one index; if n=1, then we want the first external galaxy, meaning the 0th element in the indices list
                 temp.append(dummycat['ID'][index])   #append the name (ID) of the external galaxy
 
@@ -131,19 +140,31 @@ if __name__ == '__main__':
     convflag = input('conv? enter 0 (n) or 1 (y): ')
     
     for i in range(0,len(cat)):
-        g = output_galaxy(galname=cat['prefix'][i], vfid=cat['VFID'][i])
+
+        g = output_galaxy(galname_v1=cat['prefix'][i], vfid_v1=cat['VFID_V1'][i],v2=False)
+        if g.v2 == True:    
+            g.galname_v2 = cat['prefix'][i]
+            g.vfid_v1 = cat['VFID_V1'][i]
+            g.vfid_v2 = cat['VFID'][i]
+            g.galname_v1 = vf['prefix'][(np.where(vf['VFID'] == g.vfid_vf))[0]]
+                                                          
         if convflag == 1:
-            g.outimage = str(g.galname)+'-unwise-'+str(g.band)+'-'+str(g.ncomp)+'Comp-galfit-out-conv.fits'
+            try:
+                g.outimage = str(g.galname_v2)+'-unwise-'+str(g.band)+'-'+str(g.ncomp)+'Comp-galfit-out-conv.fits'
+            except:
+                g.outimage = str(g.galname_v1)+'-unwise-'+str(g.band)+'-'+str(g.ncomp)+'Comp-galfit-out-conv.fits'
+                                                          
         param_rows = g.parse_galfit_1comp()
         for n in param_rows:
             if 'index' in n[0]:
                 print('external ID not in vf catalog')
             else:
                 t.add_row(n)
+                                                          
     if convflag == 1:
-        t.write('output_params_psf.fits', format='fits', overwrite=True)
+        t.write('output_params_'+g.band+'_psf.fits', format='fits', overwrite=True)
     if convflag == 0:
-        t.write('output_params_nopsf.fits',format='fits',overwrite=True)
+        t.write('output_params_'+g.band+'_nopsf.fits',format='fits',overwrite=True)
       
     
 
