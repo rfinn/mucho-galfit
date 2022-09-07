@@ -67,8 +67,13 @@ class galfit:
         im_mask = glob.glob('*mask.fits')[0]
         self.mask_image = im_mask
 
-        self.sigma_image = self.image_rootname+'-std-m.fits'
-        self.invvar_image = self.image_rootname+'-invvar-m.fits'
+        self.sigma_image = glob.glob('*-std-m.fits')[0]
+        
+        #I think
+        try:
+            self.invvar_image = glob.glob('*-inv-mask.fits')[0]
+        except:
+            print('')
         
         temp = fits.getdata(self.image)
         self.ximagesize, self.yimagesize = temp.shape
