@@ -6,7 +6,11 @@ GOAL:
 - generate galfit input scripts for sample galaxies
 OUTPUT:
 - individual scripts for each central galaxy in sample; default output directory is /mnt/astrophysics/kconger_wisesize/github/gal_output
-- can directly feed these textfiles into GALFIT
+- can directly feed these text files into GALFIT
+- Line 31 --> galaxy catalog
+- Line 32 --> dummy catalog
+- Line 80 --> output directory
+- Line 82 --> psf directory
 '''
 
 import numpy as np
@@ -25,7 +29,7 @@ from astropy.io import fits
 
 #have to call sample
 cat = Table.read(homedir+'/sgacut_coadd.fits')
-dummycat = Table.read(homedir+'/dummycat.fits',format='ascii')
+dummycat = Table.read(homedir+'/dummycat.fits')
 
 
 class galfit:
@@ -33,12 +37,19 @@ class galfit:
         
         self.galname=galname
         self.vfid=vfid
-        self.band=band
+        self.vfid_v1=vfid_v1
+        
+        #if band is an integer, than prepend with w to indicate that the 'band' is a WISE channel
+        try:
+            int(band)
+            self.band = 'w'+str(band)
+        except:
+            self.band = band
+        
         self.constraintflag=constraintflag
         self.fitallflag=fitallflag
         
         if vfid in dummycat['central galaxy']:
-            
             self.ncomp = len(np.where(dummycat['central galaxy'] == vfid)[0]) + 1
         else:
             self.ncomp=ncomp
@@ -46,12 +57,12 @@ class galfit:
         self.asymmetry=0
         self.galfile=str(self.galname)+'-galfit.input.'+str(self.ncomp)+'Comp'
 
-        self.image_rootname = self.galname+'-unwise-w'+str(self.band)
+        self.image_rootname = self.galname+'-unwise-'+str(self.band)
 
         #change directory, grab galaxy's image and mask FITS filenames
         #NOTE: WISESIZE DIRECTORIES ARE LABELED USING V1 VFIDs!
         os.chdir('/mnt/astrophysics/wisesize/'+str(self.vfid_v1))
-        im = glob.glob('*w3-img-m.fits')[0]
+        im = glob.glob('*'+str(self.band)+'-img-m.fits')[0]
         self.image = im
         im_mask = glob.glob('*mask.fits')[0]
         self.mask_image = im_mask
@@ -67,11 +78,11 @@ class galfit:
         #self.psf_image = 'wise-w3-psf-wpro-09x09-05x05.fits'
 
         #'personalized' w3-band psfs according to coadd_id
-        #copies psf directory into gal_output...there will be as many as there are galaxies in the vf sample, so be prepared for an influx (pun unintended) of point spread functions.
+        #copies w3 psf directory into gal_output...there will be as many as there are galaxies in the vf sample, so be prepared for an influx (pun unintended) of point spread functions.
         os.chdir('/mnt/astrophysics/kconger_wisesize/github/gal_output/')
         #print(+str(self.vfid)+' PSF now in gal_output directory.')
-        os.system('cp '+homedir+'/github/virgowise/sgacut_psfs/'+str(self.vfid_v1)+'* .')
-        self.psf_image = glob.glob(str(self.vfid_v1)+'*-psf.fits')[0]
+        os.system('cp '+homedir+'/github/virgowise/sgacut_psfs/'+str(self.vfid)+'* .')
+        self.psf_image = glob.glob(str(self.vfid)+'*psf.fits')[0]
         
         #value from original script
         self.psf_oversampling=8
@@ -201,21 +212,28 @@ class galfit:
 
 if __name__ == '__main__':
     
-    params = Table.read('/mnt/astrophysics/kconger_wisesize/gal_output_psf/nopsf_params.txt',format='ascii')
-    
     convflag = input('conv? enter 0 (n) or 1 (y): ')
+    
+    if convflag == 1:
+        params = Table.read('/mnt/astrophysics/kconger_wisesize/gal_output_psf/output_params_'+gal.band+'_nopsf.fits')
     
     for i in range(0,len(cat)):
     
         gal = galfit(galname=cat['prefix'][i], vfid=cat['VFID'][i], vfid_v1=cat['VFID_V1'][i], r25 = cat['radius'][i], convflag=convflag, constraintflag=1, fitallflag=0, ncomp=1)
         
+        #if nopsf already run, then use output params as initial input parameter guesses
         if gal.convflag == 1:
             ind = np.where(cat['galname'][i] == params['galname'])[0]
             gal.xobj=params['xc'][ind]
             gal.yobj=params['yc'][ind]
             gal.mag=params['mag'][ind]
-            gal.rad=params['re'][ind]
-            gal.nsersic=params['nsersic'][ind]
+            #help prevent errors associated with unphysical nopsf output params
+            if int(params['nsersic'][ind])>5:
+                gal.nsersic=5 #restrict nser initial guess to n=5
+                gal.rad=5     #revert to default initial guess for Re
+            else:
+                gal.nsersic=params['nsersic'][ind]
+                gal.rad=params['re'][ind]
             gal.BA=params['BA'][ind]
             gal.PA=params['PA'][ind]
         
@@ -227,7 +245,7 @@ if __name__ == '__main__':
         gal.write_sersic(1,'sersic')
         
         if gal.vfid in dummycat['central galaxy']:
-            np.where(dummycat['central galaxy'] == gal.vfid)[0]
+            indices = np.where(dummycat['central galaxy'] == gal.vfid)[0]
             for i in range(0,len(indices)):
                 index = indices[i]
                 n = int(i)+2      #i begins at 0, and 1 is already taken
