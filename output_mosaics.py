@@ -48,12 +48,12 @@ class mosaic():
         cmap = colormap, default is viridis
         '''
         
-        self.filename = glob.glob(self.galname+'-unwise-'+str(self.band)+'*Comp-galfit-out.fits')[0]
-        pngname = self.galname+'-unwise-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out.png'
+        self.filename = glob.glob(self.galname+'-'+str(self.band)+'*Comp-galfit-out.fits')[0]
+        pngname = self.galname+'-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out.png'
         
         if self.convflag:
-            self.filename = glob.glob(self.galname+'-unwise-'+str(self.band)+'*Comp-galfit-out-conv.fits')[0]
-            pngname = self.galname+'-unwise-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out-conv.png'
+            self.filename = glob.glob(self.galname+'-'+str(self.band)+'*Comp-galfit-out-conv.fits')[0]
+            pngname = self.galname+'-'+str(self.band)+'-'+str(self.ncomp)+'Comp-galfit-out-conv.png'
         
         image,h = fits.getdata(self.filename,1,header=True)
         model = fits.getdata(self.filename,2)
