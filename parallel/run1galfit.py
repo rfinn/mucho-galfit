@@ -201,7 +201,7 @@ if __name__ == '__main__':
     # fix this later when we figure how to extract two columns from data directory file
     galname = galdir.split('/')[1] # or pass VFID on second
     
-    output_dir = '/mnt/astrophysics/rfinn/muchgalfit-output/'+galname+'/'
+    output_dir = '/mnt/astrophysics/rfinn/muchogalfit-output/'+galname+'/'
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
