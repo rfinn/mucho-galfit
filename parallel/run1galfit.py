@@ -100,7 +100,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         all_images[i] = galdir+'/'+all_images[i]
 
         
-    psf_sampling = psf_oversample(bandpass)
+    psf_sampling = psf_oversampling(bandpass)
     pscale = pixel_scale(bandpass)
 
     
@@ -148,7 +148,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     outfile.write('C) %s                # Sigma image name (made from data if blank or "none") \n'%(sigma_image))
     if not firstpass:
         outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
-        outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_oversampling))
+        outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
     outfile.write('H) '+str(int(round(xminfit)))+' '+str(int(round(xmaxfit)))+' '+str(int(round(yminfit)))+' '+str(int(round(ymaxfit)))+'     # Image region to fit (xmin xmax ymin ymax)\n')
     if not firstpass:
         outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
