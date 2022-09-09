@@ -96,8 +96,10 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
 
     # prepend image directory to all images
     all_images = [image,output_image,sigma_image,psf_image]
-    for i in range(len(all_images)):
-        all_images[i] = galdir+'/'+all_images[i]
+    image = galdir+'/'+image
+    output_image = galdir+'/'+output_image
+    sigma_image = galdir+'/'+sigma_image
+    psf_image = galdir+'/'+psf_image
 
         
     psf_sampling = psf_oversampling[bandpass]
