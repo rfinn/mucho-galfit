@@ -100,8 +100,8 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         all_images[i] = galdir+'/'+all_images[i]
 
         
-    psf_sampling = psf_oversampling(bandpass)
-    pscale = pixel_scale(bandpass)
+    psf_sampling = psf_oversampling[bandpass]
+    pscale = pixel_scale[bandpass]
 
     
     # TODO: add mask to galfit input
