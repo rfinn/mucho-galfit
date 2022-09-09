@@ -227,7 +227,7 @@ if __name__ == '__main__':
     # code to run galfit
 
     print('running galfit')
-    #os.system(f"galfit {galfit_input}")
+    os.system(f"galfit galfit.input1")
 
 
     # TODO: read galfit output, and create new input to run with convolution
