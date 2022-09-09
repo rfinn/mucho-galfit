@@ -111,8 +111,9 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     # TODO: need to get (x,y) center of object
     
     # TODO check if noise image exists, if not make it from invvar
-    if not os.path.exists(noiseimage):
-        convert_invvar_noise(galname)
+    if not os.path.exists(sigma_image):
+        print('need a sigma image but skipping for now')
+        #convert_invvar_noise(galname)
 
     if firstpass:
         BA=1
