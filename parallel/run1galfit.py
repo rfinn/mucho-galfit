@@ -86,7 +86,7 @@ def convert_invvar_noise(noise_image):
 
 def write_galfit_input(galdir,bandpass, firstpass=True):
     galname = os.path.basename(galdir)
-    image = f'{galname}-custom-image-{bandpass}.fits'
+    image = f'{galname}-custom-image-{bandpass}.fits.fz'
     if firstpass:
         output_image = f'{galname}-{bandpass}-out1.fits'
     else:
