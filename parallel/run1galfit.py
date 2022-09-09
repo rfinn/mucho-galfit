@@ -138,7 +138,11 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         fitmag = 1
         fitrad = 1
         # get convolution size - set to cutout size?
-
+    # make of values for xminfit, etc for now
+    xminfit = 1
+    xmaxfit = 100
+    yminfit = 1
+    ymaxfit = 100
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
