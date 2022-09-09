@@ -143,6 +143,8 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     xmaxfit = 100
     yminfit = 1
     ymaxfit = 100
+    xobj = 50
+    yobj = 50
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
@@ -165,7 +167,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     outfile.write(' \n')
     # write object
     outfile.write('# Object number: 1 \n')
-    outfile.write(' 0) %s             # Object type \n'%(profile))
+    outfile.write(' 0) sersic             # Object type \n')
     outfile.write(' 1) %8.1f  %8.1f 1 1  # position x, y        [pixel] \n'%(xobj,yobj))
     outfile.write(' 3) %5.2f      %i       # total magnitude     \n'%(mag,fitmag))
     outfile.write(' 4) %8.2f       %i       #     R_e              [Pixels] \n'%(rad,fitrad))
