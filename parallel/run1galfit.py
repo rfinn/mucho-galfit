@@ -28,7 +28,7 @@ import glob
 
 pixel_scale = {'FUV':2.5,'NUV':2.5,'g':2.5,'r':2.5,'g':2.5,'W1':2.5,'W2':2.5,'W3':2.5,'W4':2.5}
 psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':1}
-magzp = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
+mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
 
 # TODO: set up a dictionary for the radius to use for the first guess of the sersic profile
 
@@ -102,7 +102,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         
     psf_sampling = psf_oversampling[bandpass]
     pscale = pixel_scale[bandpass]
-
+    magzp = mag_zeropoint[bandpass]
     
     # TODO: add mask to galfit input
 
