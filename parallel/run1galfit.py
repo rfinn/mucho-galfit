@@ -71,7 +71,7 @@ def convert_invvar_noise(invvar_image, noise_image):
     from astropy.io import fits
     import numpy as np
     # read in invvar image
-    print('invvar image = ',invvar_image)
+    #print('invvar image = ',invvar_image)
     hdu = fits.open(invvar_image)
     data = hdu[1].data
     header = hdu[1].header
@@ -88,8 +88,10 @@ def convert_invvar_noise(invvar_image, noise_image):
 
 def get_image_size(image):
     from astropy.io import fits
-    data = fits.getdata(image)
-    return data.shape
+    hdu = fits.open(image)
+    data_shape = hdu[1].data.shape
+    hdu.close()
+    return data_shape
 
 def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     galname = os.path.basename(galdir)
@@ -121,9 +123,8 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
 
     # TODO: need to get (x,y) center of object
     
-    # TODO check if noise image exists, if not make it from invvar
+    # check if noise image exists, if not make it from invvar
     if not os.path.exists(sigma_image):
-        #print('need a sigma image but skipping for now')
         convert_invvar_noise(invvar_image,sigma_image)
 
     if firstpass:
@@ -151,13 +152,13 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
         # get convolution size - set to cutout size?
     # make of values for xminfit, etc for now
     # get image size
-    
+    xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
     xminfit = 1
-    xmaxfit = 100
+    xmaxfit = xmax 
     yminfit = 1
-    ymaxfit = 100
-    xobj = 50
-    yobj = 50
+    ymaxfit = ymax
+    xobj = int(xmaxfit/2)
+    yobj = int(ymaxfit/2)
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
