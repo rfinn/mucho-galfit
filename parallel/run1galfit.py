@@ -66,12 +66,11 @@ def parse_galfit_1comp(galfit_outimage):
     fit_parameters.append(chi2nu)
     return fit_parameters
 
-def convert_invvar_noise(noise_image):
+def convert_invvar_noise(invvar_image, noise_image):
     # convert invvar image to noise
     from astropy.io import fits
     import numpy as np
     # read in invvar image
-    invvar_image = noise_image.replace('std','invvar')
     print('invvar image = ',invvar_image)
     hdu = fits.open(invvar_image)
     data = hdu[1].data
@@ -92,7 +91,7 @@ def get_image_size(image):
     data = fits.getdata(image)
     return data.shape
 
-def write_galfit_input(galdir,bandpass, firstpass=True):
+def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     galname = os.path.basename(galdir)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
     if firstpass:
@@ -100,13 +99,14 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     else:
         output_image = f'{galname}-{bandpass}-out2.fits'    
     sigma_image = f'{galname}-custom-std-{bandpass}.fits.fz'
+    invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
     psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
 
     # prepend image directory to all images
     all_images = [image,output_image,sigma_image,psf_image]
     image = galdir+'/'+image
-    output_image = galdir+'/'+output_image
-    sigma_image = galdir+'/'+sigma_image
+    output_image = output_dir+'/'+output_image
+    sigma_image = output_dir+'/'+sigma_image
     psf_image = galdir+'/'+psf_image
 
         
@@ -123,7 +123,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     # TODO check if noise image exists, if not make it from invvar
     if not os.path.exists(sigma_image):
         #print('need a sigma image but skipping for now')
-        convert_invvar_noise(sigma_image)
+        convert_invvar_noise(invvar_image,sigma_image)
 
     if firstpass:
         BA=1
@@ -235,7 +235,7 @@ if __name__ == '__main__':
 
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
 
-    write_galfit_input(data_dir, bandpass)
+    write_galfit_input(data_dir, output_dir, bandpass)
     # code to run galfit
 
     print('running galfit')
