@@ -123,7 +123,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     # save them in output_dir
 
     funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
-    funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
+    funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')))
                   
     # prepend output directory to all images
 
