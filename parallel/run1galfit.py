@@ -35,8 +35,10 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 ### FUNCTIONS
 def funpack_image(input,output):
     from astropy.io import fits
+    from astropy.io.fits import compression    
     hdu = fits.open(input)
-    hdu.writeto(output,overwrite=True)
+    fphdu = compression.decompress_hdu(hdu)
+    fphdu.writeto(output,overwrite=True)
     hdu.close()
     
 def parse_galfit_1comp(galfit_outimage):
