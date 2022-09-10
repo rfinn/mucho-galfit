@@ -122,9 +122,9 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
                   
     # prepend output directory to all images
 
-    image = output_dir+'/'+image
+    image = output_dir+'/'+image.replace('.fz','')
     output_image = output_dir+'/'+output_image
-    psf_image = output_dir+'/'+psf_image
+    psf_image = output_dir+'/'+psf_image.replace('.fz','')
     
     # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
