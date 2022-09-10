@@ -41,7 +41,7 @@ def funpack_image(input,output):
     try:
         fits.writeto(output,data=hdu[1].data, header=hdu[1].header, overwrite=True)
     except IndexError:
-        fits.writeto(output,data=hdu.data, header=hdu.header, overwrite=True)        
+        fits.writeto(output,data=hdu[0].data, header=hdu[0].header, overwrite=True)        
     hdu.close()
     
 def parse_galfit_1comp(galfit_outimage):
