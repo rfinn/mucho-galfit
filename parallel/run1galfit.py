@@ -274,6 +274,6 @@ if __name__ == '__main__':
     write_galfit_input(data_dir, output_dir, bandpass, firstpass=False)
 
     print('running galfit second time')
-    os.system(f"galfit galfit.input1")
+    os.system(f"galfit galfit.input2")
     
     os.chdir(topdir)
