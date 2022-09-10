@@ -26,13 +26,19 @@ import sys
 import glob
 ### DICTIONARIES
 
-pixel_scale = {'FUV':2.5,'NUV':2.5,'g':2.5,'r':2.5,'g':2.5,'W1':2.5,'W2':2.5,'W3':2.5,'W4':2.5}
+pixel_scale = {'FUV':2.5,'NUV':2.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.5,'W2':2.5,'W3':2.5,'W4':2.5}
 psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':1}
 mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
 
 # TODO: set up a dictionary for the radius to use for the first guess of the sersic profile
 
 ### FUNCTIONS
+def funpack_image(input,output):
+    from astropy.io import fits
+    hdu = fits.open(input)
+    hdu.writeto(output,overwrite=True)
+    hdu.close()
+    
 def parse_galfit_1comp(galfit_outimage):
     numerical_error_flag=0
     header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
@@ -96,21 +102,36 @@ def get_image_size(image):
 def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     galname = os.path.basename(galdir)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
+    invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
+    psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
+
+    # created images
+    sigma_image = f'{galname}-custom-std-{bandpass}.fits'    
     if firstpass:
         output_image = f'{galname}-{bandpass}-out1.fits'
     else:
         output_image = f'{galname}-{bandpass}-out2.fits'    
-    sigma_image = f'{galname}-custom-std-{bandpass}.fits.fz'
-    invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
 
-    # prepend image directory to all images
-    all_images = [image,output_image,sigma_image,psf_image]
-    image = galdir+'/'+image
+    
+
+    # funpack the .fz images so galfit can read them
+    # save them in output_dir
+
+    funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image))
+    funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image))    
+    # prepend output directory to all images
+
+    image = output_dir+'/'+image
     output_image = output_dir+'/'+output_image
+    psf_image = output_dir+'/'+psf_image
+    
+    # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
-    invvar_image = galdir+'/'+invvar_image
-    psf_image = galdir+'/'+psf_image
+    invvar_image = galdir+'/'+invvar_image    
+    if not os.path.exists(sigma_image):
+        convert_invvar_noise(invvar_image,sigma_image)
+
+
 
         
     psf_sampling = psf_oversampling[bandpass]
@@ -123,9 +144,6 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
 
     # TODO: need to get (x,y) center of object
     
-    # check if noise image exists, if not make it from invvar
-    if not os.path.exists(sigma_image):
-        convert_invvar_noise(invvar_image,sigma_image)
 
     if firstpass:
         BA=1
