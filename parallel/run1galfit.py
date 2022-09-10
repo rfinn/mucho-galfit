@@ -96,9 +96,8 @@ def convert_invvar_noise(invvar_image, noise_image):
 
 def get_image_size(image):
     from astropy.io import fits
-    hdu = fits.open(image)
-    data_shape = hdu[1].data.shape
-    hdu.close()
+    data = fits.getdata(image)
+    data_shape = data.shape
     return data_shape
 
 def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
