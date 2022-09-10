@@ -164,7 +164,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     else:
         # read in output from first pass run of galfit
         t = parse_galfit_output(output_image.replace('out2','out1'))
-        print(fit_parameters)
+
         # header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
         xc, yc, mag, rad, nsersic, BA, PA, sky = t[0],t[2],t[4],t[6],t[8],t[10],t[12],t[14]
         fitBA = 1
