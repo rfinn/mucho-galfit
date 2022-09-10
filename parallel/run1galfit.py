@@ -183,6 +183,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     ymaxfit = ymax
     xobj = int(xmaxfit/2)
     yobj = int(ymaxfit/2)
+    convolution_size = xobj
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
