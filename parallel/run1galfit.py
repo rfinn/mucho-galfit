@@ -43,6 +43,7 @@ def funpack_image(input,output,nhdu=1):
     
 def parse_galfit_output(galfit_outimage):
     from astropy.io import fits
+    import numpy as np
     numerical_error_flag=0
     header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
     fit_parameters=[]
