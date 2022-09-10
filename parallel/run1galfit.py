@@ -272,4 +272,8 @@ if __name__ == '__main__':
     # TODO: read galfit output, and create new input to run with convolution
 
     write_galfit_input(data_dir, output_dir, bandpass, firstpass=False)
+
+    print('running galfit second time')
+    os.system(f"galfit galfit.input1")
+    
     os.chdir(topdir)
