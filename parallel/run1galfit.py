@@ -107,6 +107,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     image = galdir+'/'+image
     output_image = output_dir+'/'+output_image
     sigma_image = output_dir+'/'+sigma_image
+    invvar_image = galdir+'/'+invvar_image
     psf_image = galdir+'/'+psf_image
 
         
