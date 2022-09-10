@@ -37,8 +37,7 @@ def funpack_image(input,output):
     from astropy.io import fits
     from astropy.io.fits import compression    
     hdu = fits.open(input)
-    fphdu = compression.decompress_hdu(hdu)
-    fphdu.writeto(output,overwrite=True)
+    fits.writeto(output,data=hdu[1].data, header=hdu[1].header, overwrite=True)
     hdu.close()
     
 def parse_galfit_1comp(galfit_outimage):
