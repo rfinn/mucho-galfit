@@ -79,10 +79,16 @@ def convert_invvar_noise(noise_image):
     noise_data = np.sqrt(1/data)
     
     # check for bad values, nan, inf
+    # set bad pixels to very high value, like 1e6
+    noise_data = np.nan_to_num(noise_data,nan=1.e6)
 
     # write out as noise image
     fits.writeto(noise_image,noise_data,header=header,overwrite=True)
 
+def get_image_size(image):
+    form astropy.io import fits
+    data = fits.getdata(image)
+    return data.shape
 
 def write_galfit_input(galdir,bandpass, firstpass=True):
     galname = os.path.basename(galdir)
@@ -114,8 +120,8 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
     
     # TODO check if noise image exists, if not make it from invvar
     if not os.path.exists(sigma_image):
-        print('need a sigma image but skipping for now')
-        #convert_invvar_noise(galname)
+        #print('need a sigma image but skipping for now')
+        convert_invvar_noise(galname)
 
     if firstpass:
         BA=1
@@ -131,7 +137,7 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         sky = 0
     else:
         # read in output from first pass run of galfit
-        fit_parameters = parse_galfit_output(output_image)
+        fit_parameters = parse_galfit_output(output_image.replace('out1','out2'))
         # header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
         xc, yc, mag, rad, nsersic, BA, PA, sky = fit_parameters[np.arange(0,15,2)]
         fitBA = 1
@@ -141,6 +147,8 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         fitrad = 1
         # get convolution size - set to cutout size?
     # make of values for xminfit, etc for now
+    # get image size
+    
     xminfit = 1
     xmaxfit = 100
     yminfit = 1
