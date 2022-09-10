@@ -160,7 +160,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
         sky = 0
     else:
         # read in output from first pass run of galfit
-        fit_parameters = parse_galfit_output(output_image.replace('out1','out2'))
+        fit_parameters = parse_galfit_output(output_image.replace('out2','out1'))
         # header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
         xc, yc, mag, rad, nsersic, BA, PA, sky = fit_parameters[np.arange(0,15,2)]
         fitBA = 1
@@ -266,5 +266,5 @@ if __name__ == '__main__':
 
     # TODO: read galfit output, and create new input to run with convolution
 
-
+    write_galfit_input(data_dir, output_dir, bandpass, firstpass=False)
     os.chdir(topdir)
