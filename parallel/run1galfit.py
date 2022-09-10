@@ -86,7 +86,7 @@ def convert_invvar_noise(noise_image):
     fits.writeto(noise_image,noise_data,header=header,overwrite=True)
 
 def get_image_size(image):
-    form astropy.io import fits
+    from astropy.io import fits
     data = fits.getdata(image)
     return data.shape
 
