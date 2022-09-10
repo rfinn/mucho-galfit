@@ -134,7 +134,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
         fitPA = 1
         nsersic=2
         fitn = 1
-        mag=7
+        mag=14
         fitmag = 1
         rad = 5
         fitrad = 1
@@ -153,6 +153,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     # make of values for xminfit, etc for now
     # get image size
     xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
+    print('image dimensions = ',xmax,ymax)
     xminfit = 1
     xmaxfit = xmax 
     yminfit = 1
