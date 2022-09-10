@@ -33,12 +33,15 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 # TODO: set up a dictionary for the radius to use for the first guess of the sersic profile
 
 ### FUNCTIONS
-def funpack_image(input,output,nhdu=1):
+def funpack_image(input,output):
     from astropy.io import fits
     hdu = fits.open(input)
     print('input file = ',input)
     print(hdu.info())
-    fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
+    try:
+        fits.writeto(output,data=hdu[1].data, header=hdu[1].header, overwrite=True)
+    except IndexError:
+        fits.writeto(output,data=hdu.data, header=hdu.header, overwrite=True)        
     hdu.close()
     
 def parse_galfit_1comp(galfit_outimage):
