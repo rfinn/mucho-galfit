@@ -122,16 +122,15 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
                   
     # prepend output directory to all images
 
-    image = output_dir+'/'+image.replace('.fz','')
-    output_image = output_dir+'/'+output_image
-    psf_image = output_dir+'/'+psf_image.replace('.fz','')
+    image = image.replace('.fz','')
+    psf_image = psf_image.replace('.fz','')
     
     # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
     invvar_image = galdir+'/'+invvar_image    
     if not os.path.exists(sigma_image):
         convert_invvar_noise(invvar_image,sigma_image)
-
+    sigma_image = os.path.basename(sigma_image)
 
 
         
@@ -259,7 +258,7 @@ if __name__ == '__main__':
 
     write_galfit_input(data_dir, output_dir, bandpass)
     # code to run galfit
-
+    os.chdir(output_dir)
     print('running galfit')
     os.system(f"galfit galfit.input1")
 
@@ -267,3 +266,4 @@ if __name__ == '__main__':
     # TODO: read galfit output, and create new input to run with convolution
 
 
+    os.chdir(topdir)
