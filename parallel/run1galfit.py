@@ -97,8 +97,8 @@ def write_galfit_input(galdir,bandpass, firstpass=True):
         output_image = f'{galname}-{bandpass}-out1.fits'
     else:
         output_image = f'{galname}-{bandpass}-out2.fits'    
-    sigma_image = f'{galname}-custom-std-{bandpass}.fits'
-    psf_image = f'{galname}-custom-psf-{bandpass}.fits'
+    sigma_image = f'{galname}-custom-std-{bandpass}.fits.fz'
+    psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
 
     # prepend image directory to all images
     all_images = [image,output_image,sigma_image,psf_image]
