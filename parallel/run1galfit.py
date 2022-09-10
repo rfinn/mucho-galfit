@@ -23,7 +23,8 @@ will move to each folder and run this script
 '''
 import os
 import sys
-import glob
+#import glob
+import numpy as np
 ### DICTIONARIES
 
 pixel_scale = {'FUV':2.5,'NUV':2.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.5,'W2':2.5,'W3':2.5,'W4':2.5}
@@ -43,7 +44,7 @@ def funpack_image(input,output,nhdu=1):
     
 def parse_galfit_output(galfit_outimage):
     from astropy.io import fits
-    import numpy as np
+    #import numpy as np
     numerical_error_flag=0
     header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
     fit_parameters=[]
