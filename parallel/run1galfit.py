@@ -183,6 +183,9 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     ymaxfit = ymax
     xobj = int(xmaxfit/2)
     yobj = int(ymaxfit/2)
+    # TODO: need to decide on the right size for this
+    # Chien had recommended the full image, but we could do something like 8-10x pixel size
+    # a smaller convolution size should make galfit run faster
     convolution_size = xobj
     if firstpass:
         outfile = open('galfit.input1','w')
