@@ -125,40 +125,68 @@ class output_galaxy:
 
 if __name__ == '__main__':
     
-    full_sample_table = Table(names=header,dtype=[str,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float])
+    dtype=[str,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float]
+    full_sample_table = Table(names=header,dtype=dtype)
     
     convflag = input('conv? enter 0 (n) or 1 (y): ')
     #band = input('band? enter 1-4 for w, r for r-band: ')
     
     for i in range(0,len(cat)):
-        g = output_galaxy(galname=cat['prefix'][i],objname=cat['objname'][i], vfid=cat['VFID'][i], vfid_v1=cat['VFID_V1'][i], band=3)        
+           
+        #add row of zeros for ith central galaxy and its "off-centered" sersic objects
+        g = output_galaxy(galname=cat['prefix'][i],objname=cat['objname'][i], vfid=cat['VFID'][i], vfid_v1=cat['VFID_V1'][i], band=3) 
+        num_rows = int(g.ncomp)   
+        for i in range(0,num_rows):
+            full_sample_table.add_row(np.zeros(len(dtype)))
         
-        one_gal_table = Table(names=header,dtype=[str,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float])
-        
-        if convflag == 1:
-            g.outimage = str(g.galname)+str(g.band)+'-'+str(g.ncomp)+'Comp-galfit-out-conv.fits'
-        
-        param_rows = g.parse_galfit()
-        
-        for n in param_rows:
-            if 'index' in n[0]:
-                print('external ID not in vf catalog')
-            else:
-                full_sample_table.add_row(n)
-                one_gal_table.add_row(n)
-        
-        if int(convflag) == 1:
-            one_gal_table.write(galfit_dir+g.objname+'/output_params_'+band+'_psf.fits',format='fits',overwrite=True)
-        if int(convflag) == 0:
-            one_gal_table.write(galfit_dir+g.objname+'/output_params_'+band+'_nopsf.fits',format='fits',overwrite=True)
+        #if path exists (os.path.exists() returns True), then galaxy directory exists...
+        #helpful for testing purposes
+        if os.path.exists('/mnt/astrophysics/rfinn/muchogalfit_output/'+cat['objname'][i]):
             
-        band=g.band  
+            one_gal_table = Table(names=header,dtype=[str,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float])
+
+            if convflag == 1:
+                g.outimage = str(g.galname)+str(g.band)+'-'+str(g.ncomp)+'Comp-galfit-out-conv.fits'
+
+            param_rows = g.parse_galfit()
+
+            for n in range(0,len(param_rows)):
+                
+                '''FUNCTIONALITY EXAMPLE: if ncomp=2, then there should be 2 additional zero rows for ith galaxy, appended at the bottom of the table. 
+                Beginning with n=1 (central galaxy), its corresponding zeroth row will be at index tab_length - (n-1), 
+                where the additional -1 is to accommodate the length being #, but the last index being #-1. Silly python.
+                We replace that row of zeros with the output parameters, if the galaxy output directory exists, then proceed to the n=2 galaxy. repeat.'''
+                
+                current_table_length = len(full_table_sample)
+                zeroth_row_index = current_table_length-(n-1)
+                zeroth_row_index = int(zeroth_row_index)
+                #repopulate row at this index with n
+                full_table_sample[zeroth_row_index] = n
+                #no need for such trickery with the central galaxy table...simply add the row
+                one_gal_table.add_row(n)
+                    
+            #write table of central (+external, if any) galaxy parameters in directory
+            if int(convflag) == 1:
+                one_gal_table.write(galfit_dir+g.objname+'/output_params_'+band+'_psf.fits',format='fits',overwrite=True)
+            if int(convflag) == 0:
+                one_gal_table.write(galfit_dir+g.objname+'/output_params_'+band+'_nopsf.fits',format='fits',overwrite=True)
+            
+            
+            index=len(full_table_sample)-1
+            
+            
+    band=g.band  
         
-    print(t)            
+    print(full_sample_table)
+    for i in full_sample_table['galname']:
+        if 'index' in i:
+            print('external ID not in vf catalog, removed')
+            full_sample_table.remove_row(np.where(full_sample_table['galname']==i)[0])
+            
     if int(convflag) == 1:
-        t.write(galfit_dir+'output_params_'+band+'_psf.fits', format='fits', overwrite=True)
+        full_sample_table.write(galfit_dir+'output_params_'+band+'_psf.fits', format='fits', overwrite=True)
     if int(convflag) == 0:
-        t.write(galfit_dir+'output_params_'+band+'_nopsf.fits',format='fits',overwrite=True)
+        full_sample_table.write(galfit_dir+'output_params_'+band+'_nopsf.fits',format='fits',overwrite=True)
       
     
 
