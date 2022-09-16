@@ -20,10 +20,11 @@ from astropy.io import fits
 
 #have to call sample
 homedir = os.getenv("HOME")
-galfit_dir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
-cat = Table.read(homedir+'/sgacut_coadd.fits')
-dummycat = Table.read(homedir+'/dummycat.fits')
-vf = Table.read(homedir+'/vf_v2_main.fits')
+mnt_cat_path = '/mnt/astrophysics/muchogalfit-input-cats/'
+galfit_output_dir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+cat = Table.read(mnt_cat_path+'sgacut_coadd.fits')
+dummycat = Table.read(mnt_cat_path+'dummycat.fits')
+vf = Table.read(mnt_cat_path+'vf_v2_main.fits')
 
 header = ['galname','xc','xc_err','yc','yc_err','mag','mag_err','re','re_err','nsersic','nsersic_err','BA','BA_err','PA','PA_er','sky','sky_err','err_flag','chi2nu','central_flag']
     
