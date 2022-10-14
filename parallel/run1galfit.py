@@ -37,6 +37,9 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 
 ### FUNCTIONS
 def funpack_image(input,output,nhdu=1):
+    command = 'funpack -O {} {}'.format(output,input)
+    os.system(command)
+def funpack_image_astropy(input,output,nhdu=1):
     from astropy.io import fits
     hdu = fits.open(input)
     print('input file = ',input)
