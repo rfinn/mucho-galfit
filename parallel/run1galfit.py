@@ -134,7 +134,7 @@ def write_galfit_input(galdir, output_dir, ra, dec, bandpass, firstpass=True):
         
         # funpack the .fz images so galfit can read them
         # save them in output_dir
-        funpack_image(os.path.join(galdir,image),funpacked_image)
+        funpack_image(os.path.join(galdir,image),os.path.join(galdir,image.replace('.fz',''))
         funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
 
     # get information from the image, like the image size and position of gal
