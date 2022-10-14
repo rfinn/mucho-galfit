@@ -43,6 +43,7 @@ def funpack_image(input,output,nhdu=1):
     #print(hdu.info())
     fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
     hdu.close()
+    print('finished unpacking image')
     
 def parse_galfit_output(galfit_outimage):
     from astropy.io import fits
