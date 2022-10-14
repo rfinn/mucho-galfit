@@ -142,17 +142,18 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         # save them in output_dir
         funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
         funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
-
+        # unpack invvar image
+        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
     # get information from the image, like the image size and position of gal
     image = image.replace('.fz','')
     psf_image = psf_image.replace('.fz','')
-                  
+    invvar_image = invvar_image.replace('.fz','')
     # prepend output directory to all images
 
     
     # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
-    invvar_image = galdir+'/'+invvar_image    
+    invvar_image = output_dir+'/'+invvar_image    
     if not os.path.exists(sigma_image):
         convert_invvar_noise(invvar_image,sigma_image)
     sigma_image = os.path.basename(sigma_image)
