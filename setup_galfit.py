@@ -29,5 +29,6 @@ for i in range(len(finalcat)):
     sourcefile = galpath+'/VFID{}sourcelist'.format(finalcat['VFID'][i])
     sourcelist = open(sourcefile,'w')
     # write out one line with VFID, objname, RA, DEC, wavelength
-
+    output_string = ' \n'.format()
+    sourcelist.write(output_string)
     sourcelist.close()
