@@ -271,7 +271,7 @@ if __name__ == '__main__':
     os.chdir(output_dir)
 
     # read in input file to get galname, objname, ra, dec, and bandpass
-    sourcefile = open(galname+'sourcelist')
+    sourcefile = open(galname+'sourcelist','r')
     galaxies = sourcefile.readlines()
     if len(galaxies) > 1:
         # set the flag to have more than one galaxy in the galfit input file
