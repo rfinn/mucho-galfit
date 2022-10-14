@@ -256,7 +256,7 @@ if __name__ == '__main__':
     # TODO: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
     topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
-    os.chdir()
+    os.chdir(topdir)
     
     # take as input the galaxy name
     galname = sys.argv[1]
