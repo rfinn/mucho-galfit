@@ -91,8 +91,8 @@ def convert_invvar_noise(invvar_image, noise_image):
     # read in invvar image
     print('invvar image = ',invvar_image, os.path.basename(invvar_image))
     hdu = fits.open(invvar_image)
-    data = hdu[1].data
-    header = hdu[1].header
+    data = hdu[0].data
+    header = hdu[0].header
     hdu.close()
     # operate on pixels to take sqrt(1/x)
     noise_data = np.sqrt(1/data)
