@@ -13,12 +13,14 @@ This should be run from a directory that contains
 - noise image
 
 To run:
-python ~/github/virgowise/run1galfit.py galdir bandpass
+python ~/github/virgowise/run1galfit.py galname
 
-This assumes that the galfit input file starts with galname and ends with input
+- galname should be the VFID and should correspond to the subdirectories in 
+/mnt/astrophysics/rfinn/muchogalfit-output (grawp directory)
 
-Each galaxy goes in its own folder, and the parallel program 
-will move to each folder and run this script
+/mnt/astrophysics/muchogalfit-output (how directory is mounted on virgo vms)
+
+- each subdirectory has an input file that is created by setup_galfit.py
 
 '''
 import os
@@ -103,7 +105,17 @@ def get_image_size(image):
     data_shape = data.shape
     return data_shape
 
-def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
+def get_xy_from_wcs(ra,dec,image):
+    from astropy.io import fits
+    from astropy.wcs import WCS
+    from astropy.coordinates import SkyCoord
+    header = fits.getheader(image)
+    w = WCS(header)
+    c = SkyCoord(ra,dec,unit='deg',frame='icrs')
+    xobj,yobj = w.world_to_pixel(c)
+    return xobj,yobj
+
+def write_galfit_input(galdir, output_dir, ra, dec, bandpass, firstpass=True):
     galname = os.path.basename(galdir)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
     invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
@@ -117,17 +129,20 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
         output_image = f'{galname}-{bandpass}-out2.fits'    
 
     
+    if firstpass:
 
-    # funpack the .fz images so galfit can read them
-    # save them in output_dir
+        
+        # funpack the .fz images so galfit can read them
+        # save them in output_dir
+        funpack_image(os.path.join(galdir,image),funpacked_image)
+        funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
 
-    funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
-    funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
+    # get information from the image, like the image size and position of gal
+    image = image.replace('.fz','')
+    psf_image = psf_image.replace('.fz','')
                   
     # prepend output directory to all images
 
-    image = image.replace('.fz','')
-    psf_image = psf_image.replace('.fz','')
     
     # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
@@ -147,8 +162,20 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     # TODO: need to get xmaxfit,ymaxfit
 
     # TODO: need to get (x,y) center of object
-    # read in image header and convert RA, DEC to xpixel,ypixel
+
+    # make of values for xminfit, etc for now
+    # get image size
     
+    xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
+    print('image dimensions = ',xmax,ymax)
+    xminfit = 1
+    xmaxfit = xmax 
+    yminfit = 1
+    ymaxfit = ymax
+    
+    if firstpass:
+        # read in image header and convert RA, DEC to xpixel,ypixel
+        xobj, yobj = get_xy_from_wcs(ra,dec,image)
 
     if firstpass:
         BA=1
@@ -174,16 +201,6 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
         fitmag = 1
         fitrad = 1
         # get convolution size - set to cutout size?
-    # make of values for xminfit, etc for now
-    # get image size
-    xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
-    print('image dimensions = ',xmax,ymax)
-    xminfit = 1
-    xmaxfit = xmax 
-    yminfit = 1
-    ymaxfit = ymax
-    xobj = int(xmaxfit/2)
-    yobj = int(ymaxfit/2)
     # TODO: need to decide on the right size for this
     # Chien had recommended the full image, but we could do something like 8-10x pixel size
     # a smaller convolution size should make galfit run faster
@@ -238,43 +255,55 @@ if __name__ == '__main__':
 
     # TODO: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
+    topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+    os.chdir()
+    
+    # take as input the galaxy name
+    galname = sys.argv[1]
 
-    topdir = os.getcwd()
-    
-    # TODO: take as input the galaxy directory
-    # directory of galaxy to work with, this will be 100/NGC2722A for example
-    galdir = sys.argv[1]
-
-    # wavelength of images, like W3
-    bandpass = sys.argv[2]
-    
-    # fix this later when we figure how to extract two columns from data directory file
-    galname = galdir.split('/')[1] # or pass VFID on second
-    
-    output_dir = '/mnt/astrophysics/rfinn/muchogalfit-output/'+galname+'/'
+    # move to muchogalfit-output directory
+    output_dir = topdir+galname+'/'
     if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-
-    os.chdir(output_dir)
-                      
+        print('WARNING: {} does not exist\n Be sure to run setup_galfit.py first')
+        os.chdir(topdir)
+        sys.exit()
     
+    os.chdir(output_dir)
+
+    # read in input file to get galname, objname, ra, dec, and bandpass
+    sourcefile = open(galname+'sourcelist')
+    galaxies = sourcefile.readlines()
+    if len(galaxies) > 1:
+        # set the flag to have more than one galaxy in the galfit input file
+        multiflag = True
+    elif len(galaxies) == 1:
+        multiflag = False
+    else:
+        print('Problem reading sourcelist for {}'.format(galname))
+        print('Please check the setup directory')
+        os.chdir(topdir)
+        sys.exit()
+
+    # parse information from file
+    vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
+    ra = float(ra)
+    dec = float(dec)
+    
+
     # set up path name for image directory
     # directory where galaxy images are
-    data_dir = '/mnt/astrophysics/virgofilaments-data/'+galdir
+    data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}/'.format(int(ra),objname)
 
 
 
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
-
-    write_galfit_input(data_dir, output_dir, bandpass)
+    write_galfit_input(data_dir, output_dir, ra, dec, bandpass)
+    
     # code to run galfit
-    os.chdir(output_dir)
     print('running galfit')
     os.system(f"galfit galfit.input1")
 
-
     # TODO: read galfit output, and create new input to run with convolution
-
     write_galfit_input(data_dir, output_dir, bandpass, firstpass=False)
 
     print('running galfit second time')
