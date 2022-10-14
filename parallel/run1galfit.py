@@ -88,7 +88,7 @@ def convert_invvar_noise(invvar_image, noise_image):
     from astropy.io import fits
     import numpy as np
     # read in invvar image
-    print('invvar image = ',invvar_image)
+    print('invvar image = ',invvar_image, os.path.basename(invvar_image))
     hdu = fits.open(invvar_image)
     data = hdu[1].data
     header = hdu[1].header
