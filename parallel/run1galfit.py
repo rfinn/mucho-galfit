@@ -40,7 +40,7 @@ def funpack_image(input,output,nhdu=1):
     from astropy.io import fits
     hdu = fits.open(input)
     print('input file = ',input)
-    print(hdu.info())
+    #print(hdu.info())
     fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
     hdu.close()
     
@@ -117,7 +117,7 @@ def get_xy_from_wcs(ra,dec,image):
 
 def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass=True):
     galname = objname
-    print('inside write_galfit_input: ',galdir,galname)
+    #print('inside write_galfit_input: ',galdir,galname)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
     invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
     psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
