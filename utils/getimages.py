@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# THIS PROGRAM IS NOT NEEDED BECAUSE JOHN M. MOVED THE IMAGES TO SIENA!!!
+
 def getlegacy(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makeplots=False,subfolder=None):
     """
     Download legacy image for a particular ra, dec
@@ -8,7 +10,7 @@ def getlegacy(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makeplots=Fal
     * ra
     * dec
     * galid = galaxy id (e.g. VFID0001); used for naming the image files
-    * imsize = size of cutout in pixels
+    * imsize = size of cutout in pixe ls
     * band = filter for the fits images that will be returned.  e.g. 'g' or 'r' or 'z'. 
     * pixscale = pixel scale of cutout in arcsec; native is 0.262 for legacy
     * makeplots = boolean, generate plot of image

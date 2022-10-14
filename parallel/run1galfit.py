@@ -147,6 +147,7 @@ def write_galfit_input(galdir, output_dir, bandpass, firstpass=True):
     # TODO: need to get xmaxfit,ymaxfit
 
     # TODO: need to get (x,y) center of object
+    # read in image header and convert RA, DEC to xpixel,ypixel
     
 
     if firstpass:
