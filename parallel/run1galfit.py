@@ -115,8 +115,9 @@ def get_xy_from_wcs(ra,dec,image):
     xobj,yobj = w.world_to_pixel(c)
     return xobj,yobj
 
-def write_galfit_input(galdir, output_dir, ra, dec, bandpass, firstpass=True):
+def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass=True):
     galname = os.path.basename(galdir)
+    print('inside write_galfit_input: ',galdir,galname)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
     invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
     psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
@@ -297,14 +298,14 @@ if __name__ == '__main__':
 
 
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
-    write_galfit_input(data_dir, output_dir, ra, dec, bandpass)
+    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass)
     
     # code to run galfit
     print('running galfit')
     os.system(f"galfit galfit.input1")
 
     # TODO: read galfit output, and create new input to run with convolution
-    write_galfit_input(data_dir, output_dir, bandpass, firstpass=False)
+    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, firstpass=False)
 
     print('running galfit second time')
     os.system(f"galfit galfit.input2")
