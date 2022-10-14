@@ -116,7 +116,7 @@ def get_xy_from_wcs(ra,dec,image):
     return xobj,yobj
 
 def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass=True):
-    galname = os.path.basename(galdir)
+    galname = objname
     print('inside write_galfit_input: ',galdir,galname)
     image = f'{galname}-custom-image-{bandpass}.fits.fz'
     invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
