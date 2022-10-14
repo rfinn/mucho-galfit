@@ -36,8 +36,9 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 # TODO: set up a dictionary for the radius to use for the first guess of the sersic profile
 
 ### FUNCTIONS
-def funpack_image(input,output,nhdu=1):
+def funpack_image_command(input,output,nhdu=1):
     command = 'funpack -O {} {}'.format(output,input)
+    print(command)
     os.system(command)
 def funpack_image_astropy(input,output,nhdu=1):
     from astropy.io import fits
