@@ -35,13 +35,13 @@ finalcat = matched_table[sampleflag]
 # for each galaxy, create a directory and write sourcelist
 for i in range(len(finalcat)):
     
-    galpath = '/mnt/astrophysics/muchogalfit-output/VFID'+finalcat['VFID'][i]
+    galpath = '/mnt/astrophysics/muchogalfit-output/'+finalcat['VFID'][i]
     os.mkdir(galpath)
 
-    sourcefile = galpath+'/VFID{}sourcelist'.format(finalcat['VFID'][i])
+    sourcefile = galpath+'/{}sourcelist'.format(finalcat['VFID'][i])
     sourcelist = open(sourcefile,'w')
     
     # write out one line with VFID, objname, RA, DEC, wavelength
-    output_string = finalcat['VFID'][i] + ' ' + finalcat['objname'][i] + ' ' + finalcat['RA'][i] + ' ' + finalcat['DEC'][i] + ' ' + str(wavelength) + ' \n'.format()
+    output_string = finalcat['VFID'][i] + ' ' + finalcat['objname'][i] + ' ' + str(finalcat['RA_1'][i]) + ' ' + str(finalcat['DEC_1'][i]) + ' ' + str(wavelength) + ' \n'.format()
     sourcelist.write(output_string)
     sourcelist.close()
