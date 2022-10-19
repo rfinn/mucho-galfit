@@ -15,7 +15,7 @@ wavelength = sys.argv[1]
 from astropy.table import Table
 
 # filepath which contains VF tables 
-filepath = 'mnt/astrophysics/muchogalfit-input-cats/'
+filepath = '/mnt/astrophysics/muchogalfit-input-cats/'
 
 
 # read in the main table
