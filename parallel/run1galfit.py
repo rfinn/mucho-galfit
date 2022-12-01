@@ -263,8 +263,11 @@ if __name__ == '__main__':
     # TODO: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
     topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
-    os.chdir(topdir)
-    
+    try:
+        os.chdir(topdir)
+    except FileNotFoundError: # assuming that we are running on virgo vms
+        topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+        os.chdir(topdir)
     # take as input the galaxy name
     galname = sys.argv[1]
 
