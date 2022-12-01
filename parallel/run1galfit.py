@@ -180,11 +180,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     yminfit = 1
     ymaxfit = ymax
     
-    if firstpass:
-        # read in image header and convert RA, DEC to xpixel,ypixel
-        xobj, yobj = get_xy_from_wcs(ra,dec,image)
+    #if firstpass:
+    #    # read in image header and convert RA, DEC to xpixel,ypixel
+    
 
     if firstpass:
+        xobj, yobj = get_xy_from_wcs(ra,dec,image)
         BA=1
         fitBA = 1
         PA=0
@@ -207,11 +208,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitn = 1
         fitmag = 1
         fitrad = 1
+        xobj, yobj = xc, yc
         # get convolution size - set to cutout size?
     # TODO: need to decide on the right size for this
     # Chien had recommended the full image, but we could do something like 8-10x pixel size
     # a smaller convolution size should make galfit run faster
-    convolution_size = xobj
+    convolution_size = xmaxfit
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
