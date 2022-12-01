@@ -266,7 +266,7 @@ if __name__ == '__main__':
     try:
         os.chdir(topdir)
     except FileNotFoundError: # assuming that we are running on virgo vms
-        topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+        topdir = '/mnt/astrophysics/muchogalfit-output/'
         os.chdir(topdir)
     # take as input the galaxy name
     galname = sys.argv[1]
