@@ -5,7 +5,12 @@ GOAL:
 * This will create a bash script to run multiple serial jobs in parallel using slurms array option
 
 USAGE:
+* when logging into grawp
+  module load Python3
+
 * Run this in the output directory that has a subfolder for each galaxy.
+  /mnt/astrophysics/rfinn/muchogalfit-output
+
 * Try running this once and check the output of the JOB_{}.sh script.
 * If it looks good, run again using the --submit flag to submit the script to slurm.
 
@@ -91,7 +96,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--wavelength',
                     dest='wavelength',
                     default='W3',
-                    options = ['W3'],
+                    #options = ['W3'],
                     help='Wavelength of images to analyze')
 
 parser.add_argument('--submit',
@@ -104,7 +109,10 @@ args = parser.parse_args()
 ###########################################################
 cwd = os.getcwd()
 
+# what is this directory???
 data_dir = f"{HOME}/research/wisesize/"
+
+# this is the name of the shell script that will be created
 script_id = f"VFIDall-{args.wavelength}"
 
 print('data_dir = ', data_dir)
@@ -113,9 +121,13 @@ print('script_id = ', script_id)
 print()
 os.chdir(data_dir)
 
-# this assumes that the data directory 
+# this assumes that the data directory has a file called Dirs.txt
+#
+# Dirs.txt contains one line for each galaxy that will be analyzed.
+#
+
 outfile = "Dirs.txt"
-os.system(f"ls -d VFID???? > {outfile}")
+os.system(f"ls -d VFID00?? > {outfile}")
 # count lines - need to give number of galaxies to slurm b/c this is equal to number of processes
 infile = open(outfile, 'r')
 nfiles = (len(infile.readlines()))
