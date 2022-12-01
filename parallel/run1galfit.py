@@ -192,9 +192,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitPA = 1
         nsersic=2
         fitn = 1
-        mag=14
+        mag=12
         fitmag = 1
-        rad = 5
+        rad = 10
         fitrad = 1
         sky = 0
     else:
