@@ -116,6 +116,10 @@ cwd = os.getcwd()
 
 # what is this directory???
 data_dir = f"{HOME}/research/wisesize/"
+# this is the directory that has a subdirectory for each galaxy
+# the following is the directory that grawp sees (remove rfinn if running on virgo)
+data_dir = "/mnt/astrophysics/rfinn/muchogalfit-output/"
+
 
 # this is the name of the shell script that will be created
 script_id = f"VFIDall-{args.wavelength}"
