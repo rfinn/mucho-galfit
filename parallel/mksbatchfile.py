@@ -142,11 +142,18 @@ infile = open(outfile, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
+print(f"\nthe number of lines in Dirs.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
 input_file = "Dirs.txt"
-write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, wavelength=args.wavelength,
-             submit=args.submit)
+
+# set sample size to 10 galaxies for testing
+
+if args.testsample:
+    nfiles=10
+    
+write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, \
+                 wavelength=args.wavelength,submit=args.submit)
 
 os.chdir(cwd)
