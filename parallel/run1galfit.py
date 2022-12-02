@@ -282,6 +282,11 @@ if __name__ == '__main__':
     
     os.chdir(output_dir)
 
+    # define environment variable to funpack can find the correct variables
+    os.environ["LD_LIBRARY_PATH"]="/opt/ohpc/pub/compiler/gcc/9.4.0/lib64:/home/siena.edu/rfinn/software/cfitsio-4.2.0/"
+
+
+    
     # read in input file to get galname, objname, ra, dec, and bandpass
     sourcefile = open(galname+'sourcelist','r')
     galaxies = sourcefile.readlines()
