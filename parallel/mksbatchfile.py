@@ -69,7 +69,7 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
         
     output += s
     output += "#\n"
-    output += f"python {HOME}/github/mucho-galfit/parallel/run1galfit.py $LINE {wavelength}\n"
+    output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfit.py $LINE {wavelength}\n"
 
     outfname = f"JOB_{script_id}.sh"
 
