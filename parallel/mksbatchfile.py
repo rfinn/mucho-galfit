@@ -54,8 +54,9 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "module load Python3\n"
     # print version of typing-extensions
     output += "pip3 list |grep typing"
-    output += "yes Y | pip3 uninstall typing-extensions\n"
-    output += "yes Y | pip3 install typing-extensions==4.0.1\n"    
+    #output += "yes Y | pip3 uninstall typing-extensions\n"
+    output += "yes Y | pip3 install typing-extensions==4.0.1\n"
+    output += "pip3 list |grep typing"    
     output += "module load gnu9\n"
     output += "\n"
     output += "# Move to the directory needed - defaults to the submission directory\n"
