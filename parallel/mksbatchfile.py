@@ -99,6 +99,11 @@ parser.add_argument('--wavelength',
                     #options = ['W3'],
                     help='Wavelength of images to analyze')
 
+parser.add_argument('--testsample',
+                    dest='testsample',
+                    default=False,
+                    action='store_true',
+                    help='Set this option to submit a script with a test sample of 10 galaxies to slurm. Default is false. You can check output JOB_{scriptid}.sh.  If everything looks good, then add submit flag.')
 parser.add_argument('--submit',
                     dest='submit',
                     default=False,
