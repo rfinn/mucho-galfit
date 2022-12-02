@@ -55,10 +55,10 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     # print version of typing-extensions
     #output += "pip3 list |grep typing"
     #output += "echo"
-    output += "printenv"
+    #output += "printenv"
     #output += "yes Y | pip3 uninstall typing-extensions\n"
     output += "pip3 install typing-extensions==4.0.1\n"
-    output += "pip3 list |grep typing"    
+    output += "pip3 list |grep typing \n"    
     output += "module load gnu9\n"
     output += "\n"
     output += "# Move to the directory needed - defaults to the submission directory\n"
