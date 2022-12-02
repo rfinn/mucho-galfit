@@ -158,7 +158,7 @@ input_file = "Dirs.txt"
 # set sample size to 10 galaxies for testing
 
 if args.testsample:
-    nfiles=5
+    nfiles=10
     print(f"\nSetting number of jobs to {nfiles} for testing.\n")
     
 write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, \
