@@ -305,6 +305,9 @@ if __name__ == '__main__':
     vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
     ra = float(ra)
     dec = float(dec)
+
+    # reset bandpass to the wavelength that is passed in from the command line
+    bandpass = sys.argv[2]
     
 
     # set up path name for image directory
