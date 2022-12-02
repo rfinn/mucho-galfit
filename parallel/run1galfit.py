@@ -190,7 +190,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitBA = 1
         PA=0
         fitPA = 1
-        nsersic=2
+        nsersic=1
         fitn = 1
         mag=12
         fitmag = 1
@@ -318,7 +318,9 @@ if __name__ == '__main__':
     # TODO: read galfit output, and create new input to run with convolution
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, firstpass=False)
 
-    print('running galfit second time')
-    os.system(f"galfit galfit.input2")
+    # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
+    # TODO: make sure I am using the correct PSF images
+    #print('running galfit second time')
+    #os.system(f"galfit galfit.input2")
     
     os.chdir(topdir)
