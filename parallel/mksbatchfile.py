@@ -136,7 +136,7 @@ os.chdir(data_dir)
 #
 
 outfile = "Dirs.txt"
-os.system(f"ls -d VFID00?? > {outfile}")
+os.system(f"ls -d VFID???? > {outfile}")
 # count lines - need to give number of galaxies to slurm b/c this is equal to number of processes
 infile = open(outfile, 'r')
 nfiles = (len(infile.readlines()))
