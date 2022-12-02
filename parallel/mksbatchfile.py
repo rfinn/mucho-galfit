@@ -53,8 +53,8 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "# Load any environmental modules needed\n"
     output += "module load Python3\n"
     # print version of typing-extensions
-    output += "pip3 list |grep typing"
-    output += "echo"
+    #output += "pip3 list |grep typing"
+    #output += "echo"
     output += "printenv"
     #output += "yes Y | pip3 uninstall typing-extensions\n"
     output += "pip3 install typing-extensions==4.0.1\n"
@@ -158,7 +158,7 @@ input_file = "Dirs.txt"
 # set sample size to 10 galaxies for testing
 
 if args.testsample:
-    nfiles=10
+    nfiles=20
     print(f"\nSetting number of jobs to {nfiles} for testing.\n")
     
 write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, \
