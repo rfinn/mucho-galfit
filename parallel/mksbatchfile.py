@@ -152,6 +152,7 @@ input_file = "Dirs.txt"
 
 if args.testsample:
     nfiles=10
+    print("\nSetting number of jobs to 10 for testing.\n")
     
 write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, \
                  wavelength=args.wavelength,submit=args.submit)
