@@ -29,11 +29,13 @@ import sys
 import numpy as np
 ### DICTIONARIES
 
-pixel_scale = {'FUV':2.5,'NUV':2.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.5,'W2':2.5,'W3':2.5,'W4':2.5}
+pixel_scale = {'FUV':1.5,'NUV':1.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.75,'W2':2.75,'W3':2.75,'W4':2.75}
 psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':1}
 mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
+image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
 
-# TODO: set up a dictionary for the radius to use for the first guess of the sersic profile
+# set up a dictionary for the radius to use for the first guess of the sersic profile
+# a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
 
 ### FUNCTIONS
 def funpack_image(input,output,nhdu=1):
@@ -149,15 +151,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     psf_image = psf_image.replace('.fz','')
     invvar_image = invvar_image.replace('.fz','')
     # prepend output directory to all images
-
-    
-    # check if noise image exists, if not make it from invvar
     sigma_image = output_dir+'/'+sigma_image
-    invvar_image = output_dir+'/'+invvar_image    
+    invvar_image = output_dir+'/'+invvar_image
+    # check if noise image exists, if not make it from invvar    
     if not os.path.exists(sigma_image):
         convert_invvar_noise(invvar_image,sigma_image)
     sigma_image = os.path.basename(sigma_image)
-
 
         
     psf_sampling = psf_oversampling[bandpass]
@@ -166,13 +165,14 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     
     # TODO: add mask to galfit input
 
-    # TODO: need to get xmaxfit,ymaxfit
 
-    # TODO: need to get (x,y) center of object
+
+    
 
     # make of values for xminfit, etc for now
     # get image size
-    
+
+    # TODO: need to get xmaxfit,ymaxfit
     xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
     print('image dimensions = ',xmax,ymax)
     xminfit = 1
@@ -185,18 +185,22 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     
 
     if firstpass:
+        # DONE: need to get (x,y) center of object
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
         BA=1
         fitBA = 1
         PA=0
         fitPA = 1
-        nsersic=1
+        nsersic=2
         fitn = 1
         mag=12
         fitmag = 1
-        rad = 10
-        fitrad = 1
         sky = 0
+        # set initial guess to 25 arcsec,
+        # and translate into pixels based on pixelscale of bandpass 
+        rad = 25/pixel_scale[bandpass]
+        fitrad = 1
+
     else:
         # read in output from first pass run of galfit
         t = parse_galfit_output(output_image.replace('out2','out1'))
@@ -210,10 +214,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitrad = 1
         xobj, yobj = xc, yc
         # get convolution size - set to cutout size?
-    # TODO: need to decide on the right size for this
-    # Chien had recommended the full image, but we could do something like 8-10x pixel size
-    # a smaller convolution size should make galfit run faster
-    convolution_size = xmaxfit
+    # TODO: need to decide on the right size for convolution - could be 2x image size?
+    # Chien had recommended the full image, but a smaller convolution size should make galfit run faster
+
+    # galfit website FAQ says 40-80 x PSF seeing disk
+    # see: https://users.obs.carnegiescience.edu/peng/work/galfit/TFAQ.html#convbox
+    convolution_size = int(image_resolution[bandpass]/pixel_scale[bandpass]*50)
     if firstpass:
         outfile = open('galfit.input1','w')
     else:
@@ -262,7 +268,7 @@ if __name__ == '__main__':
     
     # run this from /mnt/astrophysics
 
-    # TODO: move galfit output to a new destination
+    # DONE: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
     topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
     try:
@@ -306,6 +312,8 @@ if __name__ == '__main__':
     ra = float(ra)
     dec = float(dec)
 
+    # TODO - just a test todo
+    
     # reset bandpass to the wavelength that is passed in from the command line
     bandpass = sys.argv[2]
     
