@@ -193,12 +193,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitPA = 1
         nsersic=2
         fitn = 1
-        mag=12
+        mag=7
         fitmag = 1
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
-        rad = 25/pixel_scale[bandpass]
+        rad = 15/pixel_scale[bandpass]
         fitrad = 1
 
     else:
