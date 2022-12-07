@@ -241,6 +241,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     outfile.write('S) 0                   # Modify/create objects interactively?\n')
     outfile.write(' \n')
     # write object
+    # github test
     outfile.write('# Object number: 1 \n')
     outfile.write(' 0) sersic             # Object type \n')
     outfile.write(' 1) %8.1f  %8.1f 1 1  # position x, y        [pixel] \n'%(xobj,yobj))
