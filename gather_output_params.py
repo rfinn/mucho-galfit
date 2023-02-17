@@ -191,10 +191,10 @@ if __name__ == '__main__':
         
     print(full_sample_table)
     #remove 'external' galaxies without VFIDs, assuming I am using my dummy catalog
-    for i in full_sample_table['galname']:
+    for i in full_sample_table['VFID']:
         if 'index' in i:
             print('external ID not in vf catalog, removed')
-            full_sample_table.remove_row(np.where(full_sample_table['galname']==i)[0])
+            full_sample_table.remove_row(np.where(full_sample_table['VFID']==i)[0])
             
     if int(convflag) == 1:
         full_sample_table.write(galfit_dir+'output_params_'+band+'_psf.fits', format='fits', overwrite=True)
