@@ -26,7 +26,7 @@ dummycat = Table.read(mnt_cat_path+'dummycat.fits')
 vf = Table.read(mnt_cat_path+'vf_v2_main.fits')
 
 
-header = ['galname','xc','xc_err','yc','yc_err','mag','mag_err','re','re_err','nsersic','nsersic_err','BA','BA_err','PA','PA_er','sky','sky_err','err_flag','chi2nu','central_flag']
+header = ['VFID','xc','xc_err','yc','yc_err','mag','mag_err','re','re_err','nsersic','nsersic_err','BA','BA_err','PA','PA_er','sky','sky_err','err_flag','chi2nu','central_flag']
     
 
 class output_galaxy:
@@ -131,12 +131,10 @@ if __name__ == '__main__':
     full_sample_table = Table(names=header,dtype=dtype)
     
     convflag = input('conv? enter 0 (n) or 1 (y): ')
-    #band = input('band? enter W1-4, r for r-band: ')
+    band = input('band? enter W1-4, r for r-band: ')
 
     #for every galaxy in the VF subsample catalog...
-    for i in range(len(cat)):
-
-        
+    for i in range(len(cat)):        
         
         #add row of zeros for ith central galaxy (and each "off-centered" sersic object, if applicable)
         g = output_galaxy(galname=cat['prefix'][i],objname=cat['objname'][i], vfid=cat['VFID'][i], vfid_v1=cat['VFID_V1'][i], band='W3') 
@@ -192,6 +190,7 @@ if __name__ == '__main__':
     band=g.band  
         
     print(full_sample_table)
+    #remove 'external' galaxies without VFIDs, assuming I am using my dummy catalog
     for i in full_sample_table['galname']:
         if 'index' in i:
             print('external ID not in vf catalog, removed')
