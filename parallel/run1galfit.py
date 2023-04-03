@@ -183,16 +183,16 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     # have updated mask wrapper in halpha gui
     maskfound = False
     mask_image = get_maskname(image)
-    print()
-    print(f"mask name = {mask_image}")
-    print()
-    print(f"cwd = {os.getcwd()}")
-    print()
-    print(f"listdir = {os.listdir()}")
-    print()
+    #print()
+    #print(f"mask name = {mask_image}")
+    #print()
+    #print(f"cwd = {os.getcwd()}")
+    #print()
+    #print(f"listdir = {os.listdir()}")
+    #print()
     if os.path.exists(mask_image):
         maskfound = True
-        print("found a mask - will implement masking in galfit")
+        print(f"found mask {mask_image}.  Will implement masking in galfit")
     else:
         print()
         print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
@@ -360,7 +360,7 @@ if __name__ == '__main__':
     print('running galfit')
     os.system(f"galfit galfit.input1")
 
-    """
+
     # TODO: read galfit output, and create new input to run with convolution
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, firstpass=False)
 
@@ -368,5 +368,5 @@ if __name__ == '__main__':
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
     os.system(f"galfit galfit.input2")
-    """
+
     os.chdir(topdir)
