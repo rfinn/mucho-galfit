@@ -185,6 +185,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     mask_image = get_maskname(image)
     print()
     print(f"mask name = {mask_image}")
+    print()
+    print(f"cwd = {os.getcwd()}")
+    print()
     if os.path.exists(mask_image):
         maskfound = True
         print("found a mask - will implement masking in galfit")
