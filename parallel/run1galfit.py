@@ -135,7 +135,7 @@ def get_maskname(image):
     llist = ['image-g','image-r','image-z']
     for l in llist:
         if l in image:
-            maskname = image.replace(l+".fits","r-mask.fits")
+            maskname = image.replace(l+".fits","image-r-mask.fits")
             return maskname
         
 def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass=True):
@@ -187,6 +187,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     print(f"mask name = {mask_image}")
     print()
     print(f"cwd = {os.getcwd()}")
+    print()
+    print(f"listdir = {os.listdir()}")
     print()
     if os.path.exists(mask_image):
         maskfound = True
