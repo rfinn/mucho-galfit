@@ -186,7 +186,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     if os.path.exists(mask_image):
         maskfound = True
         print("found a mask - will implement masking in galfit")
-
+    else:
+        print("no mask found - will NOT implement masking in galfit")
     # make of values for xminfit, etc for now
     # get image size
 
