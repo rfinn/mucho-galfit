@@ -358,6 +358,7 @@ if __name__ == '__main__':
     print('running galfit')
     os.system(f"galfit galfit.input1")
 
+    """
     # TODO: read galfit output, and create new input to run with convolution
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, firstpass=False)
 
@@ -365,5 +366,5 @@ if __name__ == '__main__':
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
     os.system(f"galfit galfit.input2")
-    
+    """
     os.chdir(topdir)
