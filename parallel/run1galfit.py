@@ -183,11 +183,15 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     # have updated mask wrapper in halpha gui
     maskfound = False
     mask_image = get_maskname(image)
+    print()
+    print(f"mask name = {mask_image}")
     if os.path.exists(mask_image):
         maskfound = True
         print("found a mask - will implement masking in galfit")
     else:
+        print()
         print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+        print()
     # make of values for xminfit, etc for now
     # get image size
 
