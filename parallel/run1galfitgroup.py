@@ -47,6 +47,7 @@ pixel_scale = {'FUV':1.5,'NUV':1.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.75,'W2':
 psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':1}
 mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
 image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
+minmag2fit = {'FUV':10,'NUV':10,'g':18,'r':18,'z':18,'W1':10,'W2':10,'W3':10,'W4':10}
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
@@ -229,7 +230,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     psf_sampling = psf_oversampling[bandpass]
     pscale = pixel_scale[bandpass]
     magzp = mag_zeropoint[bandpass]
-    
+    minmag = minmag2fit[bandpass]    
     # TODO: add mask to galfit input
     # have updated mask wrapper in halpha gui
     maskfound = False
@@ -339,7 +340,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
             elif line.startswith('3)'):# check if mag is too faint, then don't fit for new parameters
                 t = line.split()
                 # check the magnitude returned from no covolution
-                if float(t[1] > 10):
+                if float(float(t[1]) > minmag):
                     # set all parameters to fixed
                     holdfixed=True
                     outfile.write(line.replace(' 1 ',' 0 '))
