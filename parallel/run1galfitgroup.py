@@ -2,9 +2,15 @@
 
 '''
 GOAL: 
-- this program will run galfit on one galaxy
+- this program will run galfit on one of JM's group images
 - galfit is run once with generic input parameters, no convolution
 - the output is used as input for a second run, w/convolution enabled
+
+INPUT:
+- group 
+PROCEDURE:
+- load virgo catalog (vf_v2_main.fits)
+- get virgo galaxies in FOV
 
 USAGE:
 This should be run from a directory that contains
@@ -13,7 +19,7 @@ This should be run from a directory that contains
 - noise image
 
 To run:
-python ~/github/virgowise/run1galfit.py galname bandpass
+python ~/github/virgowise/run1galfit.py galname
 
 - galname should be the VFID and should correspond to the subdirectories in 
 /mnt/astrophysics/rfinn/muchogalfit-output (grawp directory)
