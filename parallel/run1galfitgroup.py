@@ -230,7 +230,7 @@ def get_group_mask(image,xgals=None,ygals=None):
     """create the mask for the group image, remove galaxies to be fitted  """
     # create the mask
     # remove objects at the positions of the galaxies to be fitted    
-    m = buildgroupmask(image,xgals,ygals)
+    m = buildgroupmask(image)
     b.remove_gals(xgals,ygals)
 
     # return mask_image
