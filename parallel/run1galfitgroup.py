@@ -68,6 +68,7 @@ class buildgroupmask(buildmask):
         # SE parameters for masking
         self.threshold=0.005
         self.snr=10
+        self.snr_analysis=10        
         self.sepath = homedir+'/github/halphagui/astromatic/'
         self.config='default.sex.HDI.mask'
 
