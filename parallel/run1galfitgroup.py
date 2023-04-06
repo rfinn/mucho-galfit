@@ -329,6 +329,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         for line in input:
             if line.startswith('B)'):
                 outfile.write(line.replace('out1.fits','out2.fits'))
+                holdfixed = False
             elif line.startswith('D)'):
                 
                 outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
@@ -348,8 +349,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                 else:
                     holdfixed=False
                 print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
-            elif holdfixed and (line.startswith(' (4') or line.startswith(' (5') or line.startswith(' (9') or line.startswith('(10')):
-                outfile.write(line.replace(' 1 ',' 0 '))
+            elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
+                if holdfixed:
+                    outfile.write(line.replace(' 1 ',' 0 '))
             else:
                 outfile.write(line)
         outfile.close()
