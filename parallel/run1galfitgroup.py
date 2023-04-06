@@ -460,6 +460,6 @@ if __name__ == '__main__':
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
-    #os.system(f"galfit galfit.input2")
+    os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
