@@ -326,7 +326,6 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         i = 0
         holdfixed=False
         for line in input:
-            line = all_lines[i]
             if line.startswith('B)'):
                 outfile.write(line.replace('out1.fits','out2.fits'))
             elif line.startswith('D)'):
