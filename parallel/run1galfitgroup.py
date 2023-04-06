@@ -350,6 +350,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                     skyobject = True
                 else:
                     skyobject = False
+                outlines.append(line)
             
             
                 
