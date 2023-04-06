@@ -360,8 +360,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)
                 if float(t[1]) > minmag and not skyobject:
                     # keep the positions fixed
-                    print(i,len(outlines))
-                    outlines[i-1] = outlines[i-1].replace(' 1 1',' 0 0')
+                    #print(i,len(outlines))
+                    outlines[i-2] = outlines[i-2].replace(' 1 1',' 0 0')
                                 
                     # set all parameters to fixed
                     # fix the x and y coords
@@ -455,6 +455,6 @@ if __name__ == '__main__':
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
-    os.system(f"galfit galfit.input2")
+    #os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
