@@ -372,6 +372,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
                     holdfixed=False
+                    outlines.append(line)
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
             elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
                 if holdfixed and not skyobject:
