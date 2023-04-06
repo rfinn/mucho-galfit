@@ -33,7 +33,7 @@ primaryflag = np.zeros(len(dirlist),'bool')
 
 groupdirs_list = []
 
-for i,dir in enumerage(dirlist):
+for i,dir in enumerate(dirlist):
     # search for galaxies with no fits files
     os.chdir(dir)
     fitsfiles = glob.glob("*.fits")
