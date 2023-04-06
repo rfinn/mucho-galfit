@@ -38,7 +38,7 @@ primaryflag = np.zeros(len(dirlist),'bool')
 groupdirs_list = []
 
 for i,dir in enumerate(dirlist):
-    print(i,os.getcwd(),dir)
+    #print(i,os.getcwd(),dir)
     # search for galaxies with no fits files
     os.chdir(dir)
     fitsfiles = glob.glob("*.fits")
@@ -60,12 +60,15 @@ for i,dir in enumerate(dirlist):
 
         # check to see if this is the primary galaxy
 
-        group_dir = f'/mnt/astrophysics/virgofilaments-data/{ra}/{objname}_GROUP'
+        group_dir = f'/mnt/astrophysics/virgofilaments-data/{int(ra)}/{objname}_GROUP'
+        print(group_dir)
         if os.path.exists(group_dir):
             primaryflag[i] = True
+            print('group and found primary')
             groupdirs_list.append(group_dir)
             os.chdir(topdir)
         else:
+            print('group and but not primary')            
             os.chdir(topdir)
             continue
 
