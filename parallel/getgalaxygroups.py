@@ -36,7 +36,7 @@ groupflag = np.zeros(len(dirlist),'bool')
 primaryflag = np.zeros(len(dirlist),'bool')
 
 groupdirs_list = []
-primaryvfid=[]
+primaryvfids=[]
 for i,dir in enumerate(dirlist):
     #print(i,os.getcwd(),dir)
     # search for galaxies with no fits files
