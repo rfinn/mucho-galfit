@@ -325,7 +325,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         all_lines = input.readlines()
         outlines = []
         
-        outfile = open('galfit.input2','w')
+
         i = 0
         holdfixed = False
         skyobject = True
@@ -380,6 +380,10 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                     outlines.append(line)
             else:
                 outlines.append(line)
+                
+        outfile = open('galfit.input2','w')
+        for l in outlines:
+            outfile.write(l)
         outfile.close()
         input.close()
                                                                                                   
