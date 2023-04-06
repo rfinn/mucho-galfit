@@ -66,6 +66,7 @@ class buildgroupmask(buildmask):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
         self.image_wcs = WCS(self.imheader)
+        self.ymax,self.xmax = self.image.shape
         
         # SE parameters for masking
         self.threshold=0.005
@@ -79,8 +80,6 @@ class buildgroupmask(buildmask):
         self.gaia_mask = None
         self.add_gaia_stars = True        
 
-
-        
         t = self.image_name.split('.fit')
         self.mask_image=t[0]+'-mask.fits'
         self.mask_inv_image=t[0]+'-inv-mask.fits'
