@@ -341,14 +341,14 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
             elif line.startswith(' 3)'):# check if mag is too faint, then don't fit for new parameters
                 t = line.split()
                 # check the magnitude returned from no covolution
-                print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)
+                #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)
                 if float(float(t[1]) > minmag):
                     # set all parameters to fixed
                     holdfixed=True
                     outfile.write(line.replace(' 1 ',' 0 '))
                 else:
                     holdfixed=False
-                print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
+                #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
             elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
                 if holdfixed:
                     outfile.write(line.replace(' 1 ',' 0 '))
@@ -431,6 +431,6 @@ if __name__ == '__main__':
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
-    #os.system(f"galfit galfit.input2")
+    os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
