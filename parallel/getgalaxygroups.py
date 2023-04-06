@@ -40,6 +40,7 @@ for i,dir in enumerate(dirlist):
     fitsfiles = glob.glob("*.fits")
 
     if len(fitsfiles) > 0:
+        os.chdir(topdir)
         continue
     elif len(fitsfiles) == 0:
         groupflag[i] = True
@@ -72,7 +73,7 @@ for i,dir in enumerate(dirlist):
         else:
             continue
 
-    os.chdir(topdir)
+        os.chdir(topdir)
 # write out list of groupdirs
 gtab = Table([groupdirs_list])
 gtab.write('groupDirs.txt',format='ascii')
