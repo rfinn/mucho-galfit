@@ -360,6 +360,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)
                 if float(t[1]) > minmag and not skyobject:
                     # keep the positions fixed
+                    print(i,len(outlines))
                     outlines[i-1] = outlines[i-1].replace(' 1 1',' 0 0')
                                 
                     # set all parameters to fixed
