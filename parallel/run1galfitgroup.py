@@ -42,10 +42,11 @@ import sys
 #import glob
 import numpy as np
 
+from astropy.io import fits
+
 homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
-
 from maskwrapper import buildmask
 
 ### DICTIONARIES
