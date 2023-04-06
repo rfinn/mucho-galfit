@@ -352,6 +352,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
             elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
                 if holdfixed:
                     outfile.write(line.replace(' 1 ',' 0 '))
+                else:
+                    outfile.write(line)
             else:
                 outfile.write(line)
         outfile.close()
