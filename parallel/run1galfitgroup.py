@@ -256,7 +256,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     #if firstpass:
     #    # read in image header and convert RA, DEC to xpixel,ypixel
     
-
+    convolution_size = int(image_resolution[bandpass]/pixel_scale[bandpass]*50)
     if firstpass:
         # remove an straggler galfit files
         # this ensures that the first pass results are in galfit.01
@@ -278,7 +278,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         rad = 15/pixel_scale[bandpass]
         fitrad = 1
 
-        convolution_size = int(image_resolution[bandpass]/pixel_scale[bandpass]*50)
+        
         outfile = open('galfit.input1','w')
         outfile.write('# IMAGE PARAMETERS\n')
         outfile.write('A) '+image+'              # Input data image (FITS file)\n')
