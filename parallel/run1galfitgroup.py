@@ -109,7 +109,7 @@ class buildgroupmask(buildmask):
 
             # and 
             # set those pixels to zero
-            maskdat[maskdat == maskval]=0
+            self.maskdat[self.maskdat == maskval]=0
         self.write_mask()
         
 ### FUNCTIONS
