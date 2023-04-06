@@ -340,6 +340,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
             elif line.startswith('3)'):# check if mag is too faint, then don't fit for new parameters
                 t = line.split()
                 # check the magnitude returned from no covolution
+                print("checking magnitude {float(t[1])} compared to {minmag}")
                 if float(float(t[1]) > minmag):
                     # set all parameters to fixed
                     holdfixed=True
