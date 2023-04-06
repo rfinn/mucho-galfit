@@ -14,7 +14,7 @@ USAGE:
 import numpy as np
 import os
 from astropy.table import Table
-
+import glob
 
 
 topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
