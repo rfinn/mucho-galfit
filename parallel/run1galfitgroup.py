@@ -8,9 +8,17 @@ GOAL:
 
 INPUT:
 - group 
+
 PROCEDURE:
 - load virgo catalog (vf_v2_main.fits)
 - get virgo galaxies in FOV
+- create input file for galfit, adding sersic profile at each location
+- run galfit w/out convolution
+
+- parse output from galfit, getting details on all sources
+- create new input for galfit, with all sources and convolution
+- run galfit with convolution
+
 
 USAGE:
 This should be run from a directory that contains
@@ -19,7 +27,7 @@ This should be run from a directory that contains
 - noise image
 
 To run:
-python ~/github/virgowise/run1galfit.py galname
+python ~/github/virgowise/run1galfitgroup.py galname 
 
 - galname should be the VFID and should correspond to the subdirectories in 
 /mnt/astrophysics/rfinn/muchogalfit-output (grawp directory)
@@ -128,6 +136,41 @@ def get_xy_from_wcs(ra,dec,image):
     xobj,yobj = w.world_to_pixel(c)
     return xobj,yobj
 
+def get_galaxies_in_fov(image):
+    """get galaxies in FOV using virgo catalog """
+    from astropy.wcs import WCS
+    from astropy.coordinates import SkyCoord
+    
+    catalog='/mnt/astrophysics/rfinn/catalogs/v2-20220820/vf_v2_main.fits'
+    try:
+        vtab = Table.read(catalog)
+    except FileNotFoundError:
+        # test to see if running on Virgo VMS
+        catalog='/mnt/astrophysics/catalogs/v2-20220820/vf_v2_main.fits'
+        vtab = Table.read(catalog)
+    # create a SkyCoord object from RA and DEC of virgo galaxies
+    galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
+
+    # set up image wcs
+    image_wcs = WCS(image)
+
+    # get the size of the image
+    xmax, ymax = get_image_size(image)
+    
+    # find galaxies on cutout
+    x,y = image_wcs.world_to_pixel(galcoord)
+
+    # create flag to save galaxies on the image
+    flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
+    vfids = vtab['VFID'][flag]
+    x,y = x[flag],y[flag]
+    # write out file containing VFID, x, y
+    outfile = open('galsFOV.txt','w')
+    for i in range(len(vfids)):
+        outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
+    outfile.close()
+    return x,y
+
 def get_maskname(image):
     """ return the wise mask for wise images and the r mask for legacy images  """
     # check for wise extenstion
@@ -147,16 +190,16 @@ def get_maskname(image):
 def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass=True):
     galname = objname
     #print('inside write_galfit_input: ',galdir,galname)
-    image = f'{galname}-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{galname}-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{galname}-custom-psf-{bandpass}.fits.fz'
+    image = f'{galname}_GROUP-custom-image-{bandpass}.fits.fz'
+    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
+    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits.fz'
 
     # created images
-    sigma_image = f'{galname}-custom-std-{bandpass}.fits'    
+    sigma_image = f'{galname}_GROUP-custom-std-{bandpass}.fits'    
     if firstpass:
-        output_image = f'{galname}-{bandpass}-out1.fits'
+        output_image = f'{galname}_GROUP-{bandpass}-out1.fits'
     else:
-        output_image = f'{galname}-{bandpass}-out2.fits'    
+        output_image = f'{galname}_GROUP-{bandpass}-out2.fits'    
 
     
     if firstpass:
@@ -188,23 +231,17 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     # TODO: add mask to galfit input
     # have updated mask wrapper in halpha gui
     maskfound = False
-    mask_image = get_maskname(image)
-    #print()
-    #print(f"mask name = {mask_image}")
-    #print()
-    #print(f"cwd = {os.getcwd()}")
-    #print()
-    #print(f"listdir = {os.listdir()}")
-    #print()
-    if os.path.exists(mask_image):
-        maskfound = True
-        print(f"found mask {mask_image}.  Will implement masking in galfit")
-    else:
-        print()
-        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
-        print()
-    # make of values for xminfit, etc for now
-    # get image size
+
+    # skipping masking now for group images
+    #mask_image = get_maskname(image)
+    #if os.path.exists(mask_image):
+    #    maskfound = True
+    #    print(f"found mask {mask_image}.  Will implement masking in galfit")
+    #else:
+    #    print()
+    #    print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+    #    print()
+    
 
     # TODO: need to get xmaxfit,ymaxfit
     xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
@@ -221,6 +258,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     if firstpass:
         # DONE: need to get (x,y) center of object
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
+        xgal, ygal = get_galaxies_in_fov(image)
         BA=1
         fitBA = 1
         PA=0
@@ -278,19 +316,22 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     outfile.write(' \n')
     # write object
     # github test
-    outfile.write('# Object number: 1 \n')
-    outfile.write(' 0) sersic             # Object type \n')
-    outfile.write(' 1) %8.1f  %8.1f 1 1  # position x, y        [pixel] \n'%(xobj,yobj))
-    outfile.write(' 3) %5.2f      %i       # total magnitude     \n'%(mag,fitmag))
-    outfile.write(' 4) %8.2f       %i       #     R_e              [Pixels] \n'%(rad,fitrad))
-    outfile.write(' 5) %5.2f       %i       # Sersic exponent (deVauc=4, expdisk=1)   \n'%(nsersic,int(fitn)))
-    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(BA,int(fitBA)))
-    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(PA,int(fitPA)))
-    outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
-    
+    objnum = 1
+    if firstpass:
+        for xi, yi in zip(xgal,ygal):
+            outfile.write(f'# Object number: {objnum} \n')
+            outfile.write(' 0) sersic             # Object type \n')
+            outfile.write(' 1) %8.1f  %8.1f 1 1  # position x, y        [pixel] \n'%(xi,yi))
+            outfile.write(' 3) %5.2f      %i       # total magnitude     \n'%(mag,fitmag))
+            outfile.write(' 4) %8.2f       %i       #     R_e              [Pixels] \n'%(rad,fitrad))
+            outfile.write(' 5) %5.2f       %i       # Sersic exponent (deVauc=4, expdisk=1)   \n'%(nsersic,int(fitn)))
+            outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(BA,int(fitBA)))
+            outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(PA,int(fitPA)))
+            outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
+            objnum += 1
 
     outfile.write(' \n')
-    outfile.write('# Object number: 2 \n')
+    outfile.write(f'# Object number: {objnum} \n')
     outfile.write(' 0) sky             # Object type \n')
     outfile.write(' 1) %8.1f   1  # sky background at center of fitting region [ADUs] \n'%(sky))
     outfile.write(' 2) 0      0       # dsky/dx (sky gradient in x)    \n')
@@ -372,7 +413,7 @@ if __name__ == '__main__':
 
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
-    print('running galfit second time')
-    os.system(f"galfit galfit.input2")
+    #print('running galfit second time')
+    #os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
