@@ -69,6 +69,7 @@ class buildgroupmask(buildmask):
         self.threshold=0.005
         self.snr=10
         self.sepath = homedir+'/github/halphagui/astromatic/'
+        self.config='default.sex.HDI.mask'
 
         # GAIA catalog, with path set for grawp
         self.gaiapath = '/mnt/astrophysics/rfinn/catalogs/gaia-mask-dr9.virgo.fits'
