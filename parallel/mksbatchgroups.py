@@ -129,7 +129,7 @@ data_dir = "/mnt/astrophysics/rfinn/muchogalfit-output/"
 
 
 # this is the name of the shell script that will be created
-script_id = f"VFIDall-{args.wavelength}"
+script_id = f"VFIDgroup-{args.wavelength}"
 
 print('data_dir = ', data_dir)
 print()
@@ -142,16 +142,16 @@ os.chdir(data_dir)
 # Dirs.txt contains one line for each galaxy that will be analyzed.
 #
 
-outfile = "groupPrimaryDirs.txt"
-infile = open(outfile, 'r')
+input_file = "groupPrimaryVFID.txt"
+infile = open(infile, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
-print(f"\nthe number of lines in groupPrimaryDirs.txt = {nfiles}\n")
+print(f"\nthe number of lines in groupPrimaryVFID.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
-input_file = "groupPrimaryVFID.txt"
+#input_file = "groupPrimaryVFID.txt"
 
 # set sample size to 10 galaxies for testing
 
