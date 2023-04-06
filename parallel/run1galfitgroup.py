@@ -396,7 +396,7 @@ if __name__ == '__main__':
 
     # set up path name for image directory
     # directory where galaxy images are
-    data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}/'.format(int(ra),objname)
+    data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
 
 
