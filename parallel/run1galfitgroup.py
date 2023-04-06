@@ -109,6 +109,7 @@ class buildgroupmask(buildmask):
 
             # and 
             # set those pixels to zero
+            # adding commit just because
             self.maskdat[self.maskdat == maskval]=0
         self.write_mask()
         
