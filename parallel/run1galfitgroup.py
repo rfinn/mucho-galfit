@@ -60,7 +60,7 @@ minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
 
 class buildgroupmask(buildmask):
-    def __init__(self,image)):
+    def __init__(self,image):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
 
