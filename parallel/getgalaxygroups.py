@@ -52,16 +52,6 @@ for i,dir in enumerate(dirlist):
         # read in input file to get galname, objname, ra, dec, and bandpass
         sourcefile = open(dir+'sourcelist','r')
         galaxies = sourcefile.readlines()
-        if len(galaxies) > 1:
-            # set the flag to have more than one galaxy in the galfit input file
-            multiflag = True
-        elif len(galaxies) == 1:
-            multiflag = False
-        else:
-            print('Problem reading sourcelist for {}'.format(galname))
-            print('Please check the setup directory')
-            os.chdir(topdir)
-            sys.exit()
 
         # parse information from file
         vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
@@ -74,10 +64,12 @@ for i,dir in enumerate(dirlist):
         if os.path.exists(group_dir):
             primaryflag[i] = True
             groupdirs_list.append(group_dir)
+            os.chdir(topdir)
         else:
+            os.chdir(topdir)
             continue
 
-        os.chdir(topdir)
+        
 # write out list of groupdirs
 gtab = Table([groupdirs_list])
 gtab.write('groupDirs.txt',format='ascii')
