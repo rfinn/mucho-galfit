@@ -322,40 +322,62 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     else:
         # read in output from first pass
         input = open('galfit.01','r')
-
+        all_lines = input.readlines()
+        outlines = []
+        
         outfile = open('galfit.input2','w')
         i = 0
-        holdfixed=False
-        for line in input:
+        holdfixed = False
+        skyobject = True
+        for i in range(len(all_lines)):
+            
+            line = all_lines[i]
+            
             if line.startswith('B)'):
-                outfile.write(line.replace('out1.fits','out2.fits'))
+                outlines.append(line.replace('out1.fits','out2.fits'))
                 holdfixed = False
+                
             elif line.startswith('D)'):
                 
-                outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
+                outlines.append('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
             elif line.startswith('E)'):
-                outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
+                outlines.append('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
             elif line.startswith('I)'):
-                outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
+                outlines.append('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
+
+            elif line.startswith(' 0)'):
+                if line.find('sky') > -1:
+                    skyobject = True
+                else:
+                    skyobject = False
+            
+            
                 
             elif line.startswith(' 3)'):# check if mag is too faint, then don't fit for new parameters
                 t = line.split()
                 # check the magnitude returned from no covolution
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)
-                if float(float(t[1]) > minmag):
+                if float(t[1]) > minmag and not skyobject:
+                    # keep the positions fixed
+                    outlines[i-1] = outlines[i-1].replace(' 1 1',' 0 0')
+                                
                     # set all parameters to fixed
+                    # fix the x and y coords
+                                
+                                
+                                
                     holdfixed=True
-                    outfile.write(line.replace(' 1 ',' 0 '))
+                    outlines.append(line.replace(' 1 ',' 0 '))
                 else:
                     holdfixed=False
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
             elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
-                if holdfixed:
-                    outfile.write(line.replace(' 1 ',' 0 '))
+                if holdfixed and not skyobject:
+                    outlines.append(line.replace(' 1 ',' 0 '))
                 else:
-                    outfile.write(line)
+                    outlines.append(line)
             else:
-                outfile.write(line)
+                outlines.append(line)
         outfile.close()
         input.close()
                                                                                                   
