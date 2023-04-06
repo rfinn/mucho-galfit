@@ -143,12 +143,12 @@ def get_galaxies_in_fov(image):
     from astropy.table import Table
 
     # read in virgo catalog
-    catalog='/mnt/astrophysics/rfinn/catalogs/v2-20220820/vf_v2_main.fits'
+    catalog='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/vf_v2_main.fits'
     try:
         vtab = Table.read(catalog)
     except FileNotFoundError:
         # test to see if running on Virgo VMS
-        catalog='/mnt/astrophysics/catalogs/v2-20220820/vf_v2_main.fits'
+        catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
         vtab = Table.read(catalog)
     # create a SkyCoord object from RA and DEC of virgo galaxies
     galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
