@@ -75,8 +75,8 @@ for i,dir in enumerate(dirlist):
         
 # write out list of groupdirs
 gtab = Table([groupdirs_list])
-gtab.write('groupDirs.txt',format='ascii')
+gtab.write('groupDirs.txt',format='ascii',overwrite=True)
 
 # save information about group
 tab = Table([dirlist,groupflag,primaryflag],names=['VFID','groupflag','primary'])
-tab.write('groupinfo.fits',format='fits')
+tab.write('groupinfo.fits',format='fits',overwrite=True)
