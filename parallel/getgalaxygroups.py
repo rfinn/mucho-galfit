@@ -36,7 +36,7 @@ groupdirs_list = []
 for i,dir in enumerate(dirlist):
     print(i,dir)
     # search for galaxies with no fits files
-    os.chdir(dir)
+    os.chdir(os.getcwd(),dir)
     fitsfiles = glob.glob("*.fits")
 
     if len(fitsfiles) > 0:
