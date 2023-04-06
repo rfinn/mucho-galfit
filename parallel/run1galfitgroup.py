@@ -323,9 +323,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         input = open('galfit.01','r')
         outfile = open('galfit.input2','w')
         for line in input:
-            if line.startswith('D)'):
+            if line.startswith('B)'):
+                newline = line.replace('out1.fits','out2.fits')
+            elif line.startswith('D)'):
                 
                 outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
+            elif line.startswith('E)'):
                 outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
             elif line.startswith('I)'):
                 outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
