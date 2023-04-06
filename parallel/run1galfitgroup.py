@@ -238,9 +238,10 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 def get_group_mask(image,xgals=None,ygals=None):
     """create the mask for the group image, remove galaxies to be fitted  """
     # create the mask
-    # remove objects at the positions of the galaxies to be fitted    
+    # remove objects at the positions of the galaxies to be fitted
+    
     m = buildgroupmask(image)
-    b.remove_gals(xgals,ygals)
+    m.remove_gals(xgals,ygals)
 
     # return mask_image
     return m.mask_image
@@ -307,15 +308,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     maskfound = False
 
     # skipping masking now for group images
-    #mask_image = get_maskname(image)
-    mask_image = get_group_mask(image)
-    if os.path.exists(mask_image):
-        maskfound = True
-        print(f"found mask {mask_image}.  Will implement masking in galfit")
-    else:
-        print()
-        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
-        print()
+    mask_image = get_maskname(image)
+
     
 
     # TODO: need to get xmaxfit,ymaxfit
@@ -337,6 +331,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         # DONE: need to get (x,y) center of object
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
         xgal, ygal = get_galaxies_in_fov(image,bandpass=bandpass)
+        if not os.path.exists(mask_image):
+            mask_image = get_group_mask(image,xgals=xgal,ygals=ygal)
+            maskfound = True
         BA=1
         fitBA = 1
         PA=0
@@ -393,6 +390,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         outfile.close()
     else:
         # read in output from first pass
+
+        
         input = open('galfit.01','r')
         all_lines = input.readlines()
         outlines = []
