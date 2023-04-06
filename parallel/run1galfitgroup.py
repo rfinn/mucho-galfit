@@ -258,6 +258,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     
 
     if firstpass:
+        # remove an straggler galfit files
+        # this ensures that the first pass results are in galfit.01
+        os.system('rm galfit.??')
         # DONE: need to get (x,y) center of object
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
         xgal, ygal = get_galaxies_in_fov(image)
@@ -275,51 +278,24 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         rad = 15/pixel_scale[bandpass]
         fitrad = 1
 
-    else:
-        # read in output from first pass run of galfit
-        t = parse_galfit_output(output_image.replace('out2','out1'))
-        print(t)
-        # header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','CHI2NU']
-        xc, yc, mag, rad, nsersic, BA, PA, sky = t[0][0],t[1][0],t[2][0],t[3][0],t[4][0],t[5][0],t[6][0],t[7][0]
-        fitBA = 1
-        fitPA = 1
-        fitn = 1
-        fitmag = 1
-        fitrad = 1
-        xobj, yobj = xc, yc
-        # get convolution size - set to cutout size?
-    # TODO: need to decide on the right size for convolution - could be 2x image size?
-    # Chien had recommended the full image, but a smaller convolution size should make galfit run faster
-
-    # galfit website FAQ says 40-80 x PSF seeing disk
-    # see: https://users.obs.carnegiescience.edu/peng/work/galfit/TFAQ.html#convbox
-    convolution_size = int(image_resolution[bandpass]/pixel_scale[bandpass]*50)
-    if firstpass:
+        convolution_size = int(image_resolution[bandpass]/pixel_scale[bandpass]*50)
         outfile = open('galfit.input1','w')
-    else:
-        outfile = open('galfit.input2','w')        
-    outfile.write('# IMAGE PARAMETERS\n')
-    outfile.write('A) '+image+'              # Input data image (FITS file)\n')
-    outfile.write('B) '+output_image+'       # Name for the output image\n')
-    outfile.write('C) %s                # Sigma image name (made from data if blank or "none") \n'%(sigma_image))
-    if not firstpass:
-        outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
-        outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
-    if maskfound:
-        outfile.write(f'F) {mask_image}     # Input PSF image and (optional) diffusion kernel\n')
-    outfile.write('H) '+str(int(round(xminfit)))+' '+str(int(round(xmaxfit)))+' '+str(int(round(yminfit)))+' '+str(int(round(ymaxfit)))+'     # Image region to fit (xmin xmax ymin ymax)\n')
-    if not firstpass:
-        outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
-    outfile.write('J) %5.2f              # Magnitude photometric zeropoint \n'%(magzp))
-    outfile.write('K) %6.5f   %6.5f         # Plate scale (dx dy)  [arcsec/pix]\n'%(pscale,pscale))
-    outfile.write('O) regular                # Display type (regular, curses, both)\n')
-    outfile.write('P) 0                   # Create output image only? (1=yes; 0=optimize) \n')
-    outfile.write('S) 0                   # Modify/create objects interactively?\n')
-    outfile.write(' \n')
-    # write object
-    # github test
-    objnum = 1
-    if firstpass:
+        outfile.write('# IMAGE PARAMETERS\n')
+        outfile.write('A) '+image+'              # Input data image (FITS file)\n')
+        outfile.write('B) '+output_image+'       # Name for the output image\n')
+        outfile.write('C) %s                # Sigma image name (made from data if blank or "none") \n'%(sigma_image))
+        if maskfound:
+            outfile.write(f'F) {mask_image}     # Input PSF image and (optional) diffusion kernel\n')
+        outfile.write('H) '+str(int(round(xminfit)))+' '+str(int(round(xmaxfit)))+' '+str(int(round(yminfit)))+' '+str(int(round(ymaxfit)))+'     # Image region to fit (xmin xmax ymin ymax)\n')
+        outfile.write('J) %5.2f              # Magnitude photometric zeropoint \n'%(magzp))
+        outfile.write('K) %6.5f   %6.5f         # Plate scale (dx dy)  [arcsec/pix]\n'%(pscale,pscale))
+        outfile.write('O) regular                # Display type (regular, curses, both)\n')
+        outfile.write('P) 0                   # Create output image only? (1=yes; 0=optimize) \n')
+        outfile.write('S) 0                   # Modify/create objects interactively?\n')
+        outfile.write(' \n')
+        # write object
+        # github test
+        objnum = 1
         for xi, yi in zip(xgal,ygal):
             outfile.write(f'# Object number: {objnum} \n')
             outfile.write(' 0) sersic             # Object type \n')
@@ -332,18 +308,32 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
             outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
             objnum += 1
 
-    outfile.write(' \n')
-    outfile.write(f'# Object number: {objnum} \n')
-    outfile.write(' 0) sky             # Object type \n')
-    outfile.write(' 1) %8.1f   1  # sky background at center of fitting region [ADUs] \n'%(sky))
-    outfile.write(' 2) 0      0       # dsky/dx (sky gradient in x)    \n')
-    outfile.write(' 3) 0      0       # dsky/dy (sky gradient in y) \n')
-    outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
+        outfile.write(' \n')
+        outfile.write(f'# Object number: {objnum} \n')
+        outfile.write(' 0) sky             # Object type \n')
+        outfile.write(' 1) %8.1f   1  # sky background at center of fitting region [ADUs] \n'%(sky))
+        outfile.write(' 2) 0      0       # dsky/dx (sky gradient in x)    \n')
+        outfile.write(' 3) 0      0       # dsky/dy (sky gradient in y) \n')
+        outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
                   
     
-    outfile.close()
-
-
+        outfile.close()
+    else:
+        # read in output from first pass
+        input = open('galfit.01','r')
+        outfile = open('galfit.input2','w')
+        for line in input:
+            if line.startswith('D)'):
+                
+                outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
+                outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
+            elif line.startswith('I)'):
+                outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
+            else:
+                outfile.write(line)
+        outfile.close()
+        input.close()
+                                                                                                  
 if __name__ == '__main__':
     
     # run this from /mnt/astrophysics
@@ -415,7 +405,7 @@ if __name__ == '__main__':
 
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
-    #print('running galfit second time')
-    #os.system(f"galfit galfit.input2")
+    print('running galfit second time')
+    os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
