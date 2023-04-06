@@ -321,8 +321,12 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     else:
         # read in output from first pass
         input = open('galfit.01','r')
+
         outfile = open('galfit.input2','w')
+        i = 0
+        holdfixed=False
         for line in input:
+            line = all_lines[i]
             if line.startswith('B)'):
                 outfile.write(line.replace('out1.fits','out2.fits'))
             elif line.startswith('D)'):
@@ -332,6 +336,18 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                 outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
             elif line.startswith('I)'):
                 outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')
+                
+            elif line.startswith('3)'):# check if mag is too faint, then don't fit for new parameters
+                t = line.split()
+                # check the magnitude returned from no covolution
+                if float(t[1] > 10):
+                    # set all parameters to fixed
+                    holdfixed=True
+                    outfile.write(line.replace(' 1 ',' 0 '))
+                else:
+                    holdfixed=False
+            elif holdfixed and (line.startswith('(4') or line.startswith('(5') or line.startswith('(9') or line.startswith('(10')):
+                outfile.write(line.replace(' 1 ',' 0 '))
             else:
                 outfile.write(line)
         outfile.close()
