@@ -43,6 +43,7 @@ import sys
 import numpy as np
 
 from astropy.io import fits
+from astropy.wcs import WCS
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
@@ -64,7 +65,8 @@ class buildgroupmask(buildmask):
     def __init__(self,image):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
-
+        self.image_wcs = WCS(self.imheader)
+        
         # SE parameters for masking
         self.threshold=0.005
         self.snr=10
