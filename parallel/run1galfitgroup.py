@@ -41,17 +41,68 @@ import os
 import sys
 #import glob
 import numpy as np
+
+homedir = os.getenv("HOME")
+# add in masking from halphagui
+sys.path.append(homedir+'/github/halphagui/')
+
+from maskwrapper import buildmask
+
 ### DICTIONARIES
 
 pixel_scale = {'FUV':1.5,'NUV':1.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.75,'W2':2.75,'W3':2.75,'W4':2.75}
 psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':1}
 mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
 image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
-minmag2fit = {'FUV':10,'NUV':10,'g':18,'r':18,'z':18,'W1':10,'W2':10,'W3':10,'W4':10}
+minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4':10}
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
 
+class buildgroupmask(buildmask):
+    def __init__(self,image)):
+        self.image_name = image
+        self.image, self.imheader = fits.getdata(self.image_name,header = True)
+
+        # SE parameters for masking
+        self.threshold=0.005
+        self.snr=10
+        self.sepath = homedir+'/github/halphagui/astromatic/'
+
+        # GAIA catalog, with path set for grawp
+        self.gaiapath = '/mnt/astrophysics/rfinn/catalogs/gaia-mask-dr9.virgo.fits'
+        self.gaia_mask = None
+        self.add_gaia_stars = True        
+
+
+        
+        t = self.image_name.split('.fit')
+        self.mask_image=t[0]+'-mask.fits'
+        self.mask_inv_image=t[0]+'-inv-mask.fits'
+        print('saving mask image as: ',self.mask_image)
+
+        # SET UP AND RUN SOURCE EXTRACTOR
+        self.link_files()
+        self.runse()
+        self.update_mask()
+        self.grow_mask()
+        self.grow_mask()
+        self.grow_mask()
+
+
+    def remove_gals(self,xgals,ygals):
+        for x,y in zip(xgals,ygals):
+            # get mask value at location of galaxy
+            maskval = self.maskdat[y,x]
+            
+            
+            # get pixels where the mask value = value at location of galaxy
+
+            # and 
+            # set those pixels to zero
+            maskdat[maskdat == maskval]=0
+        self.write_mask()
+        
 ### FUNCTIONS
 def funpack_image(input,output,nhdu=1):
     command = 'funpack -O {} {}'.format(output,input)
@@ -137,7 +188,7 @@ def get_xy_from_wcs(ra,dec,image):
     xobj,yobj = w.world_to_pixel(c)
     return xobj,yobj
 
-def get_galaxies_in_fov(image):
+def get_galaxies_in_fov(image,bandpass='W3'):
     """get galaxies in FOV using virgo catalog """
     from astropy.wcs import WCS
     from astropy.coordinates import SkyCoord
@@ -168,11 +219,22 @@ def get_galaxies_in_fov(image):
     vfids = vtab['VFID'][flag]
     x,y = x[flag],y[flag]
     # write out file containing VFID, x, y
-    outfile = open('galsFOV.txt','w')
+    ofilename = f'galsFOV-{bandpass}.txt'
+    outfile = open(ofilename,'w')
     for i in range(len(vfids)):
         outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
     outfile.close()
     return x,y
+
+def get_group_mask(image,xgals=None,ygals=None):
+    """create the mask for the group image, remove galaxies to be fitted  """
+    # create the mask
+    # remove objects at the positions of the galaxies to be fitted    
+    m = buildgroupmask(image,xgals,ygals)
+    b.remove_gals(xgals,ygals)
+
+    # return mask_image
+    return m.mask_image
 
 def get_maskname(image):
     """ return the wise mask for wise images and the r mask for legacy images  """
@@ -237,13 +299,14 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
 
     # skipping masking now for group images
     #mask_image = get_maskname(image)
-    #if os.path.exists(mask_image):
-    #    maskfound = True
-    #    print(f"found mask {mask_image}.  Will implement masking in galfit")
-    #else:
-    #    print()
-    #    print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
-    #    print()
+    mask_image = get_group_mask(image)
+    if os.path.exists(mask_image):
+        maskfound = True
+        print(f"found mask {mask_image}.  Will implement masking in galfit")
+    else:
+        print()
+        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+        print()
     
 
     # TODO: need to get xmaxfit,ymaxfit
@@ -264,7 +327,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         os.system('rm galfit.??')
         # DONE: need to get (x,y) center of object
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
-        xgal, ygal = get_galaxies_in_fov(image)
+        xgal, ygal = get_galaxies_in_fov(image,bandpass=bandpass)
         BA=1
         fitBA = 1
         PA=0
