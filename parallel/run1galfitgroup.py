@@ -102,7 +102,7 @@ class buildgroupmask(buildmask):
     def remove_gals(self,xgals,ygals):
         for x,y in zip(xgals,ygals):
             # get mask value at location of galaxy
-            maskval = self.maskdat[y,x]
+            maskval = self.maskdat[int(y),int(x)]
             
             
             # get pixels where the mask value = value at location of galaxy
