@@ -151,7 +151,7 @@ print(f"\nthe number of lines in groupPrimaryDirs.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
-input_file = "groupPrimaryDirs.txt"
+input_file = "groupPrimaryVFID.txt"
 
 # set sample size to 10 galaxies for testing
 
