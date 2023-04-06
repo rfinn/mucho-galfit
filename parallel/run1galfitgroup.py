@@ -324,7 +324,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         outfile = open('galfit.input2','w')
         for line in input:
             if line.startswith('B)'):
-                newline = line.replace('out1.fits','out2.fits')
+                outfile.write(line.replace('out1.fits','out2.fits')
             elif line.startswith('D)'):
                 
                 outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
