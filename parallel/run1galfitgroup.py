@@ -140,7 +140,9 @@ def get_galaxies_in_fov(image):
     """get galaxies in FOV using virgo catalog """
     from astropy.wcs import WCS
     from astropy.coordinates import SkyCoord
-    
+    from astropy.table import Table
+
+    # read in virgo catalog
     catalog='/mnt/astrophysics/rfinn/catalogs/v2-20220820/vf_v2_main.fits'
     try:
         vtab = Table.read(catalog)
