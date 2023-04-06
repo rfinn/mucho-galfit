@@ -25,7 +25,7 @@ except FileNotFoundError: # assuming that we are running on virgo vms
     os.chdir(topdir)
 
 # look through output directories
-dirlist = Table.read('Dirs.txt')
+dirlist = Table.read('Dirs.txt',format='ascii')
 
 # set up arrays to track group galaxies and central galaxies
 groupflag = np.zeros(len(dirlist),'bool')
