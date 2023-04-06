@@ -143,7 +143,7 @@ os.chdir(data_dir)
 #
 
 input_file = "groupPrimaryVFID.txt"
-infile = open(infile, 'r')
+infile = open(input_file, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
