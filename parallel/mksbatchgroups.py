@@ -143,13 +143,11 @@ os.chdir(data_dir)
 #
 
 outfile = "groupPrimaryDirs.txt"
-os.system(f"ls -d VFID???? > {outfile}")
-# count lines - need to give number of galaxies to slurm b/c this is equal to number of processes
 infile = open(outfile, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
-print(f"\nthe number of lines in Dirs.txt = {nfiles}\n")
+print(f"\nthe number of lines in groupPrimaryDirs.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
@@ -158,7 +156,7 @@ input_file = "groupPrimaryDirs.txt"
 # set sample size to 10 galaxies for testing
 
 if args.testsample:
-    nfiles=20
+    nfiles=10
     print(f"\nSetting number of jobs to {nfiles} for testing.\n")
     
 write_output(script_id, input_file, narray=nfiles, data_dir=data_dir, \
