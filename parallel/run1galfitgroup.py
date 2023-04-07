@@ -44,12 +44,14 @@ import numpy as np
 
 from astropy.io import fits
 from astropy.wcs import WCS
+from reproject import reproject_interp
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
 from maskwrapper import buildmask
-import reproject_mask
+
+#import reproject_mask
 
 ### DICTIONARIES
 
@@ -61,6 +63,8 @@ minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
+
+
 
 class buildgroupmask(buildmask):
     def __init__(self,image):
@@ -115,6 +119,24 @@ class buildgroupmask(buildmask):
         self.write_mask()
         
 ### FUNCTIONS
+
+
+
+
+def reproject_image(maskfile, reffile):
+    hmask = fits.open(maskfile)
+
+    href = fits.open(reffile)
+
+    # reproject r-band mask onto W3 header
+
+    wisemask,footprint = reproject_interp(hmask,href[0].header)
+
+    # all wise images have the same pixel scale, so we only need one wise mask
+    outname = maskfile.replace('r-mask','wise-mask')
+    fits.writeto(outname,wisemask,href[0].header,overwrite=True)
+
+
 def funpack_image(input,output,nhdu=1):
     command = 'funpack -O {} {}'.format(output,input)
     print(command)
@@ -337,9 +359,10 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         if not os.path.exists(mask_image):
             if bandpass in ['W1','W2','W3','W4']:
                 rmask = mask_image.replace(bandpass,'r')
+                print('rband mask image = ',rmask)
                 if os.path.exists(rmask):
                     #reproject mask
-                    reproject_mask.reproject_image(rmask,image)
+                    reproject_image(rmask,image)
             else:
                 mask_image = get_group_mask(image,xgals=xgal,ygals=ygal)
             maskfound = True
