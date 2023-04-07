@@ -49,6 +49,7 @@ homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
 from maskwrapper import buildmask
+import reproject_mask
 
 ### DICTIONARIES
 
@@ -243,9 +244,10 @@ def get_group_mask(image,xgals=None,ygals=None):
     
     m = buildgroupmask(image)
     m.remove_gals(xgals,ygals)
-
+    maskname = get_maskname(image)
+    os.rename(m.mask_image,maskname)
     # return mask_image
-    return m.mask_image
+    return maskname
 
 def get_maskname(image):
     """ return the wise mask for wise images and the r mask for legacy images  """
@@ -333,7 +335,13 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         xobj, yobj = get_xy_from_wcs(ra,dec,image)
         xgal, ygal = get_galaxies_in_fov(image,bandpass=bandpass)
         if not os.path.exists(mask_image):
-            mask_image = get_group_mask(image,xgals=xgal,ygals=ygal)
+            if bandpass in ['W1','W2','W3','W4']:
+                rmask = mask_image.replace(bandpass,'r')
+                if os.path.exists(rmask):
+                    #reproject mask
+                    reproject_mask.reproject_image(rmask,image)
+            else:
+                mask_image = get_group_mask(image,xgals=xgal,ygals=ygal)
             maskfound = True
         BA=1
         fitBA = 1
