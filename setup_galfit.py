@@ -72,6 +72,6 @@ for i in range(len(finalcat)):
     sourcelist = open(sourcefile,'w')
     
     # write out one line with VFID, objname, RA, DEC, wavelength
-    output_string = finalcat['VFID'][i] + ' ' + finalcat['objname'][i] + ' ' + str(finalcat['RA_1'][i]) + ' ' + str(finalcat['DEC_1'][i]) + ' ' + str(wavelength) + ' \n'.format()
+    output_string = finalcat['VFID'][i] + ' ' + finalcat['objname'][i] + ' ' + str(finalcat['RA'][i]) + ' ' + str(finalcat['DEC'][i]) + ' ' + str(wavelength) + ' \n'.format()
     sourcelist.write(output_string)
     sourcelist.close()
