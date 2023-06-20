@@ -11,8 +11,11 @@ PROCEDURE:
 
 USAGE:
 
-call as:
-setup_galfit.py W3
+* On the virgo vms, move to /mnt/astrophysics/muchogalfit-output
+ 
+* Call as:
+
+python ~/github/muchogalfit/setup_galfit.py W3
 
 where W3 can be any wavelength band [g,r,z,W1 through W4]
 
@@ -60,7 +63,10 @@ finalcat = main_table
 for i in range(len(finalcat)):
     
     galpath = '/mnt/astrophysics/muchogalfit-output/'+finalcat['VFID'][i]
-    os.mkdir(galpath)
+
+    # make directory if it doesn't already exist
+    if not os.path.exists(galpath):
+        os.mkdir(galpath)
 
     sourcefile = galpath+'/{}sourcelist'.format(finalcat['VFID'][i])
     sourcelist = open(sourcefile,'w')
