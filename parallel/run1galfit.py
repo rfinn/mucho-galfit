@@ -352,7 +352,6 @@ if __name__ == '__main__':
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}/'.format(int(ra),objname)
 
 
-
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass)
     

@@ -14,6 +14,13 @@ USAGE:
 * Try running this once and check the output of the JOB_{}.sh script.
 * If it looks good, run again using the --submit flag to submit the script to slurm.
 
+* this reads in the Dirs.txt file to get the directory for each process.  If you need to recreate the file
+
+on virgo vms
+
+cd /mnt/astrophysics/muchogalfit-output
+
+ls -d VFID???? > Dirs.txt
 '''
 
 import os

@@ -21,6 +21,7 @@ where W3 can be any wavelength band [g,r,z,W1 through W4]
 
 -will create repositories for sample galaxies, each containing a sourcelist with which to run galfit
 
+* then run the parallel processing on grawp
 
 NOTES: 
 * 2023-06-20 : RF updating the program to run on the full virgo sample.  The program 
