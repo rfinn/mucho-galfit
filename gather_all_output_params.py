@@ -24,6 +24,7 @@ import os
 import sys
 from astropy.table import Table
 import glob
+import numpy as np
 
 HOME = os.getenv("HOME")
 sys.path.append(HOME+'/github/halphagui/')
@@ -52,7 +53,7 @@ colnames = ['VFID']+header+cheader
 dtype=[str,\
            float,float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,float]
-outtab = Table(names=colnames,dtype=dtype)
+outtab = Table(data=np.zeros(nvirgo,dype=dtype),names=colnames)
 
 topdir = os.getcwd()
 # for each VFID, look in directory
