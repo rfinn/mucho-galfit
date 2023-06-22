@@ -58,7 +58,7 @@ outtab = Table(dtype=dtype,names=colnames)
 topdir = os.getcwd()
 # for each VFID, look in directory
 for i in range(nvirgo):
-
+    os.chdir(topdir)
     vfid = f"VFID{i:04d}"
     outtab.add_row(('',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
     outtab['VFID'][i] = vfid
@@ -75,6 +75,7 @@ for i in range(nvirgo):
     else:
         # skip groups for now
         if 'GROUP' in infile1[0]:
+
             continue
         #print(infile1[0])
         t = rg.parse_galfit_results(infile1[0])
@@ -97,7 +98,7 @@ for i in range(nvirgo):
                 outtab[cheader[j]][i] = t[j][0]
             else:
                 outtab[cheader[j]][i] = t[j]
-    os.chdir(topdir)
+
 
 # write output table
 
