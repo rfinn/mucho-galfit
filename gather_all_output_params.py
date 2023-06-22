@@ -53,7 +53,7 @@ colnames = ['VFID']+header+cheader
 dtype=[str,\
            float,float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,float]
-outtab = Table(data=np.zeros(nvirgo,dype=dtype),names=colnames)
+outtab = Table(data=np.zeros(nvirgo,dtype=dtype),names=colnames)
 
 topdir = os.getcwd()
 # for each VFID, look in directory
