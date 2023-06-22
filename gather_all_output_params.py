@@ -59,41 +59,41 @@ topdir = os.getcwd()
 # for each VFID, look in directory
 for i in range(nvirgo):
 
-        vfid = f"VFID{i:04d}"
-        outtab.add_row(('',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
-        outtab['VFID'][i] = vfid
-
-        # move to directory for this galaxy
-        os.chdir(vfid)
+    vfid = f"VFID{i:04d}"
+    outtab.add_row(('',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+    outtab['VFID'][i] = vfid
+    
+    # move to directory for this galaxy
+    os.chdir(vfid)
 
         
 
-        # output from galfit is NAME-g-out1.fits = output from no convolution
-        infile1 = glob.glob(f"*{band}-out1.fits")
-        if len(infile1) < 1:
-                print("no output file for ",vfid)
-        else:
-           t = rg.parse_galfit_results(infile1[0])
-           for j in range(len(t)):
-               if j < 8:
-                   outtab[cheader[j]][i] = t[j][0]
-               else:
-                   outtab[cheader[j]][i] = t[j]
+    # output from galfit is NAME-g-out1.fits = output from no convolution
+    infile1 = glob.glob(f"*{band}-out1.fits")
+    if len(infile1) < 1:
+        print("no output file for ",vfid)
+    else:
+        t = rg.parse_galfit_results(infile1[0])
+        for j in range(len(t)):
+            if j < 8:
+                outtab[cheader[j]][i] = t[j][0]
+            else:
+                outtab[cheader[j]][i] = t[j]
                 
-        
-        # output from galfit is NAME-g-out2.fits = output with convolution        
-        infile1 = glob.glob(f"*{band}-out2.fits")
-        if len(infile1) < 1:
-                print("no output file for ",vfid)
-                continue
-        else:
-           t = rg.parse_galfit_results(infile1[0])
-           for j in range(len(t)):
-               if j < 8:
-                   outtab[cheader[j]][i] = t[j][0]
-               else:
-                   outtab[cheader[j]][i] = t[j]
-
+            
+    # output from galfit is NAME-g-out2.fits = output with convolution        
+    infile1 = glob.glob(f"*{band}-out2.fits")
+    if len(infile1) < 1:
+        print("no output file for ",vfid)
+        continue
+    else:
+        t = rg.parse_galfit_results(infile1[0])
+        for j in range(len(t)):
+            if j < 8:
+                outtab[cheader[j]][i] = t[j][0]
+            else:
+                outtab[cheader[j]][i] = t[j]
+    os.chdir(topdir)
 
 # write output table
 
