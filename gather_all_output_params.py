@@ -106,7 +106,7 @@ for i in range(nvirgo):
 
 
 # write output table
-
+os.chdir(topdir)
 outfilename = f"vf_v2_galfit_{band}.fits"
 
 outtab.write(outfilename,format='fits',overwrite=True)
