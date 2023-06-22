@@ -50,7 +50,7 @@ cheader = ["C"+i for i in header_keywords]
 colnames = ['VFID']+header_keywords+cheader
 
 dtype=[str,\
-           float,float,float,float,float,float,float,float,float,float\
+           float,float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,float]
 outtab = Table(names=header,dtype=dtype)
 
