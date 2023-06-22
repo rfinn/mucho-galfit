@@ -46,7 +46,7 @@ band = sys.argv[1]
 nvirgo = 6780
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','BA','PA','SKY','ERROR','CHI2NU']
-cheader = ["C"+i for i in header_keywords]
+cheader = ["C"+i for i in header]
 colnames = ['VFID']+header_keywords+cheader
 
 dtype=[str,\
