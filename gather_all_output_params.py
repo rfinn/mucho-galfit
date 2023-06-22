@@ -71,7 +71,7 @@ for i in range(nvirgo):
     # output from galfit is NAME-g-out1.fits = output from no convolution
     infile1 = glob.glob(f"*{band}-out1.fits")
     if len(infile1) < 1:
-        print("no output file for ",vfid)
+        print("no out1 file for ",vfid)
     else:
         # skip groups for now
         if 'GROUP' in infile1[0]:
