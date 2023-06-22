@@ -47,7 +47,7 @@ nvirgo = 6780
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','BA','PA','SKY','ERROR','CHI2NU']
 cheader = ["C"+i for i in header]
-colnames = ['VFID']+header_keywords+cheader
+colnames = ['VFID']+header+cheader
 
 dtype=[str,\
            float,float,float,float,float,float,float,float,float,float,\
