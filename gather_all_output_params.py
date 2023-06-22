@@ -75,7 +75,7 @@ for i in range(nvirgo):
         else:
            t = rg.parse_galfit_results(infile1[0])
            for j in range(len(t)):
-                  outtab[header[j]][i] = t[j]
+                  outtab[header[j]][i] = t[j][0]
                 
         
         # output from galfit is NAME-g-out2.fits = output with convolution        
@@ -86,7 +86,7 @@ for i in range(nvirgo):
         else:
            t = rg.parse_galfit_results(infile1[0])
            for j in range(len(t)):
-                  outtab[cheader[j]][i] = t[j]
+                  outtab[cheader[j]][i] = t[j][0]
 
 
 # write output table
