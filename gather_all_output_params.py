@@ -50,7 +50,7 @@ header=['XC','YC','MAG','RE','N','BA','PA','SKY','ERROR','CHI2NU']
 cheader = ["C"+i for i in header]
 colnames = ['VFID']+header+cheader
 
-dtype=[S8,\
+dtype=['S8',\
            float,float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,float]
 outtab = Table(dtype=dtype,names=colnames)
