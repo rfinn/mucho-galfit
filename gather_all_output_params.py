@@ -60,10 +60,13 @@ topdir = os.getcwd()
 for i in range(nvirgo):
 
         vfid = f"VFID{i:04d}"
+        outtab.add_row(('',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
         outtab['VFID'][i] = vfid
 
         # move to directory for this galaxy
-        os.chdir(vfid)        
+        os.chdir(vfid)
+
+        
 
         # output from galfit is NAME-g-out1.fits = output from no convolution
         infile1 = glob.glob(f"*{band}-out1.fits")
