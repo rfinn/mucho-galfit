@@ -92,6 +92,11 @@ for i in range(nvirgo):
         print("no output file for ",vfid)
         continue
     else:
+        # skip groups for now
+        if 'GROUP' in infile1[0]:
+
+            continue
+        
         t = rg.parse_galfit_results(infile1[0])
         for j in range(len(t)):
             if j < 8:
