@@ -34,6 +34,8 @@ psf_oversampling = {'FUV':1,'NUV':1,'g':1,'r':1,'g':1,'W1':1,'W2':1,'W3':1,'W4':
 mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2':22.5,'W3':22.5,'W4':22.5}
 image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
 
+guess_mag = {'FUV':16,'NUV':16,'g':14,'r':14,'z':14,'W1':14,'W2':14,'W3':13,'W4':12}
+
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
 
@@ -221,7 +223,9 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         fitPA = 1
         nsersic=2
         fitn = 1
-        mag=7
+
+        # set the magnitude based on the typical galaxy parameters
+        mag=guess_mag[bandpass]
         fitmag = 1
         sky = 0
         # set initial guess to 25 arcsec,
