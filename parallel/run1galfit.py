@@ -231,7 +231,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
-        rad = 20/pixel_scale[bandpass]
+        rad = 25/pixel_scale[bandpass]
         fitrad = 1
 
     else:
@@ -357,6 +357,10 @@ if __name__ == '__main__':
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}/'.format(int(ra),objname)
 
 
+    # TODONE: remove previous galfit files if they exist
+    os.system('rm galfit.??')
+    os.system('rm galfit.input?')
+    
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass)
     

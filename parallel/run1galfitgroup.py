@@ -61,6 +61,10 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
 minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4':10}
 
+# this is approx the peak mag of COG_MTOT_ histogram
+guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W3':14.5,'W4':14.5}
+
+
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
 
@@ -84,6 +88,7 @@ class buildgroupmask(buildmask):
         self.auto = True
         
         # GAIA catalog, with path set for grawp
+        # TODO - need to implement gaia query to get the faint stars as well
         self.gaiapath = '/mnt/astrophysics/rfinn/catalogs/gaia-mask-dr9.virgo.fits'
         self.gaia_mask = None
         self.add_gaia_stars = True        
@@ -377,7 +382,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
-        rad = 15/pixel_scale[bandpass]
+        rad = 25/pixel_scale[bandpass]
         fitrad = 1
 
         
@@ -548,7 +553,8 @@ if __name__ == '__main__':
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
 
-
+    # TODO: remove galfit input files if they exist
+    
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass)
     
