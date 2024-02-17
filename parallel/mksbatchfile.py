@@ -57,6 +57,8 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "\n"
     output += "#SBATCH --cpus-per-task=1\n"
     output += "\n"
+    output += "# purge modules\n"
+    output += "module purge\n"
     output += "# Load any environmental modules needed\n"
     output += "module load Python3\n"
     # print version of typing-extensions
