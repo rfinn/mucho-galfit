@@ -36,6 +36,9 @@ python ~/github/virgowise/run1galfitgroup.py galname
 
 - each subdirectory has an input file that is created by setup_galfit.py
 
+
+This is called my mksbatchgroups.py for running in parallel.
+
 '''
 import os
 import sys
@@ -71,7 +74,17 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 
 
 class buildgroupmask(buildmask):
-    def __init__(self,image):
+    """
+    this is builds on the buildmask class from maskwrapper
+
+    adapting to work with fields that contain multiple galaxies
+
+    all of this is pretty virgo centric, in the sense that the virgo catalogs are built in
+
+    should make this more general to work with any table containing RA and DEC
+
+    """
+    def __init__(self,image,bandpass=None):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
         self.image_wcs = WCS(self.imheader)
@@ -101,12 +114,22 @@ class buildgroupmask(buildmask):
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
         self.runse()
+
+        # number of times to run grow depends on bandpass.
+        # only once with wise bands.
+        if bandpass is not None:
+            if bandpass.startswith('W'):
+                self.grow_mask()
+        else:
+            self.grow_mask()
+            self.grow_mask()
+            self.grow_mask()
+
+
+        # get gaia stars
         self.add_gaia_masks()
         self.write_mask()
-        
-        self.grow_mask()
-        self.grow_mask()
-        self.grow_mask()
+
 
 
     def remove_gals(self,xgals,ygals):
@@ -122,11 +145,11 @@ class buildgroupmask(buildmask):
             # adding commit just because
             self.maskdat[self.maskdat == maskval]=0
         self.write_mask()
-        
+
+
+##########################################################################     
 ### FUNCTIONS
-
-
-
+##########################################################################     
 
 def reproject_image(maskfile, reffile):
     hmask = fits.open(maskfile)
@@ -264,12 +287,12 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     outfile.close()
     return x,y
 
-def get_group_mask(image,xgals=None,ygals=None):
+def get_group_mask(image,xgals=None,ygals=None,bandpass=None):
     """create the mask for the group image, remove galaxies to be fitted  """
     # create the mask
     # remove objects at the positions of the galaxies to be fitted
     
-    m = buildgroupmask(image)
+    m = buildgroupmask(image,bandpass=bandpass)
     m.remove_gals(xgals,ygals)
     maskname = get_maskname(image)
     os.rename(m.mask_image,maskname)
@@ -369,7 +392,8 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
                     #reproject mask
                     reproject_image(rmask,image)
             else:
-                mask_image = get_group_mask(image,xgals=xgal,ygals=ygal)
+                # mask should really be made from r-band image, so run this wavelength first
+                mask_image = get_group_mask(image,xgals=xgal,ygals=ygal,bandpass=bandpass)
             maskfound = True
         BA=1
         fitBA = 1
@@ -553,7 +577,10 @@ if __name__ == '__main__':
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
 
-    # TODO: remove galfit input files if they exist
+    # TODONE: remove previous galfit files if they exist
+    os.system('rm galfit.??')
+    os.system('rm galfit.input?')
+    
     
     # TODO: add code to generate galfit input for first run, no convolution, generic starting point
     write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass)

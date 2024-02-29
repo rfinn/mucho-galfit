@@ -14,6 +14,10 @@ USAGE:
 * Try running this once and check the output of the JOB_{}.sh script.
 * If it looks good, run again using the --submit flag to submit the script to slurm.
 
+
+This runs `run1galfitgroup.py` on all the targets in "groupPrimaryVFID.txt".
+
+
 '''
 
 import os
@@ -51,6 +55,7 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "#SBATCH --cpus-per-task=1\n"
     output += "\n"
     output += "# Load any environmental modules needed\n"
+    output += "module purge\n"    
     output += "module load Python3\n"
     # print version of typing-extensions
     #output += "pip3 list |grep typing"

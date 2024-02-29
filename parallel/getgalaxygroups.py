@@ -5,10 +5,21 @@ GOAL:
 * figure out which galaxies are in John's groups
 * get list of groups
 
+INPUT:
+* NONE
+
+OUTPUT:
+* groupinfo.fits - saves info on VFID, groupflag and groupPrimary 
+                   (could confirm that this matches JM's photometry table)
+
+* groupDirs.txt - list of directories containing primary group members
+
+* groupPrimaryVFID.txt - list of VFIDs of primary group members; used by mksbatchgroups.py
+
 USAGE:
 * run from muchogalfit-output directory
 
-
+python ~/github/mucho-galfit/
 
 """
 import numpy as np
