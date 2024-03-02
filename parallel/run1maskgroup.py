@@ -344,7 +344,7 @@ if __name__ == '__main__':
     vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
     ra = float(ra)
     dec = float(dec)
-
+    bandpass = 'r'
     # reset bandpass to the wavelength that is passed in from the command line
     #bandpass = sys.argv[2]
     
@@ -356,7 +356,7 @@ if __name__ == '__main__':
     image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
     invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
     psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
-
+    print("image = ",image)
     # get mask
     mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass='r',overwrite=True)
     # TODO: remove galfit input files if they exist
