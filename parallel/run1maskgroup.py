@@ -248,7 +248,7 @@ def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
         if os.path.exists(mask_image) and ~overwrite:
             print("found r-band mask  - no remaking it")
         else:
-            mask_image = get_rband_mask(image,ra,dec)
+            mask_image = get_rband_mask(image)
 
     else: # reproject r-band mask onto
         
@@ -257,7 +257,7 @@ def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
         rimage = image.replace(bandpass,'r')        
         # if r-band mask doesn't exist, build it
         if not os.path.exists(rmask):
-            rmask = get_rband_mask(rimage,ra,dec)
+            rmask = get_rband_mask(rimage)
 
         if bandpass in ['W1','W2','W3','W4']:
             mask_image = reproject_mask(rmask,image)
