@@ -94,6 +94,19 @@ class buildgroupmask(buildmask):
         self.mask_inv_image=t[0]+'-inv-mask.fits'
         print('saving mask image as: ',self.mask_image)
 
+        # default se parameters
+        self.config = None#'default is default.sex.HDI.mask'
+        self.objra = None
+        self.objdec = None
+        self.objsma = None
+        self.objBA = None
+        self.objPA = None
+        self.ngrow = 3
+        self.sesnr = 10
+        self.minarea = 5
+        
+
+        
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
         self.runse()
