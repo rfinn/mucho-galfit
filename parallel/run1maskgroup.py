@@ -220,7 +220,7 @@ class buildgroupmask(buildmask):
         self.objBA = gBA
         self.objPA = gPA
         self.objsma = gRAD
-        self.objsma_pixels = self.objsma/(self.pscalex*3600)
+        self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
         
                 
 
