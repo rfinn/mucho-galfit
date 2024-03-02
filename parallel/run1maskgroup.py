@@ -132,7 +132,7 @@ class buildgroupmask(buildmask):
         self.adjust_mask = True
         self.figure_size = (10,5)
         self.cmap = 'gist_heat_r'
-        
+    def build_mask(self):
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
         self.runse()
@@ -144,6 +144,9 @@ class buildgroupmask(buildmask):
         self.write_mask()
         self.get_galaxies_in_fov()
         self.get_ellipse_params()
+        self.remove_center_object()
+        #m.remove_gals(xgals,ygals)
+        self.show_mask_mpl()
         
     def get_galaxies_in_fov(self):
         """get virgo catalog galaxies in FOV """
@@ -342,9 +345,7 @@ def get_rband_mask(image):
     xgals, ygals = get_galaxies_in_fov(image,bandpass='r')
     
     m = buildgroupmask(image)
-    m.remove_center_object()
-    m.remove_gals(xgals,ygals)
-    m.show_mask_mpl()
+    m.build_mask()
     os.rename(m.mask_image,mask_image)
 
 
