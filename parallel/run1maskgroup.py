@@ -120,7 +120,12 @@ class buildgroupmask(buildmask):
         # Get coord of image center.  will use when getting gaia stars
         self.racenter,self.deccenter = imutils.get_image_center_deg(self.image_name)                
 
-        self.ellipseparams = None
+
+        # other params that need to be initialized
+        # TODO - add ellipse param for each galaxy in FOV
+        self.ellipseparams = None 
+        self.figure_size = (10,5)
+
         
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
