@@ -81,6 +81,11 @@ class buildgroupmask(buildmask):
         # another parameter to initialize
         self.off_center_flag = False
         self.remove_center_object_flag = False
+
+        # to track usr masks - need this for writing functions
+        self.deleted_objects = []
+        self.usr_mask = np.zeros_like(self.image)
+
         
         # SE parameters for masking
         self.threshold=0.005
