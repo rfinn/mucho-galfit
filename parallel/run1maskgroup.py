@@ -148,11 +148,12 @@ class buildgroupmask(buildmask):
         self.grow_mask()
         self.grow_mask()
         
-        self.write_mask()
+
         self.get_galaxies_in_fov()
         self.get_ellipse_params()
         self.remove_center_object()
         #m.remove_gals(xgals,ygals)
+        #self.write_mask()        
         self.show_mask_mpl()
         
     def get_galaxies_in_fov(self):
