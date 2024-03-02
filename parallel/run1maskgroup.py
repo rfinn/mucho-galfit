@@ -222,11 +222,11 @@ class buildgroupmask(buildmask):
             gDEC.append(t[1])
             gRAD.append(t[2])
             gBA.append(t[3])
-            gPA.append(t[4])
+            gPA.append(float(t[4])+90)
         # convert radius to pixels
 
         self.objBA = gBA
-        self.objPA = gPA+90
+        self.objPA = gPA
         self.objsma = gRAD
         self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
         
