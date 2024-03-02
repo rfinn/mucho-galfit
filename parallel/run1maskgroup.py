@@ -120,7 +120,7 @@ class buildgroupmask(buildmask):
         # Get coord of image center.  will use when getting gaia stars
         self.racenter,self.deccenter = imutils.get_image_center_deg(self.image_name)                
 
-        
+        self.ellipseparams = None
         
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
