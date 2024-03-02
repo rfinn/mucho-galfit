@@ -311,7 +311,7 @@ if __name__ == '__main__':
         os.chdir(topdir)
     # take as input the galaxy name
     galname = sys.argv[1]
-
+    bandpass = 'r'
     # move to muchogalfit-output directory
     output_dir = topdir+galname+'/'
     if not os.path.exists(output_dir):
