@@ -142,7 +142,7 @@ class buildgroupmask(buildmask):
         self.grow_mask()
         
         self.write_mask()
-        self.show_mask_mpl()
+
         
 
 
@@ -265,7 +265,7 @@ def get_rband_mask(image):
     
     m = buildgroupmask(image)
     m.remove_gals(xgals,ygals)
-
+    m.show_mask_mpl()
     os.rename(m.mask_image,mask_image)
 
 
