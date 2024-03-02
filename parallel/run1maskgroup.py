@@ -78,7 +78,9 @@ class buildgroupmask(buildmask):
         self.yc = self.ymax/2.
         self.image_wcs = WCS(self.imheader)
         
-
+        # another parameter to initialize
+        self.off_center_flag = False
+        self.remove_center_object_flag = False
         
         # SE parameters for masking
         self.threshold=0.005
