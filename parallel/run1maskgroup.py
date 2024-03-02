@@ -95,7 +95,6 @@ class buildgroupmask(buildmask):
         print('saving mask image as: ',self.mask_image)
 
         # default se parameters
-        self.config = None#'default is default.sex.HDI.mask'
         self.objra = None
         self.objdec = None
         self.objsma = None
