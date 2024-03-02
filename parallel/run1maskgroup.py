@@ -342,7 +342,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 def get_rband_mask(image):
     mask_image = get_maskname(image)
     
-    xgals, ygals = get_galaxies_in_fov(image,bandpass='r')
+    #xgals, ygals = get_galaxies_in_fov(image,bandpass='r')
     
     m = buildgroupmask(image)
     m.build_mask()
