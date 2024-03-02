@@ -584,24 +584,8 @@ if __name__ == '__main__':
 
     # get mask
 
-    mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass=bandpass,overwrite=False)
+    mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass=bandpass,overwrite=True)
     # TODO: remove galfit input files if they exist
 
-    
-    # TODO: add code to generate galfit input for first run, no convolution, generic starting point
-    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass,mask_image=mask_image)
-    
-    # code to run galfit
-    print('running galfit')
-    os.system(f"galfit galfit.input1")
-
-
-    # TODO: read galfit output, and create new input to run with convolution
-    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, mask_image=mask_image, firstpass=False)
-
-    # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
-    # TODO: make sure I am using the correct PSF images
-    print('running galfit second time')
-    os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
