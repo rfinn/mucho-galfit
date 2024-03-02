@@ -340,9 +340,9 @@ if __name__ == '__main__':
     # directory where galaxy images are
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
-    image = f'{objname}_GROUP-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
+    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
+    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
 
     # get mask
     mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass='r',overwrite=True)
