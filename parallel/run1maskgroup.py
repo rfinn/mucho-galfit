@@ -183,7 +183,7 @@ class buildgroupmask(buildmask):
         for i in range(len(vfids)):
             outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
         outfile.close()
-        self.keepflag = keepflag
+        self.keepflag = flag
         self.vfids = vfids
         self.xpixel = x
         self.ypixel = y
