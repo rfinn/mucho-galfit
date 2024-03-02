@@ -245,7 +245,7 @@ def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
     
     # if bandpass='r', make the mask
     if (bandpass == 'r'):
-        if os.path.exists(mask_image) & not overwrite:
+        if os.path.exists(mask_image) and ~overwrite:
             print("found r-band mask  - no remaking it")
         else:
             mask_image = get_rband_mask(image,ra,dec)
