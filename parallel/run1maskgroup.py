@@ -109,10 +109,11 @@ class buildgroupmask(buildmask):
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
         self.runse()
+        
+        self.add_gaia_masks()
         self.grow_mask()
         self.grow_mask()
         
-        self.add_gaia_masks()
         self.write_mask()
         self.show_mask_mpl()
         
