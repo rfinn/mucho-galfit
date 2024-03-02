@@ -73,11 +73,12 @@ class buildgroupmask(buildmask):
     def __init__(self,image):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
+        self.ymax,self.xmax = self.image.shape        
         self.xc = self.xmax/2.
         self.yc = self.ymax/2.
         self.image_wcs = WCS(self.imheader)
         
-        self.ymax,self.xmax = self.image.shape
+
         
         # SE parameters for masking
         self.threshold=0.005
