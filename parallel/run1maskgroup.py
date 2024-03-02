@@ -46,7 +46,7 @@ homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
 from maskwrapper import buildmask
-
+import imutils
 #import reproject_mask
 
 ### DICTIONARIES
@@ -105,6 +105,22 @@ class buildgroupmask(buildmask):
         self.minarea = 5
         
 
+        # read in image and define center coords
+        self.image, self.imheader = fits.getdata(self.image_name,header = True)
+        self.ymax,self.xmax = self.image.shape
+        self.xc = self.xmax/2.
+        self.yc = self.ymax/2.
+        self.image_wcs = WCS(self.imheader)
+        self.pscalex,self.pscaley = self.image_wcs.proj_plane_pixel_scales() # appears to be degrees/pixel
+        
+        # get image dimensions in deg,deg
+        self.dxdeg,self.dydeg = imutils.get_image_size_deg(self.image_name)
+        
+
+        # Get coord of image center.  will use when getting gaia stars
+        self.racenter,self.deccenter = imutils.get_image_center_deg(self.image_name)                
+
+        
         
         # SET UP AND RUN SOURCE EXTRACTOR
         self.link_files()
