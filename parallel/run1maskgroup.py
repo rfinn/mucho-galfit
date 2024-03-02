@@ -121,9 +121,13 @@ class buildgroupmask(buildmask):
         self.racenter,self.deccenter = imutils.get_image_center_deg(self.image_name)                
 
 
-        # other params that need to be initialized
+
         # TODO - add ellipse param for each galaxy in FOV
-        self.ellipseparams = None 
+        self.ellipseparams = None
+
+        # other params that need to be initialized        
+        self.v1,self.v2=scoreatpercentile(self.image,[5.,99.5])
+        self.adjust_mask = True
         self.figure_size = (10,5)
 
         
