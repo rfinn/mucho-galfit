@@ -168,7 +168,7 @@ class buildgroupmask(buildmask):
         # set up image wcs
 
         # get the size of the image
-        xmax, ymax = get_image_size(self.image)
+        xmax, ymax = get_image_size(self.image_name)
     
         # find galaxies on cutout
         x,y = self.image_wcs.world_to_pixel(galcoord)
