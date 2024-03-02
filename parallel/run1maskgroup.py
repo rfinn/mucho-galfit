@@ -49,6 +49,7 @@ homedir = os.getenv("HOME")
 sys.path.append(homedir+'/github/halphagui/')
 from maskwrapper import buildmask
 import imutils
+from mask1galaxy import get_galaxy_params
 #import reproject_mask
 
 ### DICTIONARIES
@@ -142,9 +143,84 @@ class buildgroupmask(buildmask):
         self.grow_mask()
         
         self.write_mask()
-
+        self.get_galaxies_in_fov()
+        self.get_ellipse_params()
         
+    def get_galaxies_in_fov(self):
+        """get virgo catalog galaxies in FOV """
+        from astropy.wcs import WCS
+        from astropy.coordinates import SkyCoord
+        from astropy.table import Table
 
+        # read in virgo catalog
+        catalog='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/vf_v2_main.fits'
+        if os.path.exists(catalog):
+            vtab = Table.read(catalog)
+        else:
+            # test to see if running on Virgo VMS
+            catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+            vtab = Table.read(catalog)
+        # create a SkyCoord object from RA and DEC of virgo galaxies
+        galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
+
+        # set up image wcs
+        image_wcs = WCS(self.image)
+
+        # get the size of the image
+        xmax, ymax = get_image_size(self.image)
+    
+        # find galaxies on cutout
+        x,y = image_wcs.world_to_pixel(galcoord)
+
+        # create flag to save galaxies on the image
+        flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
+        vfids = vtab['VFID'][flag]
+        x,y = x[flag],y[flag]
+        # write out file containing VFID, x, y
+        ofilename = f'galsFOV.txt'
+        outfile = open(ofilename,'w')
+        for i in range(len(vfids)):
+            outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
+        outfile.close()
+        self.keepflag = keepflag
+        self.vfids = vfids
+        self.xpixel = x
+        self.ypixel = y
+
+        self.pixel_scale = image_wcs.pixel_scale_matrix[1][1]
+        
+    
+    def get_ellipse_params(self):
+        """
+
+        call after get_galaxies_in_fov()
+
+        this create lists of ellipse parameters to use with maskwrapper
+
+        """
+        # get ellipse params as well
+    
+        #self.objparams = [self.defcat.cat['RA'][self.igal],self.defcat.cat['DEC'][self.igal],mask_scalefactor*self.radius_arcsec[self.igal],self.BA[self.igal],self.PA[self.igal]+90]
+        gRA = []
+        gDEC = []
+        gRAD = []
+        gBA = []
+        gPA = []
+        for vf in self.vfids:
+            t = get_galaxy_params(vf)
+            gRA.append(t[0])
+            gDEC.append(t[1])
+            gRAD.append(t[2])
+            gBA.append(t[3])
+            gPA.append(t[4])
+        # convert radius to pixels
+
+        self.objBA = gBA
+        self.objPA = gPA
+        self.objsma = gRAD
+        self.objsma_pixels = self.objsma/(self.pixel_scale*3600)
+        
+                
 
     def remove_gals(self,xgals,ygals):
 
@@ -228,9 +304,9 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
     # read in virgo catalog
     catalog='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/vf_v2_main.fits'
-    try:
+    if os.path.exists(catalog):
         vtab = Table.read(catalog)
-    except FileNotFoundError:
+    else:
         # test to see if running on Virgo VMS
         catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
         vtab = Table.read(catalog)
@@ -256,6 +332,11 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     for i in range(len(vfids)):
         outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
     outfile.close()
+
+
+    # get ellipse params as well
+
+    #self.objparams = [self.defcat.cat['RA'][self.igal],self.defcat.cat['DEC'][self.igal],mask_scalefactor*self.radius_arcsec[self.igal],self.BA[self.igal],self.PA[self.igal]+90]    
     return x,y
 
 def get_rband_mask(image):
@@ -264,6 +345,7 @@ def get_rband_mask(image):
     xgals, ygals = get_galaxies_in_fov(image,bandpass='r')
     
     m = buildgroupmask(image)
+    m.remove_center_object()
     m.remove_gals(xgals,ygals)
     m.show_mask_mpl()
     os.rename(m.mask_image,mask_image)
