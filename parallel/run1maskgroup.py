@@ -41,6 +41,8 @@ import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from reproject import reproject_interp
+from scipy.stats import scoreatpercentile
+
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
