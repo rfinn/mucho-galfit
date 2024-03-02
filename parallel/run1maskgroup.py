@@ -73,7 +73,10 @@ class buildgroupmask(buildmask):
     def __init__(self,image):
         self.image_name = image
         self.image, self.imheader = fits.getdata(self.image_name,header = True)
+        self.xc = self.xmax/2.
+        self.yc = self.ymax/2.
         self.image_wcs = WCS(self.imheader)
+        
         self.ymax,self.xmax = self.image.shape
         
         # SE parameters for masking
@@ -109,11 +112,6 @@ class buildgroupmask(buildmask):
         
 
         # read in image and define center coords
-        self.image, self.imheader = fits.getdata(self.image_name,header = True)
-        self.ymax,self.xmax = self.image.shape
-        self.xc = self.xmax/2.
-        self.yc = self.ymax/2.
-        self.image_wcs = WCS(self.imheader)
         self.pscalex,self.pscaley = self.image_wcs.proj_plane_pixel_scales() # appears to be degrees/pixel
         
         # get image dimensions in deg,deg
@@ -164,13 +162,12 @@ class buildgroupmask(buildmask):
         galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
 
         # set up image wcs
-        image_wcs = WCS(self.image)
 
         # get the size of the image
         xmax, ymax = get_image_size(self.image)
     
         # find galaxies on cutout
-        x,y = image_wcs.world_to_pixel(galcoord)
+        x,y = self.image_wcs.world_to_pixel(galcoord)
 
         # create flag to save galaxies on the image
         flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
@@ -187,7 +184,6 @@ class buildgroupmask(buildmask):
         self.xpixel = x
         self.ypixel = y
 
-        self.pixel_scale = image_wcs.pixel_scale_matrix[1][1]
         
     
     def get_ellipse_params(self):
@@ -218,7 +214,7 @@ class buildgroupmask(buildmask):
         self.objBA = gBA
         self.objPA = gPA
         self.objsma = gRAD
-        self.objsma_pixels = self.objsma/(self.pixel_scale*3600)
+        self.objsma_pixels = self.objsma/(self.pscalex*3600)
         
                 
 
