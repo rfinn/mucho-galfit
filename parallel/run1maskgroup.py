@@ -114,7 +114,7 @@ class buildgroupmask(buildmask):
         self.objsma = None
         self.objBA = None
         self.objPA = None
-        self.ngrow = 3
+        self.ngrow = 4
         self.sesnr = 10
         self.minarea = 5
         
