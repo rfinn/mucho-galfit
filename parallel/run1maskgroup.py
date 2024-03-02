@@ -135,7 +135,7 @@ class buildgroupmask(buildmask):
         self.ellipseparams = None
 
         # other params that need to be initialized        
-        self.v1,self.v2=scoreatpercentile(self.image,[5.,99.5])
+        self.v1,self.v2=scoreatpercentile(self.image,[.5,99.5])
         self.adjust_mask = True
         self.figure_size = (10,5)
         self.cmap = 'gist_heat_r'
