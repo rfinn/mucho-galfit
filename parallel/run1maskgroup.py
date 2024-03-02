@@ -147,6 +147,8 @@ class buildgroupmask(buildmask):
         self.add_gaia_masks()
         self.grow_mask()
         self.grow_mask()
+        self.grow_mask()
+        self.grow_mask()        
         
 
         self.get_galaxies_in_fov()
