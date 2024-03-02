@@ -226,7 +226,7 @@ class buildgroupmask(buildmask):
         # convert radius to pixels
 
         self.objBA = gBA
-        self.objPA = gPA
+        self.objPA = gPA+90
         self.objsma = gRAD
         self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
         
