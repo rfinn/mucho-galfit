@@ -154,7 +154,7 @@ class buildgroupmask(buildmask):
             # get mask value at location of galaxy
             maskval = self.maskdat[int(y),int(x)]
             
-            
+            print(f"galaxy at {x:.1f},{y:.1f}, value={maskval:.0f}")
             # get pixels where the mask value = value at location of galaxy
 
             # and 
