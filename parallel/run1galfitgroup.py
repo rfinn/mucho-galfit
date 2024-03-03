@@ -490,6 +490,7 @@ if __name__ == '__main__':
     if not os.path.exists(data_dir):
         data_dir = '/mnt/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
+    print(f"running on VFID {vfid}")
     print("source directory for JM images = ",data_dir)
 
     image = f'{objname}_GROUP-custom-image-{bandpass}.fits.fz'
