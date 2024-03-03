@@ -265,10 +265,10 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
     #print()
     if os.path.exists(mask_image):
         maskfound = True
-        print(f"found mask {mask_image}.  Will implement masking in galfit")
+        print(f"found mask {mask_image}.  Will implement masking in galfit!")
     else:
         print()
-        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit :(")
         maskfound = False
         print()
     
@@ -534,7 +534,7 @@ if __name__ == '__main__':
     
     # code to run galfit
     print('running galfit')
-    #os.system(f"galfit galfit.input1")
+    os.system(f"galfit galfit.input1")
 
 
     # TODO: read galfit output, and create new input to run with convolution
