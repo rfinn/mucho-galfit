@@ -544,11 +544,11 @@ if __name__ == '__main__':
 
 
     # TODO: read galfit output, and create new input to run with convolution
-    #write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image, firstpass=False)
+    write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image, firstpass=False)
 
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
-    #os.system(f"galfit galfit.input2")
+    os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
