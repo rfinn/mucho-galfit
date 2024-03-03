@@ -481,7 +481,10 @@ if __name__ == '__main__':
     
     # set up path name for image directory
     # directory where galaxy images are
+    
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
+    if not os.path.exists(data_dir):
+        data_dir = '/mnt/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
     print("source directory for JM images = ",data_dir)
 
