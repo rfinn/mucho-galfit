@@ -435,10 +435,10 @@ if __name__ == '__main__':
             topdir = os.getcwd()+'/'
             os.chdir(topdir)
     # take as input the galaxy name
-    galname = sys.argv[1]
+    vfid = sys.argv[1]
 
     # move to muchogalfit-output directory
-    output_dir = topdir+galname+'/'
+    output_dir = topdir+vfid+'/'
     if not os.path.exists(output_dir):
         print(f'WARNING: {output_dir} does not exist\n Be sure to run setup_galfit.py first')
         os.chdir(topdir)
@@ -452,7 +452,7 @@ if __name__ == '__main__':
 
     
     # read in input file to get galname, objname, ra, dec, and bandpass
-    sourcefile = open(galname+'sourcelist','r')
+    sourcefile = open(vfid+'sourcelist','r')
     galaxies = sourcefile.readlines()
     if len(galaxies) > 1:
         # set the flag to have more than one galaxy in the galfit input file
@@ -460,7 +460,7 @@ if __name__ == '__main__':
     elif len(galaxies) == 1:
         multiflag = False
     else:
-        print('Problem reading sourcelist for {}'.format(galname))
+        print('Problem reading sourcelist for {}'.format(vfid))
         print('Please check the setup directory')
         os.chdir(topdir)
         sys.exit()
@@ -488,9 +488,9 @@ if __name__ == '__main__':
 
     print("source directory for JM images = ",data_dir)
 
-    image = f'{galname}_GROUP-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    image = f'{objname}_GROUP-custom-image-{bandpass}.fits.fz'
+    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
+    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits.fz'
     
     # need to copy image from data directory if it doesn't exist
     if not os.path.exists(image.replace('.fz','')):
