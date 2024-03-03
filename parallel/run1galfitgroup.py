@@ -489,7 +489,10 @@ if __name__ == '__main__':
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
     if not os.path.exists(data_dir):
         data_dir = '/mnt/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
-
+        if not os.path.exists(data_dir):
+            
+            print(f"could not find data_dir - exiting")
+            sys.exit()
     print(f"running on VFID {vfid}")
     print("source directory for JM images = ",data_dir)
 
