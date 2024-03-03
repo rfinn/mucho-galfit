@@ -169,9 +169,15 @@ class buildgroupmask(buildmask):
         if os.path.exists(catalog):
             vtab = Table.read(catalog)
         else:
-            # test to see if running on Virgo VMS
-            catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
-            vtab = Table.read(catalog)
+            try:
+                # test to see if running on Virgo VMS
+                catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+                vtab = Table.read(catalog)
+            except FileNotFoundError: # adding case for testing on laptop
+                catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
+                vtab = Table.read(catalog)
+            
+
         # create a SkyCoord object from RA and DEC of virgo galaxies
         galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
 
@@ -317,9 +323,14 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     if os.path.exists(catalog):
         vtab = Table.read(catalog)
     else:
-        # test to see if running on Virgo VMS
-        catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
-        vtab = Table.read(catalog)
+        try:
+            # test to see if running on Virgo VMS
+            catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+            vtab = Table.read(catalog)
+        except FileNotFoundError: # adding case for testing on laptop
+            catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
+            vtab = Table.read(catalog)
+        
     # create a SkyCoord object from RA and DEC of virgo galaxies
     galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
 
@@ -378,15 +389,19 @@ def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
         if os.path.exists(mask_image) and not overwrite:
             print("found r-band mask  - no remaking it")
         else:
+            print("did not find r-band mask - remaking it!")
             mask_image = get_rband_mask(image)
 
     else: # reproject r-band mask onto
         
         # look for r-band mask
-        rmask = mask_image.replace(bandpass,'r')
+        if bandpass in ['W1','W2','W3','W4']:
+            rmask = mask_image.replace('wise','r')
+        print("looking for an r-band masked called ",rmask)
         rimage = image.replace(bandpass,'r')        
         # if r-band mask doesn't exist, build it
         if not os.path.exists(rmask):
+            print("did not find r-band mask - remaking it!")
             rmask = get_rband_mask(rimage)
 
         if bandpass in ['W1','W2','W3','W4']:

@@ -156,15 +156,15 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         output_image = f'{galname}-{bandpass}-out2.fits'    
 
     
+    # TODO this should be in main program
     if firstpass:
-
-        
         # funpack the .fz images so galfit can read them
         # save them in output_dir
         funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
         funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
         # unpack invvar image
-        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
+        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)
+        
     # get information from the image, like the image size and position of gal
     image = image.replace('.fz','')
     psf_image = psf_image.replace('.fz','')
@@ -265,7 +265,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
         outfile.write('D) '+psf_image+'     # Input PSF image and (optional) diffusion kernel\n')
         outfile.write('E) %i                   # PSF oversampling factor relative to data\n'%(psf_sampling))
     if maskfound:
-        outfile.write(f'F) {mask_image}     # Input PSF image and (optional) diffusion kernel\n')
+        outfile.write(f'F) {mask_image}     # Bad pixel mask (FITS image or ASCII coord list)\n')
     outfile.write('H) '+str(int(round(xminfit)))+' '+str(int(round(xmaxfit)))+' '+str(int(round(yminfit)))+' '+str(int(round(ymaxfit)))+'     # Image region to fit (xmin xmax ymin ymax)\n')
     if not firstpass:
         outfile.write('I) '+str(int(round(convolution_size)))+' '+str(int(round(convolution_size)))+'             # Size of convolution box (x y)\n')

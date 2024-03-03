@@ -56,7 +56,7 @@ homedir = os.getenv("HOME")
 sys.path.append(homedir+'/github/halphagui/')
 sys.path.append(homedir+'/github/mucho-galfit/parallel/')
 from maskwrapper import buildmask
-from run1galfit import get_mask_name
+from run1galfit import get_maskname
 import run1maskgroup as mg
 
 #import reproject_mask
@@ -179,9 +179,14 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     try:
         vtab = Table.read(catalog)
     except FileNotFoundError:
-        # test to see if running on Virgo VMS
-        catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
-        vtab = Table.read(catalog)
+        try:
+            # test to see if running on Virgo VMS
+            catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+            vtab = Table.read(catalog)
+        except FileNotFoundError: # adding case for testing on laptop
+            catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
+            vtab = Table.read(catalog)
+            
     # create a SkyCoord object from RA and DEC of virgo galaxies
     galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
 
@@ -213,35 +218,24 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
     galname = objname
     #print('inside write_galfit_input: ',galdir,galname)
-    image = f'{galname}_GROUP-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    image = f'{galname}_GROUP-custom-image-{bandpass}.fits'
+    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits'    
+    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits'
 
-    if maskimage is not None:
+    if mask_image is not None:
         maskfound = True
     else:
         maskfound = False
+        
     # created images
-    sigma_image = f'{galname}_GROUP-custom-std-{bandpass}.fits'    
+    sigma_image = f'{galname}_GROUP-custom-std-{bandpass}.fits'
+
+    
     if firstpass:
         output_image = f'{galname}_GROUP-{bandpass}-out1.fits'
     else:
         output_image = f'{galname}_GROUP-{bandpass}-out2.fits'    
 
-    
-    if firstpass:
-
-        
-        # funpack the .fz images so galfit can read them
-        # save them in output_dir
-        funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
-        funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)
-        # unpack invvar image
-        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
-    # get information from the image, like the image size and position of gal
-    image = image.replace('.fz','')
-    psf_image = psf_image.replace('.fz','')
-    invvar_image = invvar_image.replace('.fz','')
     # prepend output directory to all images
     sigma_image = output_dir+'/'+sigma_image
     invvar_image = output_dir+'/'+invvar_image
@@ -260,8 +254,8 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
 
     # TODONE: add mask to galfit input
     # have updated mask wrapper in halpha gui
-    maskfound = False
-    mask_image = get_maskname(image)
+    #maskfound = False
+    #mask_image = get_maskname(image)
     #print()
     #print(f"mask name = {mask_image}")
     #print()
@@ -275,6 +269,7 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
     else:
         print()
         print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+        maskfound = False
         print()
     
 
@@ -297,7 +292,7 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
         # DONE: need to get (x,y) center of object
 
 
-        maskfound = True
+
         BA=1
         fitBA = 1
         PA=0
@@ -319,7 +314,7 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
         outfile.write('B) '+output_image+'       # Name for the output image\n')
         outfile.write('C) %s                # Sigma image name (made from data if blank or "none") \n'%(sigma_image))
         if maskfound:
-            outfile.write(f'F) {mask_image}     # Input PSF image and (optional) diffusion kernel\n')
+            outfile.write(f'F) {mask_image}     # Bad pixel mask (FITS image or ASCII coord list)\n')
         outfile.write('H) '+str(int(round(xminfit)))+' '+str(int(round(xmaxfit)))+' '+str(int(round(yminfit)))+' '+str(int(round(ymaxfit)))+'     # Image region to fit (xmin xmax ymin ymax)\n')
         outfile.write('J) %5.2f              # Magnitude photometric zeropoint \n'%(magzp))
         outfile.write('K) %6.5f   %6.5f         # Plate scale (dx dy)  [arcsec/pix]\n'%(pscale,pscale))
@@ -433,15 +428,19 @@ if __name__ == '__main__':
     try:
         os.chdir(topdir)
     except FileNotFoundError: # assuming that we are running on virgo vms or draco
-        topdir = '/mnt/astrophysics/muchogalfit-output/'
-        os.chdir(topdir)
+        try:
+            topdir = '/mnt/astrophysics/muchogalfit-output/'
+            os.chdir(topdir)
+        except FileNotFoundError: # assume we are testing on linux laptop
+            topdir = os.getcwd()+'/'
+            os.chdir(topdir)
     # take as input the galaxy name
     galname = sys.argv[1]
 
     # move to muchogalfit-output directory
     output_dir = topdir+galname+'/'
     if not os.path.exists(output_dir):
-        print('WARNING: {} does not exist\n Be sure to run setup_galfit.py first')
+        print(f'WARNING: {output_dir} does not exist\n Be sure to run setup_galfit.py first')
         os.chdir(topdir)
         sys.exit()
     
@@ -475,13 +474,46 @@ if __name__ == '__main__':
     bandpass = sys.argv[2]
     
 
+
+    ###############################################################################
+    ### GET IMAGES
+    ###############################################################################
+    
     # set up path name for image directory
     # directory where galaxy images are
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
-    image = f'{objname}_GROUP-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    print("source directory for JM images = ",data_dir)
+
+    image = f'{galname}_GROUP-custom-image-{bandpass}.fits.fz'
+    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
+    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    
+    # need to copy image from data directory if it doesn't exist
+    if not os.path.exists(image.replace('.fz','')):
+        funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
+    image = image.replace('.fz','')
+
+
+    if not os.path.exists(invvar_image.replace('.fz','')):
+        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
+    invvar_image = invvar_image.replace('.fz','')
+
+    if not os.path.exists(psf_image.replace('.fz','')):
+        funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)        
+    psf_image = psf_image.replace('.fz','')
+    
+
+    ###############################################################################
+    ### END GET IMAGES
+    ###############################################################################
+    
+
+    
+    # get information from the image, like the image size and position of gal
+
+    # unpack the image
+    
 
     # get mask
     mask_image = mg.get_group_mask(image,bandpass=bandpass,overwrite=False)
@@ -492,22 +524,22 @@ if __name__ == '__main__':
 
     # get galaxies in the FOV
     # def get_galaxies_in_fov(image,bandpass='W3'):    
-    x,y = get_galaxies_in_FOV(image, bandpass=bandpass)
+    x,y = get_galaxies_in_fov(image, bandpass=bandpass)
     
     # TODONE: add code to generate galfit input for first run, no convolution, generic starting point
-    write_galfit_input(data_dir, output_dir, objname, xgal=x, ygal=y, bandpass,mask_image=mask_image)
+    write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image)
     
     # code to run galfit
     print('running galfit')
-    os.system(f"galfit galfit.input1")
+    #os.system(f"galfit galfit.input1")
 
 
     # TODO: read galfit output, and create new input to run with convolution
-    write_galfit_input(data_dir, output_dir, objname, bandpass,xgal=x,ygal=y, mask_image=mask_image, firstpass=False)
+    #write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image, firstpass=False)
 
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
-    os.system(f"galfit galfit.input2")
+    #os.system(f"galfit galfit.input2")
 
     os.chdir(topdir)
