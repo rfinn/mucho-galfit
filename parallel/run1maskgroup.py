@@ -403,7 +403,8 @@ def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
         if not os.path.exists(rmask):
             print("did not find r-band mask - remaking it!")
             rmask = get_rband_mask(rimage)
-
+        else:
+            print("\tfound it!")
         if bandpass in ['W1','W2','W3','W4']:
             mask_image = reproject_mask(rmask,image)
     
