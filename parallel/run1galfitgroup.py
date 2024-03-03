@@ -280,6 +280,7 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
     xmaxfit = xmax 
     yminfit = 1
     ymaxfit = ymax
+
     
     #if firstpass:
     #    # read in image header and convert RA, DEC to xpixel,ypixel
@@ -299,13 +300,16 @@ def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None
         fitPA = 1
         nsersic=2
         fitn = 1
-        mag=7
+
+        # set the magnitude based on the typical galaxy parameters
+        mag=guess_mag[bandpass]
         fitmag = 1
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
         rad = 25/pixel_scale[bandpass]
         fitrad = 1
+        
 
         
         outfile = open('galfit.input1','w')
@@ -495,6 +499,8 @@ if __name__ == '__main__':
     # need to copy image from data directory if it doesn't exist
     if not os.path.exists(image.replace('.fz','')):
         funpack_image(os.path.join(data_dir,image),os.path.join(output_dir,image.replace('.fz','')))
+    else:
+        print("image is in place - no need to recopy")
     image = image.replace('.fz','')
 
 
