@@ -54,7 +54,10 @@ from reproject import reproject_interp
 homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
+sys.path.append(homedir+'/github/mucho-galfit/parallel/')
 from maskwrapper import buildmask
+from run1galfit import get_mask_name
+import run1maskgroup as mg
 
 #import reproject_mask
 
@@ -75,97 +78,11 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 
 
 
-class buildgroupmask(buildmask):
-    """
-    this is builds on the buildmask class from maskwrapper
-
-    adapting to work with fields that contain multiple galaxies
-
-    all of this is pretty virgo centric, in the sense that the virgo catalogs are built in
-
-    should make this more general to work with any table containing RA and DEC
-
-    """
-    def __init__(self,image,bandpass=None):
-        self.image_name = image
-        self.image, self.imheader = fits.getdata(self.image_name,header = True)
-        self.image_wcs = WCS(self.imheader)
-        self.ymax,self.xmax = self.image.shape
-        
-        # SE parameters for masking
-        self.threshold=0.005
-        self.snr=10
-        self.snr_analysis=10        
-        self.sepath = homedir+'/github/halphagui/astromatic/'
-        self.config='default.sex.HDI.mask'
-
-        # set auto to true to run masking in automatic mode
-        self.auto = True
-        
-        # GAIA catalog, with path set for grawp
-        # TODO - need to implement gaia query to get the faint stars as well
-        self.gaiapath = '/mnt/astrophysics/rfinn/catalogs/gaia-mask-dr9.virgo.fits'
-        self.gaia_mask = None
-        self.add_gaia_stars = True        
-
-        t = self.image_name.split('.fit')
-        self.mask_image=t[0]+'-mask.fits'
-        self.mask_inv_image=t[0]+'-inv-mask.fits'
-        print('saving mask image as: ',self.mask_image)
-
-        # SET UP AND RUN SOURCE EXTRACTOR
-        self.link_files()
-        self.runse()
-
-        # number of times to run grow depends on bandpass.
-        # only once with wise bands.
-        if bandpass is not None:
-            if bandpass.startswith('W'):
-                self.grow_mask()
-        else:
-            self.grow_mask()
-            self.grow_mask()
-            self.grow_mask()
-
-
-        # get gaia stars
-        self.add_gaia_masks()
-        self.write_mask()
-
-
-
-    def remove_gals(self,xgals,ygals):
-        for x,y in zip(xgals,ygals):
-            # get mask value at location of galaxy
-            maskval = self.maskdat[int(y),int(x)]
-            
-            
-            # get pixels where the mask value = value at location of galaxy
-
-            # and 
-            # set those pixels to zero
-            # adding commit just because
-            self.maskdat[self.maskdat == maskval]=0
-        self.write_mask()
-
 
 ##########################################################################     
 ### FUNCTIONS
 ##########################################################################     
 
-def reproject_mask(maskfile, reffile):
-    hmask = fits.open(maskfile)
-
-    href = fits.open(reffile)
-
-    # reproject r-band mask onto W3 header
-
-    wisemask,footprint = reproject_interp(hmask,href[0].header)
-
-    # all wise images have the same pixel scale, so we only need one wise mask
-    outname = maskfile.replace('r-mask','wise-mask')
-    fits.writeto(outname,wisemask,href[0].header,overwrite=True)
-    return outname
 
 def funpack_image(input,output,nhdu=1):
     command = 'funpack -O {} {}'.format(output,input)
@@ -290,71 +207,10 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     return x,y
 
 
-def get_rband_mask(image,ra,dec,bandpass=None):
-    mask_image = get_maskname(image)
-    xobj, yobj = get_xy_from_wcs(ra,dec,image)    
-    xgal, ygal = get_galaxies_in_fov(image,bandpass='r')
- 
-    m = buildgroupmask(image,bandpass=bandpass)
-    m.remove_gals(xgals,ygals)
-
-    os.rename(m.mask_image,mask_image)
-    
 
 
-def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
-    """
-    create the mask for the group image, remove galaxies to be fitted  
-
-    the logic in this function assumes that the r-band mask is made first!!!
-
-    """
-    # create the mask
-    # remove objects at the positions of the galaxies to be fitted
-
-    # this will return the r-band mask for g,r,z and the 'wise' mask for W1-W4
-    mask_image = get_maskname(image)
-    
-    # if bandpass='r', make the mask
-    if (bandpass == 'r'):
-        if os.path.exists(mask_image) & not(overwrite):
-            print("found r-band mask  - no remaking it")
-        else:
-            mask_image = get_rband_mask(image,ra,dec,bandpass=bandpass)
-
-    else: # reproject r-band mask onto
         
-        # look for r-band mask
-        rmask = mask_image.replace(bandpass,'r')
-        rimage = image.replace(bandpass,'r')        
-        # if r-band mask doesn't exist, build it
-        if not os.path.exists(rmask):
-            rmask = get_rband_mask(rimage,ra,dec)
-
-        if bandpass in ['W1','W2','W3','W4']:
-            mask_image = reproject_mask(rmask,image)
-    
-
-    # return mask_image
-    return mask_image
-
-def get_maskname(image):
-    """ return the wise mask for wise images and the r mask for legacy images  """
-    # check for wise extenstion
-    elist = ['W1','W2','W3','W4']
-    
-    for e in elist:
-        if e in image:
-            maskname = image.replace(e+".fits","wise-mask.fits")
-            return maskname
-    # check for legacy
-    llist = ['image-g','image-r','image-z']
-    for l in llist:
-        if l in image:
-            maskname = image.replace(l+".fits","image-r-mask.fits")
-            return maskname
-        
-def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, mask_image=None, firstpass=True):
+def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
     galname = objname
     #print('inside write_galfit_input: ',galdir,galname)
     image = f'{galname}_GROUP-custom-image-{bandpass}.fits.fz'
@@ -402,9 +258,27 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, mask_imag
     # TODO: add mask to galfit input
     # have updated mask wrapper in halpha gui
 
+    # TODONE: add mask to galfit input
+    # have updated mask wrapper in halpha gui
+    maskfound = False
+    mask_image = get_maskname(image)
+    #print()
+    #print(f"mask name = {mask_image}")
+    #print()
+    #print(f"cwd = {os.getcwd()}")
+    #print()
+    #print(f"listdir = {os.listdir()}")
+    #print()
+    if os.path.exists(mask_image):
+        maskfound = True
+        print(f"found mask {mask_image}.  Will implement masking in galfit")
+    else:
+        print()
+        print(f"no mask found for {image} {mask_image}- will NOT implement masking in galfit")
+        print()
     
 
-    # TODO: need to get xmaxfit,ymaxfit
+    # TODONE: need to get xmaxfit,ymaxfit
     xmax,ymax = get_image_size(image) # am I mixing x and y dimensions here?
     print('image dimensions = ',xmax,ymax)
     xminfit = 1
@@ -610,15 +484,18 @@ if __name__ == '__main__':
     psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits.fz'
 
     # get mask
-    mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass=bandpass,overwrite=False)
+    mask_image = mg.get_group_mask(image,bandpass=bandpass,overwrite=False)
 
     # TODONE: remove previous galfit files if they exist
     os.system('rm galfit.??')
     os.system('rm galfit.input?')
+
+    # get galaxies in the FOV
+    # def get_galaxies_in_fov(image,bandpass='W3'):    
+    x,y = get_galaxies_in_FOV(image, bandpass=bandpass)
     
-    
-    # TODO: add code to generate galfit input for first run, no convolution, generic starting point
-    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass,mask_image=mask_image)
+    # TODONE: add code to generate galfit input for first run, no convolution, generic starting point
+    write_galfit_input(data_dir, output_dir, objname, xgal=x, ygal=y, bandpass,mask_image=mask_image)
     
     # code to run galfit
     print('running galfit')
@@ -626,7 +503,7 @@ if __name__ == '__main__':
 
 
     # TODO: read galfit output, and create new input to run with convolution
-    write_galfit_input(data_dir, output_dir, objname, ra, dec, bandpass, mask_image=mask_image, firstpass=False)
+    write_galfit_input(data_dir, output_dir, objname, bandpass,xgal=x,ygal=y, mask_image=mask_image, firstpass=False)
 
     # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images

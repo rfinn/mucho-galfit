@@ -182,7 +182,7 @@ def write_galfit_input(galdir, output_dir, objname, ra, dec, bandpass, firstpass
     pscale = pixel_scale[bandpass]
     magzp = mag_zeropoint[bandpass]
     
-    # TODO: add mask to galfit input
+    # TODONE: add mask to galfit input
     # have updated mask wrapper in halpha gui
     maskfound = False
     mask_image = get_maskname(image)
