@@ -491,16 +491,16 @@ if __name__ == '__main__':
     
     # need to copy image from data directory if it doesn't exist
     if not os.path.exists(image.replace('.fz','')):
-        funpack_image(os.path.join(galdir,image),os.path.join(output_dir,image.replace('.fz','')))
+        funpack_image(os.path.join(data_dir,image),os.path.join(output_dir,image.replace('.fz','')))
     image = image.replace('.fz','')
 
 
     if not os.path.exists(invvar_image.replace('.fz','')):
-        funpack_image(os.path.join(galdir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
+        funpack_image(os.path.join(data_dir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
     invvar_image = invvar_image.replace('.fz','')
 
     if not os.path.exists(psf_image.replace('.fz','')):
-        funpack_image(os.path.join(galdir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)        
+        funpack_image(os.path.join(data_dir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)        
     psf_image = psf_image.replace('.fz','')
     
 
