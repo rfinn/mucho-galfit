@@ -196,5 +196,7 @@ if __name__ == '__main__':
             get_images(vfid,ra,objname,group_name,aphys=aphys)
 
             os.chdir(outdir)
-            if i > 1:
-                sys.exit()
+
+            # for testing
+            #if i > 1:
+            #    sys.exit()
