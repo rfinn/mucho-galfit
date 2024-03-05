@@ -171,7 +171,10 @@ if __name__ == '__main__':
     outdir = os.path.join(aphys,'muchogalfit-output/')
     os.chdir(outdir)
     # for each galaxy, create a directory and write sourcelist
-    for i in range(len(etab)):
+
+    # could run in parallel by just sending in the line number
+    line_number = sys.argv[1]
+    for i in [line_number]:
         if etab['GROUP_PRIMARY'][i] & (etab['GROUP_MULT'][i] > 0): # make directory for primary targets
             galpath = outdir+etab['VFID'][i]
 
