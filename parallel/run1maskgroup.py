@@ -80,7 +80,7 @@ class buildgroupmask(buildmask):
         
         # another parameter to initialize
         self.off_center_flag = False
-        self.remove_center_object_flag = True
+        self.remove_center_object_flag = False
 
         # to track usr masks - need this for writing functions
         self.deleted_objects = []
@@ -371,7 +371,7 @@ def get_rband_mask(image):
 
 
 
-def get_group_mask(image,ra=None,dec=None,bandpass=None,overwrite=True):
+def get_group_mask(image,bandpass=None,overwrite=True):
     """
     create the mask for the group image, remove galaxies to be fitted  
 
@@ -443,10 +443,10 @@ if __name__ == '__main__':
         topdir = '/mnt/astrophysics/muchogalfit-output/'
         os.chdir(topdir)
     # take as input the galaxy name
-    galname = sys.argv[1]
+    vfid = sys.argv[1]
     bandpass = 'r'
     # move to muchogalfit-output directory
-    output_dir = topdir+galname+'/'
+    output_dir = topdir+vfid+'/'
     if not os.path.exists(output_dir):
         print('WARNING: {} does not exist\n Be sure to run setup_galfit.py first')
         os.chdir(topdir)
@@ -454,8 +454,6 @@ if __name__ == '__main__':
     
     os.chdir(output_dir)
 
-    # define environment variable so funpack can find the correct variables
-    os.environ["LD_LIBRARY_PATH"]="/opt/ohpc/pub/compiler/gcc/9.4.0/lib64:/home/siena.edu/rfinn/software/cfitsio-4.2.0/"
 
 
     
@@ -486,13 +484,50 @@ if __name__ == '__main__':
     # directory where galaxy images are
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
 
-    image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
-    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
-    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
-    print("image = ",image)
-    # get mask
-    mask_image = get_group_mask(image,ra=ra,dec=dec,bandpass='r',overwrite=True)
-    # TODO: remove galfit input files if they exist
+    # read in virgo catalog
+    tablename = 'vf_v2_legacy_ephot.fits'
+    maintablename = 'vf_v2_main.fits'
+    # directory structure on grawp
+    catalogdir='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/'
+    try:
+        
+        etab = Table.read(catalogdir+tablename)
+        maintab = Table.read(catalogdir+maintablename)        
+        
+        aphys = '/mnt/astrophysics/rfinn/'
+    except FileNotFoundError:
+        try:
+            # test to see if running on Virgo VMS or draco
+            catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
+            etab = Table.read(catalogdir+tablename)
+            maintab = Table.read(catalogdir+maintablename)        
+            aphys = '/mnt/astrophysics/'        
+        except FileNotFoundError: # 
+            print("ERROR: problem locating astrophysics drive - exiting")
+            sys.exit()
 
+    matchflag = etab['VFID'] == vfid
+    
+    if np.sum(matchflag) < 1:
+        print("ERROR: did not find a matching VFID for ",vfid)
+    matchindex = np.arange(len(etab))[matchflag][0]
+    
+        
+    for bandpass in ['r','W1']:
+        objname = etab['GALAXY'][matchindex]
+        # look in vf tables to find if file is group or not
+        if etab['GROUP_MULT'][matchindex] > 1:
+            image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
+            invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
+            psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
+        else:
+            image = f'{objname}-custom-image-{bandpass}.fits'
+            invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
+            psf_image = f'{objname}-custom-psf-{bandpass}.fits'
+            
+        print("image = ",image)
+            
+        # get mask
+        mask_image = get_group_mask(image,bandpass=bandpass,overwrite=True)
 
     os.chdir(topdir)
