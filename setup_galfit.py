@@ -173,7 +173,7 @@ if __name__ == '__main__':
     # for each galaxy, create a directory and write sourcelist
 
     # could run in parallel by just sending in the line number
-    line_number = sys.argv[1]
+    line_number = int(sys.argv[1])
     for i in [line_number]:
         if etab['GROUP_PRIMARY'][i] & (etab['GROUP_MULT'][i] > 0): # make directory for primary targets
             galpath = outdir+etab['VFID'][i]
