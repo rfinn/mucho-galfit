@@ -174,6 +174,7 @@ if __name__ == '__main__':
 
     # could run in parallel by just sending in the line number
     line_number = int(sys.argv[1])
+    print("line number = ",line_number)
     for i in [line_number]:
         if etab['GROUP_PRIMARY'][i] & (etab['GROUP_MULT'][i] > 0): # make directory for primary targets
             galpath = outdir+etab['VFID'][i]
