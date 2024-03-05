@@ -66,14 +66,14 @@ def convert_invvar_noise(invvar_image, noise_image):
     # write out as noise image
     fits.writeto(noise_image,noise_data,header=header,overwrite=True)
     
-def get_images(ra,objname,group_name,aphys='/mnt/astrophysics/rfinn/'):
+def get_images(vfid,ra,objname,group_name,aphys='/mnt/astrophysics/rfinn/'):
     ###############################################################################
     ### GET IMAGES
     ###############################################################################
     
     # set up path name for image directory
     # directory where galaxy images are
-    output_dir = os.path.join(aphys,'muchogalfit-output/')
+    output_dir = os.path.join(aphys,'muchogalfit-output',vfid+'/')
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
@@ -187,12 +187,13 @@ if __name__ == '__main__':
             #sourcelist.close()
 
             # copy images and funpack
+            vfid = maintab['VFID'][i]
             ra = maintab['RA'][i]
             dec = maintab['DEC'][i]
             objname = maintab['objname'][i]
             group_name = etab['GROUP_NAME'][i] # this is either the objname, or objname_GROUP for groups
 
-            get_images(ra,objname,group_name,aphys=aphys)
+            get_images(vfid,ra,objname,group_name,aphys=aphys)
 
             os.chdir(outdir)
             if i > 1:
