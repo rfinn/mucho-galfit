@@ -169,6 +169,7 @@ if __name__ == '__main__':
 
 
     outdir = os.path.join(aphys,'muchogalfit-output/')
+    os.chdir(outdir)
     # for each galaxy, create a directory and write sourcelist
     for i in range(len(etab)):
         if etab['GROUP_PRIMARY'][i] & (etab['GROUP_MULT'][i] > 0): # make directory for primary targets
@@ -177,7 +178,7 @@ if __name__ == '__main__':
             # make directory if it doesn't already exist
             if not os.path.exists(galpath):
                 os.mkdir(galpath)
-
+            os.chdir(galpath)
             #sourcefile = galpath+'/{}sourcelist'.format(maintab['VFID'][i])
             #sourcelist = open(sourcefile,'w')
             ## write out one line with VFID, objname, RA, DEC, wavelength
@@ -193,6 +194,6 @@ if __name__ == '__main__':
 
             get_images(ra,objname,group_name,aphys=aphys)
 
-
-            if i > 2:
+            os.chdir(outdir)
+            if i > 1:
                 sys.exit()
