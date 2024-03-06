@@ -454,13 +454,6 @@ if __name__ == '__main__':
     
     os.chdir(output_dir)
 
-
-
-    
-    # set up path name for image directory
-    # directory where galaxy images are
-    data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
-
     # read in virgo catalog
     tablename = 'vf_v2_legacy_ephot.fits'
     maintablename = 'vf_v2_main.fits'
