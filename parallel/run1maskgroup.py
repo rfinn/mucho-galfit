@@ -457,29 +457,6 @@ if __name__ == '__main__':
 
 
     
-    # read in input file to get galname, objname, ra, dec, and bandpass
-    sourcefile = open(galname+'sourcelist','r')
-    galaxies = sourcefile.readlines()
-    if len(galaxies) > 1:
-        # set the flag to have more than one galaxy in the galfit input file
-        multiflag = True
-    elif len(galaxies) == 1:
-        multiflag = False
-    else:
-        print('Problem reading sourcelist for {}'.format(galname))
-        print('Please check the setup directory')
-        os.chdir(topdir)
-        sys.exit()
-
-    # parse information from file
-    vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
-    ra = float(ra)
-    dec = float(dec)
-    bandpass = 'r'
-    # reset bandpass to the wavelength that is passed in from the command line
-    #bandpass = sys.argv[2]
-    
-
     # set up path name for image directory
     # directory where galaxy images are
     data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
