@@ -200,33 +200,24 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
 
         
-def write_galfit_input(galdir, output_dir, objname, bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
-    galname = objname
-    #print('inside write_galfit_input: ',galdir,galname)
-    image = f'{galname}_GROUP-custom-image-{bandpass}.fits'
-    invvar_image = f'{galname}_GROUP-custom-invvar-{bandpass}.fits'    
-    psf_image = f'{galname}_GROUP-custom-psf-{bandpass}.fits'
+def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
 
+ 
     if mask_image is not None:
         maskfound = True
     else:
         maskfound = False
         
-    # created images
-    sigma_image = f'{galname}_GROUP-custom-std-{bandpass}.fits'
 
-    
+    t = image.split('-')
     if firstpass:
-        output_image = f'{galname}_GROUP-{bandpass}-out1.fits'
+        output_image = f'{t[0]}-{bandpass}-out1.fits'
     else:
-        output_image = f'{galname}_GROUP-{bandpass}-out2.fits'    
+        output_image = f'{t[0]}-{bandpass}-out2.fits'    
 
     # prepend output directory to all images
     sigma_image = output_dir+'/'+sigma_image
-    invvar_image = output_dir+'/'+invvar_image
-    # check if noise image exists, if not make it from invvar    
-    if not os.path.exists(sigma_image):
-        convert_invvar_noise(invvar_image,sigma_image)
+
     sigma_image = os.path.basename(sigma_image)
 
         
@@ -472,11 +463,13 @@ if __name__ == '__main__':
     # look in vf tables to find if file is group or not
     if etab['GROUP_MULT'][matchindex] > 1:
         image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
-        invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
+        invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'
+        std_image = f'{objname}_GROUP-custom-std-{bandpass}.fits'            
         psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
     else:
         image = f'{objname}-custom-image-{bandpass}.fits'
-        invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
+        invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'
+        std_image = f'{objname}-custom-std-{bandpass}.fits'    
         psf_image = f'{objname}-custom-psf-{bandpass}.fits'
             
     print("image = ",image)
@@ -496,7 +489,8 @@ if __name__ == '__main__':
     x,y = get_galaxies_in_fov(image, bandpass=bandpass)
     
     # TODONE: add code to generate galfit input for first run, no convolution, generic starting point
-    write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image)
+    #write_galfit_input(output_dir, image, sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):    
+    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image)
     
     # code to run galfit
     print('running galfit')
@@ -504,7 +498,7 @@ if __name__ == '__main__':
 
 
     # TODONE: read galfit output, and create new input to run with convolution
-    write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image, firstpass=False)
+    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False)
 
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
