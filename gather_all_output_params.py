@@ -47,7 +47,10 @@ band = sys.argv[1]
 nvirgo = 6780
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','BA','PA','SKY','ERROR','CHI2NU']
+
+# for convolution - second pass of galfit
 cheader = ["C"+i for i in header]
+
 colnames = ['VFID']+header+cheader
 
 dtype=['S8',\
@@ -74,6 +77,7 @@ for i in range(nvirgo):
         print("no out1 file for ",vfid)
     else:
         # skip groups for now
+        # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
         if 'GROUP' in infile1[0]:
 
             continue
