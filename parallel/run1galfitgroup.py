@@ -56,8 +56,8 @@ homedir = os.getenv("HOME")
 sys.path.append(homedir+'/github/halphagui/')
 sys.path.append(homedir+'/github/mucho-galfit/parallel/')
 from maskwrapper import buildmask
-from run1galfit import get_maskname
-import run1maskgroup as mg
+#from run1galfit import get_maskname
+#import run1maskgroup as mg
 
 #import reproject_mask
 
@@ -83,20 +83,23 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 ### FUNCTIONS
 ##########################################################################     
 
-
-def funpack_image(input,output,nhdu=1):
-    command = 'funpack -O {} {}'.format(output,input)
-    print(command)
-    os.system(command)
-def funpack_image_astropy(input,output,nhdu=1):
-    from astropy.io import fits
-    hdu = fits.open(input)
-    print('input file = ',input)
-    #print(hdu.info())
-    fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
-    hdu.close()
-    print('finished unpacking image')
+def get_maskname(image):
+    """ return the wise mask for wise images and the r mask for legacy images  """
+    # check for wise extenstion
+    elist = ['W1','W2','W3','W4']
     
+    for e in elist:
+        if e in image:
+            maskname = image.replace(e+".fits","wise-mask.fits")
+            return maskname
+    # check for legacy
+    llist = ['image-g','image-r','image-z']
+    for l in llist:
+        if l in image:
+            maskname = image.replace(l+".fits","image-r-mask.fits")
+            return maskname
+    
+
 def parse_galfit_output(galfit_outimage):
     from astropy.io import fits
     #import numpy as np
@@ -132,25 +135,6 @@ def parse_galfit_output(galfit_outimage):
     fit_parameters.append(chi2nu)
     return fit_parameters
 
-def convert_invvar_noise(invvar_image, noise_image):
-    # convert invvar image to noise
-    from astropy.io import fits
-    import numpy as np
-    # read in invvar image
-    print('invvar image = ',invvar_image, os.path.basename(invvar_image))
-    hdu = fits.open(invvar_image)
-    data = hdu[0].data
-    header = hdu[0].header
-    hdu.close()
-    # operate on pixels to take sqrt(1/x)
-    noise_data = np.sqrt(1/data)
-    
-    # check for bad values, nan, inf
-    # set bad pixels to very high value, like 1e6
-    noise_data = np.nan_to_num(noise_data,nan=1.e6)
-
-    # write out as noise image
-    fits.writeto(noise_image,noise_data,header=header,overwrite=True)
 
 def get_image_size(image):
     from astropy.io import fits
@@ -428,109 +412,80 @@ if __name__ == '__main__':
 
     # DONE: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
+
+
+    # DONE: move galfit output to a new destination
+    # /mnt/astrophysics/rfinn/muchogalfit-output
     topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
     try:
         os.chdir(topdir)
     except FileNotFoundError: # assuming that we are running on virgo vms or draco
-        try:
-            topdir = '/mnt/astrophysics/muchogalfit-output/'
-            os.chdir(topdir)
-        except FileNotFoundError: # assume we are testing on linux laptop
-            topdir = os.getcwd()+'/'
-            os.chdir(topdir)
+        topdir = '/mnt/astrophysics/muchogalfit-output/'
+        os.chdir(topdir)
+        
     # take as input the galaxy name
     vfid = sys.argv[1]
 
+    # set bandpass to the wavelength that is passed in from the command line
+    bandpass = sys.argv[2]
+    
     # move to muchogalfit-output directory
     output_dir = topdir+vfid+'/'
     if not os.path.exists(output_dir):
-        print(f'WARNING: {output_dir} does not exist\n Be sure to run setup_galfit.py first')
+        print('WARNING: {} does not exist\n Be sure to run setup_galfit.py first')
         os.chdir(topdir)
         sys.exit()
     
     os.chdir(output_dir)
 
-    # define environment variable so funpack can find the correct variables
-    os.environ["LD_LIBRARY_PATH"]="/opt/ohpc/pub/compiler/gcc/9.4.0/lib64:/home/siena.edu/rfinn/software/cfitsio-4.2.0/"
-
-
-    
-    # read in input file to get galname, objname, ra, dec, and bandpass
-    sourcefile = open(vfid+'sourcelist','r')
-    galaxies = sourcefile.readlines()
-    if len(galaxies) > 1:
-        # set the flag to have more than one galaxy in the galfit input file
-        multiflag = True
-    elif len(galaxies) == 1:
-        multiflag = False
-    else:
-        print('Problem reading sourcelist for {}'.format(vfid))
-        print('Please check the setup directory')
-        os.chdir(topdir)
-        sys.exit()
-
-    # parse information from file
-    vfid, objname, ra, dec, bandpass = galaxies[0].rstrip().split()
-    ra = float(ra)
-    dec = float(dec)
-
-    # reset bandpass to the wavelength that is passed in from the command line
-    bandpass = sys.argv[2]
-    
-
-
-    ###############################################################################
-    ### GET IMAGES
-    ###############################################################################
-    
-    # set up path name for image directory
-    # directory where galaxy images are
-    
-    data_dir = '/mnt/astrophysics/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
-    if not os.path.exists(data_dir):
-        data_dir = '/mnt/virgofilaments-data/{}/{}_GROUP/'.format(int(ra),objname)
-        if not os.path.exists(data_dir):
-            
-            print(f"could not find data_dir - exiting")
+    # read in virgo catalog
+    tablename = 'vf_v2_legacy_ephot.fits'
+    maintablename = 'vf_v2_main.fits'
+    # directory structure on grawp
+    catalogdir='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/'
+    try:
+        
+        etab = Table.read(catalogdir+tablename)
+        maintab = Table.read(catalogdir+maintablename)        
+        
+        aphys = '/mnt/astrophysics/rfinn/'
+    except FileNotFoundError:
+        try:
+            # test to see if running on Virgo VMS or draco
+            catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
+            etab = Table.read(catalogdir+tablename)
+            maintab = Table.read(catalogdir+maintablename)        
+            aphys = '/mnt/astrophysics/'        
+        except FileNotFoundError: # 
+            print("ERROR: problem locating astrophysics drive - exiting")
             sys.exit()
-    print(f"running on VFID {vfid}")
-    print("source directory for JM images = ",data_dir)
 
-    image = f'{objname}_GROUP-custom-image-{bandpass}.fits.fz'
-    invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits.fz'    
-    psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits.fz'
+    matchflag = etab['VFID'] == vfid
     
-    # need to copy image from data directory if it doesn't exist
-    if not os.path.exists(image.replace('.fz','')):
-        funpack_image(os.path.join(data_dir,image),os.path.join(output_dir,image.replace('.fz','')))
+    if np.sum(matchflag) < 1:
+        print("ERROR: did not find a matching VFID for ",vfid)
+    matchindex = np.arange(len(etab))[matchflag][0]
+    
+
+    objname = etab['GALAXY'][matchindex]
+    # look in vf tables to find if file is group or not
+    if etab['GROUP_MULT'][matchindex] > 1:
+        image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
+        invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
+        psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
     else:
-        print("image is in place - no need to recopy")
-    image = image.replace('.fz','')
+        image = f'{objname}-custom-image-{bandpass}.fits'
+        invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
+        psf_image = f'{objname}-custom-psf-{bandpass}.fits'
+            
+    print("image = ",image)
 
+        
 
-    if not os.path.exists(invvar_image.replace('.fz','')):
-        funpack_image(os.path.join(data_dir,invvar_image),os.path.join(output_dir,invvar_image.replace('.fz','')),nhdu=0)        
-    invvar_image = invvar_image.replace('.fz','')
-
-    if not os.path.exists(psf_image.replace('.fz','')):
-        funpack_image(os.path.join(data_dir,psf_image),os.path.join(output_dir,psf_image.replace('.fz','')),nhdu=0)        
-    psf_image = psf_image.replace('.fz','')
+    # masks are made first, but run1maskgroup.py
+    # so we just need the correct mask name
+    mask_image = get_maskname(image)
     
-
-    ###############################################################################
-    ### END GET IMAGES
-    ###############################################################################
-    
-
-    
-    # get information from the image, like the image size and position of gal
-
-    # unpack the image
-    
-
-    # get mask
-    mask_image = mg.get_group_mask(image,bandpass=bandpass,overwrite=False)
-
     # TODONE: remove previous galfit files if they exist
     os.system('rm galfit.??')
     os.system('rm galfit.input?')
@@ -547,10 +502,9 @@ if __name__ == '__main__':
     os.system(f"galfit galfit.input1")
 
 
-    # TODO: read galfit output, and create new input to run with convolution
+    # TODONE: read galfit output, and create new input to run with convolution
     write_galfit_input(data_dir, output_dir, objname, bandpass, xgal=x, ygal=y, mask_image=mask_image, firstpass=False)
 
-    # TODO: skipping convolution for now, so that I can test parallel code.  Come back to this.
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
     os.system(f"galfit galfit.input2")

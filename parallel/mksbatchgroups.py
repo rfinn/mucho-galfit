@@ -147,12 +147,12 @@ os.chdir(data_dir)
 # Dirs.txt contains one line for each galaxy that will be analyzed.
 #
 
-input_file = "groupPrimaryVFID.txt"
+input_file = "PrimaryDirs.txt"
 infile = open(input_file, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
-print(f"\nthe number of lines in groupPrimaryVFID.txt = {nfiles}\n")
+print(f"\nthe number of lines in PrimaryDirs.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
