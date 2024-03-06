@@ -50,6 +50,7 @@ import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from reproject import reproject_interp
+from astropy.table import Table
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
