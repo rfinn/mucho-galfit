@@ -70,10 +70,10 @@ colnames.append('CNumerical_Error')
 
 
 dtype=['S8',\
-           float,float,float,float,float,float,float,float,float,float,\
-           float,float,float,float,float,float,float,float,float,float,\
-           float,float,float,float,float,float,float,float,float,float,\
-           float,float,float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,\
            'bool','bool']
 print('length of dtype = ',len(dtype))
 
