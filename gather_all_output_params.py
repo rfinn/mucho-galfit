@@ -23,6 +23,7 @@ or should we combine all wavelengths into one table?
 import os
 import sys
 from astropy.table import Table
+from astropy.io import fits
 import glob
 import numpy as np
 
@@ -98,8 +99,8 @@ dirlist = glob.glob('VFID????')
 print(dirlist)
 # go in each directory
 for d in dirlist:
-
-    print(d)
+    if os.path.isdir(d):
+        print(d)
     os.chdir(d)
 
     for k in range(2):
