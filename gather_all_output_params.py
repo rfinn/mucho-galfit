@@ -100,8 +100,8 @@ dirlist.sort()
 #print(dirlist)
 # go in each directory
 for d in dirlist:
-    if os.path.isdir(d):
-        print(d)
+    #if os.path.isdir(d):
+    #    print(d)
     os.chdir(d)
 
     gfile = f"galsFOV-{band}.txt"
@@ -117,7 +117,7 @@ for d in dirlist:
             xgal.append(t[1])
             ygal.append(t[2])
 
-    print("number of galaxies = ",len(xgal))
+    #print("number of galaxies = ",len(xgal))
 
     
     for k in range(2):
