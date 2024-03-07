@@ -134,6 +134,7 @@ for d in dirlist:
             xgal = [0]
             vfids = [d]
         imheader = fits.getheader(infile1[0])
+        print(imheader)
         print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
