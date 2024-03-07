@@ -105,7 +105,7 @@ for d in dirlist:
     os.chdir(d)
 
     for k in range(2):
-        if k == 1:
+        if k == 0:
             #output from galfit is NAME-g-out1.fits = output from no convolution
             infile1 = glob.glob(f"*{band}-out1.fits")
             prefix = ''
