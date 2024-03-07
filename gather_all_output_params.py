@@ -139,7 +139,7 @@ for d in dirlist:
             table_index = int(vfids[i].replace('VFID',''))
             for h in header:
                 hkey = f"{i}_{h}"
-                t = fits.getheader(hkey)
+                t = header[hkey]
                 if '*' in t:
                     outtab[table_index][prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
