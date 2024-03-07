@@ -154,7 +154,13 @@ for d in dirlist:
                     print(prefix+'Numerical_Error')
                     print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = False
-                a,b = t.split('+/-')
+                if t.find('[') > -1:
+                    t=t.replace('[','')
+                    t=t.replace(']','')
+                    t=t.split('+/-')
+                    a,b=(float(t[0]),0.)# fit and error
+                else:
+                    a,b = t.split('+/-')
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
             t = imheader[prefix+f"{len(xgal)+1}_SKY"]
