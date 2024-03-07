@@ -139,14 +139,14 @@ for d in dirlist:
         imheader = hdu[2].header
         #print(imheader)
         hdu.close()
-        print(infile1[0])
+        #print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
 
                 t = imheader[hkey]
-                print(hkey,t)
+                #print(hkey,t)
                 if '*' in t:
                     #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
@@ -166,7 +166,7 @@ for d in dirlist:
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
             nsky = len(xgal) + 1
-            print("HEYYYY: nsky = ",nsky)
+            #print("HEYYYY: nsky = ",nsky)
             t = imheader[f"{nsky}_SKY"]
             a,b = t.split(' +/- ')
             outtab[prefix+'SKY'][table_index] = float(a)
