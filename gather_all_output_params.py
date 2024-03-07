@@ -136,6 +136,7 @@ for d in dirlist:
         hdu = fits.open(infile1[0])
  
         imheader = hdu[2].header
+        print(imheader)
         hdu.close()
         print(infile1[0])
         for i in range(len(xgal)):
