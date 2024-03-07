@@ -135,8 +135,8 @@ for d in dirlist:
             vfids = [d]
         hdu = fits.open(infile1[0])
  
-        imheader = hdu[3].header
-        print(imheader)
+        imheader = hdu[2].header
+        #print(imheader)
         hdu.close()
         print(infile1[0])
         for i in range(len(xgal)):
