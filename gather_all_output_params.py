@@ -96,7 +96,7 @@ topdir = os.getcwd()
 os.chdir(topdir)
 # TODO get list of directories
 dirlist = glob.glob('VFID????')
-print(dirlist)
+#print(dirlist)
 # go in each directory
 for d in dirlist:
     if os.path.isdir(d):
@@ -132,6 +132,7 @@ for d in dirlist:
                     ygal.append([t2])
         else:
             xgal = [0]
+            vfids = [d]
         header = fits.getheader(infile1[0])
         print(infile1[0])
         for i in range(len(xgal)):
