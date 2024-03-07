@@ -142,7 +142,7 @@ for d in dirlist:
             table_index = int(vfids[i].replace('VFID',''))
             for h in header:
                 hkey = f"{i+1}_{h}"
-
+                print(hkey)
                 t = imheader[hkey]
                 if '*' in t:
                     print(outtab[prefix+'Numerical_Error'][table_index])
@@ -153,7 +153,7 @@ for d in dirlist:
                     print(prefix+'Numerical_Error')
                     print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = False
-                a,b = t.split(' +/- ')
+                a,b = t.split('+/-')
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
             t = imheader[prefix+f"{len(xgal)+1}_SKY"]
