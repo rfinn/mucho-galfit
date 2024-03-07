@@ -147,13 +147,13 @@ for d in dirlist:
                 t = imheader[hkey]
                 print(hkey,t)
                 if '*' in t:
-                    print(outtab[prefix+'Numerical_Error'][table_index])
+                    #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
                 else:
-                    print(table_index)
-                    print(prefix+'Numerical_Error')
-                    print(outtab[prefix+'Numerical_Error'][table_index])
+                    #print(table_index)
+                    #print(prefix+'Numerical_Error')
+                    #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = False
                 if t.find('[') > -1:
                     t=t.replace('[','')
