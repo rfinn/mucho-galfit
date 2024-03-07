@@ -142,8 +142,9 @@ for d in dirlist:
             table_index = int(vfids[i].replace('VFID',''))
             for h in header:
                 hkey = f"{i+1}_{h}"
-                print(hkey)
+
                 t = imheader[hkey]
+                print(hkey,t)
                 if '*' in t:
                     print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
