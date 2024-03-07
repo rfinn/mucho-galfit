@@ -78,9 +78,9 @@ dtype=['S8',\
            float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,\
            'bool','bool']
-print('length of dtype = ',len(dtype))
+#print('length of dtype = ',len(dtype))
 
-print('length of colnames = ',len(colnames))
+#print('length of colnames = ',len(colnames))
 outtab = Table(np.zeros((nvirgo,len(dtype))),dtype=dtype,names=colnames)
 
 
@@ -146,13 +146,13 @@ for d in dirlist:
                 hkey = f"{i+1}_{h}"
 
                 t = imheader[hkey]
-                print(hkey,t)
+                #print(hkey,t)
                 if t.find('*') > -1:
-                    print("numerical error...")
+                    #print("numerical error...")
                     #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
                     t=t.replace('*','')
-                    print("t w/out error = ",t)
+                    #print("t w/out error = ",t)
                 else:
                     #print(table_index)
                     #print(prefix+'Numerical_Error')
