@@ -75,7 +75,9 @@ dtype=['S8',\
            float,float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,float,\
            'bool','bool']
+print('length of dtype = ',len(dtype))
 
+print('length of colnames = ',len(colnames))
 outtab = Table(np.zeros((nvirgo,len(dtype))),dtype=dtype,names=colnames)
 
 
