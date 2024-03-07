@@ -47,11 +47,11 @@ band = sys.argv[1]
 nvirgo = 6780
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','BA','PA','SKY','CHI2NU']
-header_err = [f"{h}_ERR" for h in header]
+header_err = [f"{h}_ERR" for h in header[:-1]]
 # TODO - make an empty table
 # for convolution - second pass of galfit
 cheader = ["C"+i for i in header]
-cheader_err = [f"{h}_ERR" for h in cheader]
+cheader_err = [f"{h}_ERR" for h in cheader[:-1]]
 
 hheader_with_err = []
 cheader_with_err = []
