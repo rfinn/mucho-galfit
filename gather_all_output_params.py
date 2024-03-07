@@ -133,13 +133,14 @@ for d in dirlist:
         else:
             xgal = [0]
             vfids = [d]
-        header = fits.getheader(infile1[0])
+        imheader = fits.getheader(infile1[0])
         print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
             for h in header:
-                hkey = f"{i}_{h}"
-                t = header[hkey]
+                hkey = f"{i+1}_{h}"
+
+                t = imheader[hkey]
                 if '*' in t:
                     outtab[table_index][prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
@@ -148,7 +149,7 @@ for d in dirlist:
                 a,b = t.split(' +/- ')
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
-            t = header[prefix+f"{len(xgal)+1}_SKY"]
+            t = imheader[prefix+f"{len(xgal)+1}_SKY"]
             a,b = t.split(' +/- ')
             outtab[prefix+'SKY'][table_index] = float(a)
             outtab[prefix+'SKY_ERR'][table_index] = float(b)
