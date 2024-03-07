@@ -142,7 +142,7 @@ for d in dirlist:
         print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
-            for h in header:
+            for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
 
                 t = imheader[hkey]
