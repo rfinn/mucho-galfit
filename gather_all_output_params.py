@@ -130,7 +130,7 @@ for d in dirlist:
                     t = line.strip().split(',')
                     vfids.append(t[0])
                     xgal.append(t[1])
-                    ygal.append([t2])
+                    ygal.append(t[2])
         else:
             xgal = [0]
             vfids = [d]
@@ -165,7 +165,9 @@ for d in dirlist:
                     a,b = t.split('+/-')
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
-            t = imheader[prefix+f"{len(xgal)+1}_SKY"]
+            nsky = len(xgal) + 1
+            print("nsky = ",nsky)
+            t = imheader[prefix+f"{nsky}_SKY"]
             a,b = t.split(' +/- ')
             outtab[prefix+'SKY'][table_index] = float(a)
             outtab[prefix+'SKY_ERR'][table_index] = float(b)
