@@ -96,7 +96,7 @@ os.chdir(topdir)
 # TODO get list of directories
 dirlist = glob.glob('VFID????')
 # go in each directory
-for d in range(dirlist):
+for d in range(len(dirlist)):
 
     if os.path.isdir(d):
         # move to directory for this galaxy
