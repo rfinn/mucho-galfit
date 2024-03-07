@@ -46,69 +46,106 @@ band = sys.argv[1]
 
 nvirgo = 6780
 # set up table to store galfit output
-header=['XC','YC','MAG','RE','N','BA','PA','SKY','ERROR','CHI2NU']
-
+header=['XC','YC','MAG','RE','N','BA','PA','SKY','CHI2NU']
+header_err = [f"{h}_ERR" for h in header]
+# TODO - make an empty table
 # for convolution - second pass of galfit
 cheader = ["C"+i for i in header]
+cheader_err = [f"{h}_ERR" for h in cheader]
 
-colnames = ['VFID']+header+cheader
+hheader_with_err = []
+cheader_with_err = []
+for i in range(len(header)):
+    hheader_with_err.append(header[i])
+    hheader_with_err.append(header_err[i])    
+for i in range(len(cheader)):
+    cheader_with_err.append(cheader[i])
+    cheader_with_err.append(cheader_err[i])
+col1 = ['VFID']
+
+
+colnames = col1 + hheader_with_err + cheader_with_err
+colnames.append('Numerical_Error')
+colnames.append('CNumerical_Error')
+
 
 dtype=['S8',\
            float,float,float,float,float,float,float,float,float,float,\
-           float,float,float,float,float,float,float,float,float,float]
-outtab = Table(dtype=dtype,names=colnames)
+           float,float,float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,float,float,\
+           float,float,float,float,float,float,float,float,float,float,'bool','bool']
 
-topdir = os.getcwd()
-# for each VFID, look in directory
+outtab = Table(np.zeros(nvirgo,len(dtype),dtype=dtype,names=colnames))
+
+
+
+
 for i in range(nvirgo):
-    os.chdir(topdir)
     vfid = f"VFID{i:04d}"
-    outtab.add_row(('',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
     outtab['VFID'][i] = vfid
-    
-    # move to directory for this galaxy
-    os.chdir(vfid)
+    #outtab['VFID'][i] = vfid
 
-        
+# create a dictionary to link the VFID and row in table?
+topdir = os.getcwd()
+os.chdir(topdir)
+# TODO get list of directories
+dirlist = glob.glob('VFID????')
+# go in each directory
+for d in range(dirlist):
 
-    # output from galfit is NAME-g-out1.fits = output from no convolution
-    infile1 = glob.glob(f"*{band}-out1.fits")
-    if len(infile1) < 1:
-        print("no out1 file for ",vfid)
-    else:
-        # skip groups for now
+    if os.path.isdir(d):
+        # move to directory for this galaxy
+        os.chdir(d)
+
+        for k in range(2):
+            if k == 1:
+                #output from galfit is NAME-g-out1.fits = output from no convolution
+                infile1 = glob.glob(f"*{band}-out1.fits")
+                prefix = ''
+            else:
+                infile1 = glob.glob(f"*{band}-out2.fits")
+                prefix = 'C'
+        if len(infile1) < 1:
+            print("no out1 file for ",vfid)
+            continue
+
         # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
         if 'GROUP' in infile1[0]:
-
-            continue
-        #print(infile1[0])
-        t = rg.parse_galfit_results(infile1[0])
-        for j in range(len(t)):
-            if j < 8:
-                outtab[header[j]][i] = t[j][0]
-            else:
-                outtab[header[j]][i] = t[j]
-                
+            # read in galsFOV-{band}.txt to get VFIDs of sources in field
+            gfile = f"galsFOV-{band}.txt"
+            if os.path.exits(gfile):
+                vfids = []
+                xgal = []
+                ygal = []
             
-    # output from galfit is NAME-g-out2.fits = output with convolution        
-    infile1 = glob.glob(f"*{band}-out2.fits")
-    if len(infile1) < 1:
-        print("no out2 file for ",vfid)
-        continue
-    else:
-        # skip groups for now
-        if 'GROUP' in infile1[0]:
+                vgals = open(gfile,'r')
+                for line in vgals:
+                    t = line.strip().split(',')
+                    vfids.append(t[0])
+                    xgal.append(t[1])
+                    ygal.append([t2])
+        else:
+            xgal = [0]
+        header = fits.getheader(infile1[0])
+        for i in range(len(xgal)):
+            table_index = int(vfids[i].replace('VFID',''))
+            for h in header:
+                hkey = f"{i}_{h}"
+                t = fits.getheader(hkey)
+                if '*' in t:
+                    outtab[table_index][prefix+'Numerical_Error'][table_index] = True
+                    t.replace('*','')
+                else:
+                    outtab[table_index][prefix+'Numerical_Error'][table_index] = False
+                a,b = t.split(' +/- ')
+                outtab[prefix+h][table_index] = float(a)
+                outtab[prefix+h+"_ERR"][table_index] = float(b)
+            t = header[prefix+f"{len(xgal)+1}_SKY"]
+            a,b = t.split(' +/- ')
+            outtab[prefix+'SKY'][table_index] = float(a)
+            outtab[prefix+'SKY_ERR'][table_index] = float(b)
 
-            continue
-        
-        t = rg.parse_galfit_results(infile1[0])
-        for j in range(len(t)):
-            if j < 8:
-                outtab[cheader[j]][i] = t[j][0]
-            else:
-                outtab[cheader[j]][i] = t[j]
-
-
+os.chdir(topdir)
 # write output table
 os.chdir(topdir)
 outfilename = f"vf_v2_galfit_{band}.fits"
