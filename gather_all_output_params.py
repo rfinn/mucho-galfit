@@ -146,8 +146,8 @@ for d in dirlist:
                 hkey = f"{i+1}_{h}"
 
                 t = imheader[hkey]
-                #print(hkey,t)
-                if '*' in t:
+                print(hkey,t)
+                if t.find('*') > -1:
                     #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
@@ -156,6 +156,7 @@ for d in dirlist:
                     #print(prefix+'Numerical_Error')
                     #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = False
+                    
                 if t.find('[') > -1:
                     t=t.replace('[','')
                     t=t.replace(']','')
