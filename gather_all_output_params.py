@@ -104,6 +104,22 @@ for d in dirlist:
         print(d)
     os.chdir(d)
 
+    gfile = f"galsFOV-{band}.txt"
+    if os.path.exists(gfile):
+        vfids = []
+        xgal = []
+        ygal = []
+
+        vgals = open(gfile,'r')
+        for line in vgals:
+            t = line.strip().split(',')
+            vfids.append(t[0])
+            xgal.append(t[1])
+            ygal.append(t[2])
+
+    print("number of galaxies = ",len(xgal))
+
+    
     for k in range(2):
         if k == 0:
             #output from galfit is NAME-g-out1.fits = output from no convolution
@@ -117,20 +133,6 @@ for d in dirlist:
             continue
 
         # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
-        gfile = f"galsFOV-{band}.txt"
-        if os.path.exists(gfile):
-            vfids = []
-            xgal = []
-            ygal = []
-
-            vgals = open(gfile,'r')
-            for line in vgals:
-                t = line.strip().split(',')
-                vfids.append(t[0])
-                xgal.append(t[1])
-                ygal.append(t[2])
-                
-        print("number of galaxies = ",len(xgal))
 
         # read in image header
         hdu = fits.open(infile1[0])
