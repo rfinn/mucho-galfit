@@ -145,14 +145,14 @@ for d in dirlist:
 
                 t = imheader[hkey]
                 if '*' in t:
-                    print(outtab[table_index][prefix+'Numerical_Error'][table_index])
-                    outtab[table_index][prefix+'Numerical_Error'][table_index] = True
+                    print(outtab[prefix+'Numerical_Error'][table_index])
+                    outtab[prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
                 else:
                     print(table_index)
                     print(prefix+'Numerical_Error')
-                    print(outtab[table_index][prefix+'Numerical_Error'][table_index])
-                    outtab[table_index][prefix+'Numerical_Error'][table_index] = False
+                    print(outtab[prefix+'Numerical_Error'][table_index])
+                    outtab[prefix+'Numerical_Error'][table_index] = False
                 a,b = t.split(' +/- ')
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
