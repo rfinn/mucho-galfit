@@ -120,7 +120,7 @@ for d in dirlist:
         if 'GROUP' in infile1[0]:
             # read in galsFOV-{band}.txt to get VFIDs of sources in field
             gfile = f"galsFOV-{band}.txt"
-            if os.path.exits(gfile):
+            if os.path.exists(gfile):
                 vfids = []
                 xgal = []
                 ygal = []
