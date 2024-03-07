@@ -110,45 +110,45 @@ for d in range(len(dirlist)):
             else:
                 infile1 = glob.glob(f"*{band}-out2.fits")
                 prefix = 'C'
-        if len(infile1) < 1:
-            print("no out1 file for ",vfid)
-            continue
+            if len(infile1) < 1:
+                print("no out1 file for ",vfid)
+                continue
 
-        # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
-        if 'GROUP' in infile1[0]:
-            # read in galsFOV-{band}.txt to get VFIDs of sources in field
-            gfile = f"galsFOV-{band}.txt"
-            if os.path.exits(gfile):
-                vfids = []
-                xgal = []
-                ygal = []
-            
-                vgals = open(gfile,'r')
-                for line in vgals:
-                    t = line.strip().split(',')
-                    vfids.append(t[0])
-                    xgal.append(t[1])
-                    ygal.append([t2])
-        else:
-            xgal = [0]
-        header = fits.getheader(infile1[0])
-        for i in range(len(xgal)):
-            table_index = int(vfids[i].replace('VFID',''))
-            for h in header:
-                hkey = f"{i}_{h}"
-                t = fits.getheader(hkey)
-                if '*' in t:
-                    outtab[table_index][prefix+'Numerical_Error'][table_index] = True
-                    t.replace('*','')
-                else:
-                    outtab[table_index][prefix+'Numerical_Error'][table_index] = False
+            # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
+            if 'GROUP' in infile1[0]:
+                # read in galsFOV-{band}.txt to get VFIDs of sources in field
+                gfile = f"galsFOV-{band}.txt"
+                if os.path.exits(gfile):
+                    vfids = []
+                    xgal = []
+                    ygal = []
+
+                    vgals = open(gfile,'r')
+                    for line in vgals:
+                        t = line.strip().split(',')
+                        vfids.append(t[0])
+                        xgal.append(t[1])
+                        ygal.append([t2])
+            else:
+                xgal = [0]
+            header = fits.getheader(infile1[0])
+            for i in range(len(xgal)):
+                table_index = int(vfids[i].replace('VFID',''))
+                for h in header:
+                    hkey = f"{i}_{h}"
+                    t = fits.getheader(hkey)
+                    if '*' in t:
+                        outtab[table_index][prefix+'Numerical_Error'][table_index] = True
+                        t.replace('*','')
+                    else:
+                        outtab[table_index][prefix+'Numerical_Error'][table_index] = False
+                    a,b = t.split(' +/- ')
+                    outtab[prefix+h][table_index] = float(a)
+                    outtab[prefix+h+"_ERR"][table_index] = float(b)
+                t = header[prefix+f"{len(xgal)+1}_SKY"]
                 a,b = t.split(' +/- ')
-                outtab[prefix+h][table_index] = float(a)
-                outtab[prefix+h+"_ERR"][table_index] = float(b)
-            t = header[prefix+f"{len(xgal)+1}_SKY"]
-            a,b = t.split(' +/- ')
-            outtab[prefix+'SKY'][table_index] = float(a)
-            outtab[prefix+'SKY_ERR'][table_index] = float(b)
+                outtab[prefix+'SKY'][table_index] = float(a)
+                outtab[prefix+'SKY_ERR'][table_index] = float(b)
 
 os.chdir(topdir)
 # write output table
