@@ -172,7 +172,7 @@ for d in dirlist:
             outtab[prefix+'SKY'][table_index] = float(a)
             outtab[prefix+'SKY_ERR'][table_index] = float(b)
 
-os.chdir(topdir)
+    os.chdir(topdir)
 # write output table
 os.chdir(topdir)
 outfilename = f"vf_v2_galfit_{band}.fits"
