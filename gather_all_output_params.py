@@ -57,10 +57,12 @@ hheader_with_err = []
 cheader_with_err = []
 for i in range(len(header)):
     hheader_with_err.append(header[i])
-    hheader_with_err.append(header_err[i])    
+    if i < len(header)-1:
+        hheader_with_err.append(header_err[i])    
 for i in range(len(cheader)):
     cheader_with_err.append(cheader[i])
-    cheader_with_err.append(cheader_err[i])
+    if i < len(cheader) -1:
+        cheader_with_err.append(cheader_err[i])
 col1 = ['VFID']
 
 
