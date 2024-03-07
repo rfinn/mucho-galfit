@@ -117,28 +117,28 @@ for d in dirlist:
             continue
 
         # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
-        if 'GROUP' in infile1[0]:
-            # read in galsFOV-{band}.txt to get VFIDs of sources in field
-            gfile = f"galsFOV-{band}.txt"
-            if os.path.exists(gfile):
-                vfids = []
-                xgal = []
-                ygal = []
+        gfile = f"galsFOV-{band}.txt"
+        if os.path.exists(gfile):
+            vfids = []
+            xgal = []
+            ygal = []
 
-                vgals = open(gfile,'r')
-                for line in vgals:
-                    t = line.strip().split(',')
-                    vfids.append(t[0])
-                    xgal.append(t[1])
-                    ygal.append(t[2])
-        else:
-            xgal = [0]
-            vfids = [d]
+            vgals = open(gfile,'r')
+            for line in vgals:
+                t = line.strip().split(',')
+                vfids.append(t[0])
+                xgal.append(t[1])
+                ygal.append(t[2])
+                
+        print("number of galaxies = ",len(xgal))
+
+        # read in image header
         hdu = fits.open(infile1[0])
- 
+        # extension 2 has the model info
         imheader = hdu[2].header
         #print(imheader)
         hdu.close()
+        
         #print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
