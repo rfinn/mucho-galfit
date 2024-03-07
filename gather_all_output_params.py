@@ -100,6 +100,7 @@ for d in range(len(dirlist)):
 
     if os.path.isdir(d):
         # move to directory for this galaxy
+        print(d)
         os.chdir(d)
 
         for k in range(2):
@@ -132,6 +133,7 @@ for d in range(len(dirlist)):
             else:
                 xgal = [0]
             header = fits.getheader(infile1[0])
+            print(infile1[0])
             for i in range(len(xgal)):
                 table_index = int(vfids[i].replace('VFID',''))
                 for h in header:
