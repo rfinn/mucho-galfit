@@ -148,6 +148,7 @@ for d in dirlist:
                 t = imheader[hkey]
                 print(hkey,t)
                 if t.find('*') > -1:
+                    print("numerical error...")
                     #print(outtab[prefix+'Numerical_Error'][table_index])
                     outtab[prefix+'Numerical_Error'][table_index] = True
                     t.replace('*','')
