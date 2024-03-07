@@ -96,6 +96,7 @@ topdir = os.getcwd()
 os.chdir(topdir)
 # TODO get list of directories
 dirlist = glob.glob('VFID????')
+dirlist.sort()
 #print(dirlist)
 # go in each directory
 for d in dirlist:
