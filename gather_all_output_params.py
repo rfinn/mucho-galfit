@@ -166,7 +166,7 @@ for d in dirlist:
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
             nsky = len(xgal) + 1
-            print("nsky = ",nsky)
+            print("HEYYYY: nsky = ",nsky)
             t = imheader[prefix+f"{nsky}_SKY"]
             a,b = t.split(' +/- ')
             outtab[prefix+'SKY'][table_index] = float(a)
