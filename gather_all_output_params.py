@@ -133,8 +133,10 @@ for d in dirlist:
         else:
             xgal = [0]
             vfids = [d]
-        imheader = fits.getheader(infile1[0])
-        print(imheader)
+        hdu = fits.open(infile1[0])
+ 
+        imheader = hdu[2].header
+        hdu.close()
         print(infile1[0])
         for i in range(len(xgal)):
             table_index = int(vfids[i].replace('VFID',''))
