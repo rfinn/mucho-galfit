@@ -129,7 +129,7 @@ for d in dirlist:
             infile1 = glob.glob(f"*{band}-out2.fits")
             prefix = 'C'
         if len(infile1) < 1:
-            print("no out1 file for ",vfid)
+            print(f"no out{k+1} file for ",d)
             continue
 
         # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
