@@ -402,11 +402,43 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                         outlines.append(line)
 
                 # set the min radius to 5 arcsec/pscale
-            elif (line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
+            elif line.startswith(' 9)'):
                 if holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
+                    gparams = line.split()
+                    ba = float(gparams[1].replace('*',''))
+                    #print(f"HEY::::: ba from round one = {rad:.3f}")
+                    if ba < 0.1:
+                        print("setting radius to min value")
+                        outlines.append(' 9) 1      1       #     Axis Ratio (b/a) \n')
+                    else:
+                        outlines.append(line)
+
+                
+            elif line.startswith(' 5)'):
+                if holdfixed and not skyobject:
+                    outlines.append(line.replace(' 1 ',' 0 '))
+                else:
+                    gparams = line.split()
+                    n = float(gparams[1].replace('*',''))
+                    #print(f"HEY::::: ba from round one = {rad:.3f}")
+                    if (n < 0.5) | (n > 5):
+                        #print("setting radius to min value")
+                        outlines.append(' 5) 2      1       #     Sersic index n \n')
+                    else:
+                        outlines.append(line)
+
+
+
+
+            elif line.startswith('10)'):
+                if holdfixed and not skyobject:
+                    outlines.append(line.replace(' 1 ',' 0 '))
+
+                else:
                     outlines.append(line)
+
             else:
                 outlines.append(line)
                 
