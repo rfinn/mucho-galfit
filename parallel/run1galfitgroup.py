@@ -397,7 +397,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     print(f"HEY::::: radius from round one = {rad:.3f}")
                     if rad < 2:
                         print("setting radius to min value")
-                        outlines.append(' 4) 5      1       #     R_e              [Pixels] \n')
+                        outlines.append(' 4) 10      1       #     R_e              [Pixels] \n')
                     else:
                         outlines.append(line)
 
