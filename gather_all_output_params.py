@@ -155,11 +155,7 @@ for d in dirlist:
                     outtab[prefix+'Numerical_Error'][table_index] = True
                     t=t.replace('*','')
                     #print("t w/out error = ",t)
-                else:
-                    #print(table_index)
-                    #print(prefix+'Numerical_Error')
-                    #print(outtab[prefix+'Numerical_Error'][table_index])
-                    outtab[prefix+'Numerical_Error'][table_index] = False
+
                     
                 if t.find('[') > -1:
                     t=t.replace('[','')
