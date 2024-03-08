@@ -394,6 +394,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     rad = float(t[1])
                     if rad < 2:
                         newline = line.replace(t[1], '5')
+                        print(newline)
                         outlines.append(newline)
                 # set the min radius to 5 arcsec/pscale
             elif (line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
