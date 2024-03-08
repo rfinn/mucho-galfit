@@ -391,7 +391,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
                     gparams = line.split()
-                    rad = float(t[1].replace('*','')
+                    rad = float(t[1].replace('*',''))
                     print(f"HEY::::: radius from round one = {rad:.3f}")
                     if rad < 2:
                         print("setting radius to min value")
