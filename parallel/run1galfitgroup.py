@@ -386,7 +386,17 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     holdfixed=False
                     outlines.append(line)
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
-            elif (line.startswith(' 4)') or line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
+            elif (line.startswith(' 4)')):
+                if holdfixed and not skyobject:
+                    outlines.append(line.replace(' 1 ',' 0 '))
+                else:
+                    gparams = line.split()
+                    rad = float(t[1])
+                    if rad < 2:
+                        newline = line.replace(t[1], '5')
+                        outlines.append(newline)
+                # set the min radius to 5 arcsec/pscale
+            elif (line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
                 if holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
