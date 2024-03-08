@@ -387,13 +387,13 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     holdfixed=False
                     outlines.append(line)
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
-            elif (line.startswith(' 4)')):
+            elif line.startswith(' 4)'):
                 print("result from round 1 = ",line)
                 if holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
                     gparams = line.split()
-                    rad = float(t[1].replace('*',''))
+                    rad = float(gparams[1].replace('*',''))
                     print(f"HEY::::: radius from round one = {rad:.3f}")
                     if rad < 2:
                         print("setting radius to min value")
