@@ -285,7 +285,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
-        rad = 30/pixel_scale[bandpass]
+        rad = 25/pixel_scale[bandpass]
         fitrad = 1
         
 
