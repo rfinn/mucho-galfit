@@ -377,6 +377,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                                 
                     # set all parameters to fixed
                     # fix the x and y coords
+                    print("WARNING: object too faint to fit!!!!!!!!")
                                 
                                 
                                 
@@ -387,6 +388,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     outlines.append(line)
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
             elif (line.startswith(' 4)')):
+                print("result from round 1 = ",line)
                 if holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
                 else:
