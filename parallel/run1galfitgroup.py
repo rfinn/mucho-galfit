@@ -392,9 +392,13 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                 else:
                     gparams = line.split()
                     rad = float(t[1])
+                    print(f"HEY::::: radius from round one = {rad:.3f}")
                     if rad < 2:
                         print("setting radius to min value")
                         outlines.append(' 4) 5      1       #     R_e              [Pixels] \n')
+                    else:
+                        outlines.append(line)
+
                 # set the min radius to 5 arcsec/pscale
             elif (line.startswith(' 5)') or line.startswith(' 9)') or line.startswith('10)')):
                 if holdfixed and not skyobject:
