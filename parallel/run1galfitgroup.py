@@ -571,7 +571,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 3:
         # open the galfit output table from rband
-        rgalfit = Table.read('vf_v2_galfit_r.fits')
+        rgalfit = Table.read(topdir+'/vf_v2_galfit_r.fits')
         # check numerical error flag
         if rgalfit['Numerical_Error'][matchindex]:
             print("not using r-band params b/c they are not reliable")
