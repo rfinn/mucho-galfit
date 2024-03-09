@@ -331,6 +331,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             outfile.write(' 5) %5.2f       %i       # Sersic exponent (deVauc=4, expdisk=1)   \n'%(nsersic,int(fitn)))
             if rBA is not None:
                 if fixBA:
+                    print("Fixing BA")
                     outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
                 else:
                     outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
@@ -447,6 +448,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             elif line.startswith(' 9)'):
                 if rBA is not None:
                     if fixBA:
+                        print("fixing BA!")                        
                         outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
                     else:
                         outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
@@ -468,6 +470,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             elif line.startswith('10)'):
                 if rPA is not None:
                     if fixPA:
+                        print("fixing PA!")
                         outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
                     else:
                         outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
@@ -590,15 +593,15 @@ if __name__ == '__main__':
             print("not using r-band params b/c they are not reliable")
             rCPA = None
             rCBA = None
-            fixCBA = True
-            fixCPA = True
+            fixCBA = False
+            fixCPA = False
             
         else:
             # get the PA and BA for this galaxy
             rCPA = rgalfit['CPA'][matchindex]
             rCBA = rgalfit['CAR'][matchindex]            
-            fixCBA = False
-            fixCPA = False
+            fixCBA = True
+            fixCPA = True
     else:
         rPA = None
         rBA = None
