@@ -638,7 +638,7 @@ if __name__ == '__main__':
 
 
     # TODONE: read galfit output, and create new input to run with convolution
-    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA))
+    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA)
 
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
