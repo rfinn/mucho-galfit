@@ -599,7 +599,12 @@ if __name__ == '__main__':
             rCBA = rgalfit['CAR'][matchindex]            
             fixCBA = False
             fixCPA = False
-
+    else:
+        rPA = None
+        rBA = None
+        fixBA = False
+        fixPA = False
+        
 
     objname = etab['GALAXY'][matchindex]
     # look in vf tables to find if file is group or not
