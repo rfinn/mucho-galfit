@@ -447,9 +447,9 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             elif line.startswith(' 9)'):
                 if rBA is not None:
                     if fixBA:
-                        outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
+                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
                     else:
-                        outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
+                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
                         
                 elif holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
@@ -468,9 +468,9 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             elif line.startswith('10)'):
                 if rPA is not None:
                     if fixPA:
-                        outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
+                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
                     else:
-                        outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
+                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
                 
                 elif holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
