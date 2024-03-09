@@ -34,7 +34,14 @@ import rungalfit as rg
 
 band = sys.argv[1]
 
+try:
+    flag = int(sys.argv[2])
+    fixBA = '-fixBA'
+    
+except:
+    fixBA = ''
 
+print("fixBA = ",fixBA)
 # read in VFID catalog
 #tabledir = "/mnt/astrophysics/rfinn/catalogs/Virgo/v2/"
 
@@ -123,10 +130,10 @@ for d in dirlist:
     for k in range(2):
         if k == 0:
             #output from galfit is NAME-g-out1.fits = output from no convolution
-            infile1 = glob.glob(f"*{band}-out1.fits")
+            infile1 = glob.glob(f"*{band}{fixBA}-out1.fits")
             prefix = ''
         else:
-            infile1 = glob.glob(f"*{band}-out2.fits")
+            infile1 = glob.glob(f"*{band}{fixBA}-out2.fits")
             prefix = 'C'
         if len(infile1) < 1:
             print(f"no out{k+1} file for ",d)
@@ -176,6 +183,6 @@ for d in dirlist:
     os.chdir(topdir)
 # write output table
 os.chdir(topdir)
-outfilename = f"vf_v2_galfit_{band}.fits"
+outfilename = f"vf_v2_galfit_{band}{fixBA}.fits"
 
 outtab.write(outfilename,format='fits',overwrite=True)
