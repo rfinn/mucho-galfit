@@ -81,7 +81,12 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
         
     output += s
     output += "#\n"
+
     output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup.py $LINE {wavelength}\n"
+
+    if wavelength.startwith('W'):
+        # run galfit again, fixing BA and PA to r-band values
+        output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup.py --fix2rparams $LINE {wavelength}\n"
 
     outfname = f"JOB_{script_id}.sh"
 

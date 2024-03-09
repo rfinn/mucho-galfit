@@ -70,10 +70,10 @@ mag_zeropoint = {'FUV':22.5,'NUV':22.5,'g':22.5,'r':22.5,'g':22.5,'W1':22.5,'W2'
 image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W3':6.5,'W4':12}
 
 # check this - what is the min mag we want to fit????
-minmag2fit = {'FUV':17,'NUV':17,'g':17,'r':17,'z':17,'W1':17,'W2':17,'W3':17,'W4':17}
+minmag2fit = {'FUV':18,'NUV':18,'g':20,'r':20,'z':20,'W1':17,'W2':17,'W3':17,'W4':17}
 
 # this is approx the peak mag of COG_MTOT_ histogram
-guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W3':14.5,'W4':14.5}
+guess_mag = {'FUV':15.5,'NUV':15.5,'g':14.5,'r':14.5,'z':14.5,'W1':11,'W2':11,'W3':11,'W4':11}
 
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
@@ -202,8 +202,17 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
 
         
-def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
+def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True,\
+                       rBA=None,fixBA=False,rPA=None,fixPA=False):
+    """
+    
+    PARAMS:
+    * BA : BA value to start with
+    * fixBA : hold BA fixed
+    * PA : PA value to start with
+    * fixPA : hold PA fixed; use this if holding r-band values fixed
 
+    """
  
     if mask_image is not None:
         maskfound = True
@@ -213,9 +222,15 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
 
     t = image.split('-')
     if firstpass:
-        output_image = f'{t[0]}-{bandpass}-out1.fits'
+        if fixBA:
+            output_image = f'{t[0]}-{bandpass}-fixBA-out1.fits'
+        else:
+            output_image = f'{t[0]}-{bandpass}-out1.fits'
     else:
-        output_image = f'{t[0]}-{bandpass}-out2.fits'    
+        if fixBA:
+            output_image = f'{t[0]}-{bandpass}-fixBA-out2.fits'
+        else:
+            output_image = f'{t[0]}-{bandpass}-out2.fits'
 
     # prepend output directory to all images
     sigma_image = output_dir+'/'+sigma_image
@@ -314,8 +329,20 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             outfile.write(' 3) %5.2f      %i       # total magnitude     \n'%(mag,fitmag))
             outfile.write(' 4) %8.2f       %i       #     R_e              [Pixels] \n'%(rad,fitrad))
             outfile.write(' 5) %5.2f       %i       # Sersic exponent (deVauc=4, expdisk=1)   \n'%(nsersic,int(fitn)))
-            outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(BA,int(fitBA)))
-            outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(PA,int(fitPA)))
+            if rBA is not None:
+                if fixBA:
+                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
+                else:
+                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
+            else:
+                outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(BA,int(fitBA)))
+            if rPA is not None:
+                if fixPA:
+                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
+                else:
+                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
+            else:
+                outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(PA,int(fitPA)))
             outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
             objnum += 1
 
@@ -402,20 +429,8 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                         outlines.append(line)
 
                 # set the min radius to 5 arcsec/pscale
-            elif line.startswith(' 9)'):
-                if holdfixed and not skyobject:
-                    outlines.append(line.replace(' 1 ',' 0 '))
-                else:
-                    gparams = line.split()
-                    ba = float(gparams[1].replace('*',''))
-                    #print(f"HEY::::: ba from round one = {rad:.3f}")
-                    if ba < 0.1:
-                        print("setting radius to min value")
-                        outlines.append(' 9) 1      1       #     Axis Ratio (b/a) \n')
-                    else:
-                        outlines.append(line)
 
-                
+                 
             elif line.startswith(' 5)'):
                 if holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
@@ -429,11 +444,35 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     else:
                         outlines.append(line)
 
+            elif line.startswith(' 9)'):
+                if rBA is not None:
+                    if fixBA:
+                        outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
+                    else:
+                        outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
+                        
+                elif holdfixed and not skyobject:
+                    outlines.append(line.replace(' 1 ',' 0 '))
+                else:
+                    gparams = line.split()
+                    ba = float(gparams[1].replace('*',''))
+                    #print(f"HEY::::: ba from round one = {rad:.3f}")
+                    if ba < 0.1:
+                        print("setting radius to min value")
+                        outlines.append(' 9) 1      1       #     Axis Ratio (b/a) \n')
+                    else:
+                        outlines.append(line)
 
 
 
             elif line.startswith('10)'):
-                if holdfixed and not skyobject:
+                if rPA is not None:
+                    if fixPA:
+                        outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
+                    else:
+                        outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
+                
+                elif holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
 
                 else:
@@ -441,7 +480,8 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
 
             else:
                 outlines.append(line)
-                
+
+
         outfile = open('galfit.input2','w')
         for l in outlines:
             outfile.write(l)
@@ -449,6 +489,20 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         input.close()
                                                                                                   
 if __name__ == '__main__':
+
+
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Program to create create input file for galfit and then run galfit. ')
+    parser.add_argument('--fix2rparams',
+                        dest='fix2rparams',
+                        default=False,
+                        action='store_true',
+                        help='set this to run WISE images using r-band PA and BA')
+
+
+    args = parser.parse_args()
     
     # run this from /mnt/astrophysics
 
@@ -507,7 +561,42 @@ if __name__ == '__main__':
     if np.sum(matchflag) < 1:
         print("ERROR: did not find a matching VFID for ",vfid)
     matchindex = np.arange(len(etab))[matchflag][0]
-    
+
+
+    ########################################################
+    ## USE r-band PARAMETERS
+    ########################################################
+    if args.fix2rparams:
+        # open the galfit output table from rband
+        rgalfit = Table.read('vf_v2_galfit_r.fits')
+        # check numerical error flag
+        if rgalfit['Numerical_Error'][matchindex]:
+            print("not using r-band params b/c they are not reliable")
+            rPA = None
+            rBA = None
+            fixBA = False
+            fixPA = False
+        else:
+            # get the PA and BA for this galaxy
+            rPA = rgalfit['PA'][matchindex]
+            rBA = rgalfit['AR'][matchindex]
+            fixBA = True
+            fixPA = True
+            
+        if rgalfit['CNumerical_Error'][matchindex]:
+            print("not using r-band params b/c they are not reliable")
+            rCPA = None
+            rCBA = None
+            fixCBA = True
+            fixCPA = True
+            
+        else:
+            # get the PA and BA for this galaxy
+            rCPA = rgalfit['CPA'][matchindex]
+            rCBA = rgalfit['CAR'][matchindex]            
+            fixCBA = False
+            fixCPA = False
+
 
     objname = etab['GALAXY'][matchindex]
     # look in vf tables to find if file is group or not
@@ -539,8 +628,9 @@ if __name__ == '__main__':
     x,y = get_galaxies_in_fov(image, bandpass=bandpass)
     
     # TODONE: add code to generate galfit input for first run, no convolution, generic starting point
-    #write_galfit_input(output_dir, image, sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):    
-    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image)
+    #write_galfit_input(output_dir, image, sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
+    #rBA=None,fixBA=False,rPA=None,fixPA=False):    
+    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,rPA=rPA,fixPA=fixPA,rBA=rBA,fixBA=fixBA)
     
     # code to run galfit
     print('running galfit')
@@ -548,7 +638,7 @@ if __name__ == '__main__':
 
 
     # TODONE: read galfit output, and create new input to run with convolution
-    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False)
+    write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA))
 
     # TODO: make sure I am using the correct PSF images
     print('running galfit second time')
