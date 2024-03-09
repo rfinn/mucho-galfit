@@ -491,18 +491,18 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
 if __name__ == '__main__':
 
 
-    import argparse
+    # import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Program to create create input file for galfit and then run galfit. ')
-    parser.add_argument('--fix2rparams',
-                        dest='fix2rparams',
-                        default=False,
-                        action='store_true',
-                        help='set this to run WISE images using r-band PA and BA')
+    # parser = argparse.ArgumentParser(
+    #     description='Program to create create input file for galfit and then run galfit. ')
+    # parser.add_argument('--fix2rparams',
+    #                     dest='fix2rparams',
+    #                     default=False,
+    #                     action='store_true',
+    #                     help='set this to run WISE images using r-band PA and BA')
 
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
     # run this from /mnt/astrophysics
 
@@ -565,8 +565,11 @@ if __name__ == '__main__':
 
     ########################################################
     ## USE r-band PARAMETERS
+    #  if a 3rd argument is passed into program, then
+    #  keep BA and PA fixed at r-band values
     ########################################################
-    if args.fix2rparams:
+
+    if len(sys.argv) > 3:
         # open the galfit output table from rband
         rgalfit = Table.read('vf_v2_galfit_r.fits')
         # check numerical error flag
