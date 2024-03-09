@@ -604,6 +604,10 @@ if __name__ == '__main__':
         rBA = None
         fixBA = False
         fixPA = False
+        rCPA = None
+        rCBA = None
+        fixCBA = False
+        fixCPA = False
         
 
     objname = etab['GALAXY'][matchindex]
