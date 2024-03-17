@@ -90,8 +90,8 @@ def get_params_from_name(image_name):
 def buildone(subdir,outdir,flist):
     print(subdir)
 
-    telescope,dateobs,pointing = get_params_from_name(subdir)
-    run = dateobs+'-'+pointing
+    #telescope,dateobs,pointing = get_params_from_name(subdir)
+    #run = dateobs+'-'+pointing
     #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
     if os.path.isdir(subdir):
         print('##########################################')
@@ -113,7 +113,7 @@ def buildone(subdir,outdir,flist):
 
         p = cutout_dir(cutoutdir=subdir,outdir=gal_outdir)
         p.runall()
-
+        #p.get_galfit_model(band='r')
         i = flist.index(args.oneimage)            
         # define previous gal for html links
         if i > 0:
@@ -126,7 +126,7 @@ def buildone(subdir,outdir,flist):
             #print('next = ',next)
         else:
             next = None
-        h = build_html_cutout(p,gal_outdir,previous=previous,next=next,tel=telescope,run=run)
+        h = build_html_cutout(p,gal_outdir,previous=previous,next=next,tel=None,run=None)
         h.build_html()
         #except:
         #    print('WARNING: problem building webpage for ',subdir)
@@ -296,8 +296,14 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
           print("\nshape of image = ",image.shape)
           print("shape of mask = ",mask.shape)
           print()
-          im = image[~mask]
-          res = residual[~mask]
+          try:
+              im = image[~mask]
+              res = residual[~mask]
+          except IndexError:
+              im = image
+              res = residual
+              
+              print("no mask for galfit ",galfile)
           norms = [simple_norm(im,'asinh',max_percent=percentile2),
                    simple_norm(im,'asinh',max_percent=percentile2),
                    simple_norm(res,'asinh',max_percent=percentile2,min_percent=20)]
@@ -360,8 +366,8 @@ class cutout_dir():
     def runall(self):
         self.get_file_names()
         self.get_ellipse_params()
-        
-        self.get_galfit_model()
+        self.make_png_mask()
+        #self.get_galfit_model()
     def get_file_names(self):
         search_string = os.path.join(self.cutoutdir,'*custom-image-r.fits')
         #print(search_string)
@@ -378,7 +384,7 @@ class cutout_dir():
         self.w4 = self.rimage.replace('-r.fits','-W4.fits')
         
         self.maskimage = self.rimage.replace('.fits','-mask.fits')
-
+        self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
 
     def get_ellipse_params(self):
         """ get ellipse parameters from the header of the mask image  """
@@ -481,6 +487,46 @@ class cutout_dir():
                 print('WARNING: problem making png for ',self.fitsimages[f])
 
 
+    def make_png_mask(self):
+        # fitsimages and pngimages should be dictionaries
+        # so I am not relying on where they are in the list
+        imnames = ['mask','wisemask']
+        self.image_keys = imnames
+        # build dictionaries to store fits and png images,
+        # setting to None if image is not available
+        self.fitsimages = {i:None for i in imnames}
+        self.pngimages = {i:None for i in imnames}
+            
+        self.fitsimages['mask'] = self.maskimage
+        self.fitsimages['wisemask'] = self.wisemaskimage        
+
+        mask = fits.getdata(self.maskimage)
+        mask = mask > 0
+            
+        for i,f in enumerate(self.fitsimages): # loop over keys
+
+            try:
+                pngfile = os.path.join(self.outdir,os.path.basename(self.fitsimages[f]).replace('.fits','.png'))
+            except TypeError:
+                continue
+            try:
+                if i < 4:
+                    make_png(self.fitsimages[f],pngfile,mask=mask)
+                elif i == (len(self.fitsimages)-2): # add ellipse to mask image
+                    if self.ellipseparams is not None:
+                        make_png(self.fitsimages[f],pngfile,ellipseparams=self.ellipseparams)
+                    else:
+                        make_png(self.fitsimages[f],pngfile)
+                else:
+                    make_png(self.fitsimages[f],pngfile)                    
+                self.pngimages[f] = pngfile
+            except FileNotFoundError:
+                print('WARNING: can not find ',self.fitsimages[f])
+
+            except TypeError:
+                print('WARNING: problem making png for ',self.fitsimages[f])
+                
+
     def make_cs_png(self,gr=False):
         if gr:
             csdata,csheader = fits.getdata(self.csgrimage,header=True)
@@ -522,9 +568,9 @@ class cutout_dir():
                     self.csgr_png2 = pngfile
                 else:
                     self.cs_png2 = pngfile 
-    def get_galfit_model(self,band):
+    def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
-        self.galfit = self.rimage.replace('custom-image-r.fits','-1Comp-galfit-out.fits')
+        self.galfit = f"{self.galname}-{band}-out2.fits"
         if os.path.exists(self.galfit):
             # store fit results
 
@@ -532,9 +578,9 @@ class cutout_dir():
             mask = mask > 0
 
 
-            display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,ellipseparams=self.ellipseparams)
+            display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
-            outim = ['galfit_image.png','galfit_model.png','galfit_residual.png']
+            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png']
         
             self.galimage = os.path.join(self.outdir,outim[0])
             self.galmodel = os.path.join(self.outdir,outim[1])
@@ -703,6 +749,7 @@ class build_html_cutout():
     def __init__(self,cutoutdir,outdir,previous=None,next=None,tel=None,run=None):
         ''' pass in instance of cutout_dir class and output directory '''
         #print("in build_html_cutout!")
+        # instance of class cutout_dir
         self.cutout = cutoutdir
 
 
@@ -733,24 +780,32 @@ class build_html_cutout():
         self.write_navigation_links()
         # adding this here so we can inspect the masks quickly
         # can remove once we are done with masks
-        self.write_galfit_images()
-        self.write_image_stats()
-        if self.cutout.legacy_flag:
-            self.write_legacy_images()
 
-        self.write_sfr_images()
-        if self.cutout.wise_flag:
-            self.write_wise_images()
-        self.write_halpha_images()
-        if self.cutout.galimage is not None:
-            self.write_galfit_images()
-            self.write_galfit_table()
-        try:
-            self.write_phot_profiles()
-        except AttributeError:
-            pass
-        self.write_mag_table()
-        self.write_morph_table()        
+        bands = ['r','g','W1','W2','W3','W4']
+        bands = ['g','r','W1','W1-fixBA','W2','W3','W3-fixBA','W4']
+        bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
+        for b in bands:
+            self.cutout.get_galfit_model(band=b)
+        
+            self.write_galfit_images(band=b)
+            self.write_galfit_table(band=b)
+        #self.write_image_stats()
+        #if self.cutout.legacy_flag:
+        #    self.write_legacy_images()
+
+        #self.write_sfr_images()
+        #if self.cutout.wise_flag:
+        #    self.write_wise_images()
+        #self.write_halpha_images()
+        #if self.cutout.galimage is not None:
+        #    self.write_galfit_images()
+        #    self.write_galfit_table()
+        #try:
+        #    self.write_phot_profiles()
+        #except AttributeError:
+        #    pass
+        #self.write_mag_table()
+        #self.write_morph_table()        
         self.write_navigation_links()
         self.close_html()
     def write_header(self):
@@ -956,10 +1011,10 @@ class build_html_cutout():
         self.html.write('<h2>GALEX Images</h2>\n')                
         pass
 
-    def write_galfit_images(self):
+    def write_galfit_images(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
         if self.cutout.galimage is not None:
-            self.html.write('<h2>GALFIT r-band Modeling </h2>\n')                
+            self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')                
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
                       self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
@@ -967,9 +1022,9 @@ class build_html_cutout():
             write_table(self.html,images=images,labels=labels)
 
     
-    def write_galfit_table(self):
+    def write_galfit_table(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
-        self.html.write('<h4>GALFIT Sersic Parameters</h4>\n')                
+        self.html.write(f'<h4>GALFIT Sersic Parameters for {band}</h4>\n')                
         labels=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','ERROR','CHI2NU']
         data = ['{:.1f}+/-{:.1f}'.format(self.cutout.xc, self.cutout.xc_err),
                 '{:.1f}+/-{:.1f}'.format(self.cutout.yc, self.cutout.yc_err),
@@ -1049,7 +1104,7 @@ if __name__ == '__main__':
     #parser.add_argument('--table-path', dest = 'tablepath', default = '/Users/rfinn/github/Virgo/tables/', help = 'path to github/Virgo/tables')
     parser.add_argument('--cutoutdir',dest = 'cutoutdir', default=None, help='set to cutout directory. default is the current directory, like you are running from the cutouts/ directory')
     parser.add_argument('--oneimage',dest = 'oneimage',default=None, help='give directory for one image')
-    parser.add_argument('--outdir',dest = 'outdir',default='/data-pool/Halpha/html_dev/cutouts/', help='output directory.  default is /data-pool/Halpha/html_dev/cutouts/')    
+    parser.add_argument('--outdir',dest = 'outdir',default='/data-pool/Halpha/html_dev/galfit/', help='output directory.  default is /data-pool/Halpha/html_dev/galfit/')    
      
     args = parser.parse_args()
 
@@ -1058,7 +1113,7 @@ if __name__ == '__main__':
     vfha = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_halpha.fits')
     #fullha = fits.getdata('../halphagui-output-combined-2023-Aug-27.fits')
     # adding new filename
-    fullha = fits.getdata('../halphagui-output-combined-2024-Jan-04.fits')        
+    #fullha = fits.getdata('../halphagui-output-combined-2024-Jan-04.fits')        
 
     
     if args.cutoutdir is not None:
