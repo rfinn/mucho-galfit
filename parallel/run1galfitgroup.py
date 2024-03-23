@@ -659,4 +659,11 @@ if __name__ == '__main__':
     print('running galfit second time')
     os.system(f"galfit galfit.input2")
 
+
+    # TODO : add a third iteration if sersic n > 6
+    # rerun galfit and hold n fixed at n=6
+
+    # check index from prior run
+
+    
     os.chdir(topdir)
