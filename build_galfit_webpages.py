@@ -104,6 +104,12 @@ def buildone(subdir,outdir,flist):
         # move to subdirectory
         # adding the telescope and run so that we don't write over
         # images if galaxy was observed more than once
+
+        # moving to subdirectory
+        if args.verbose:
+            print("moving to directory ",subdir)
+        os.chdir(subdir)
+
         gal_outdir = os.path.join(outdir,subdir+"")
         print('out directory for this galaxy = ',gal_outdir)
         if not os.path.exists(outdir):
@@ -355,10 +361,12 @@ class galfit_dir():
         # this returns the VFID
         # the galname should be the NED name that JM uses
         self.vfid = cutoutdir
-        
-        print('inside cutoutdir, vfid = ',self.vfid)
+
+        if args.verbose:
+            print('inside galfit_dir, vfid = ',self.vfid)
         #print('cutoutdir = ',cutoutdir)
-        #print('outdir = ',outdir)        
+        #print('outdir = ',outdir)
+        
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         self.outdir = outdir
@@ -375,13 +383,15 @@ class galfit_dir():
 
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
-        t = glob.glob(self.cutoutdir+'/*-custom-image-r.fits')[0]
+
+        # running from within galfit output directory
+        t = glob.glob('*-custom-image-r.fits')[0]
         self.gname = os.path.basename(t).split('-custom')[0]
         print("galaxy nedname = ",self.gname)
         
                 
     def get_file_names(self):
-        search_string = os.path.join(self.cutoutdir,'*custom-image-r.fits')
+        search_string = '*custom-image-r.fits'
         #print(search_string)
         t = glob.glob(search_string)
         #print(t)
@@ -390,6 +400,9 @@ class galfit_dir():
         self.maskimage = self.gname+'-custom-image-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
 
+        if not os.path.exists(self.maskimage):
+            print(f"WARNING: can not find mask image {self.maskimage}!!!")
+            
     def get_ellipse_params(self):
         """ get ellipse parameters from the header of the mask image  """
         try:
@@ -647,13 +660,14 @@ if __name__ == '__main__':
     vfmain = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_main.fits')
     ephot = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_legacy_ephot.fits')
 
-    
-    if args.cutoutdir is not None:
-        os.chdir(args.cutoutdir)
+    topdir = os.getcwd()
 
     # get directory list to use with Previous and Next links
     rfiles = os.listdir()
     rfiles.sort()
+
+
+    
     outdir = args.outdir
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -669,3 +683,5 @@ if __name__ == '__main__':
 
     buildone(args.oneimage,outdir,rfiles)
     
+
+    os.chdir(topdir)
