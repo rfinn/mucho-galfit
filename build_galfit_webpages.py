@@ -371,6 +371,7 @@ class galfit_dir():
     def runall(self):
         self.get_ned_name()
         self.get_file_names()
+        self.make_png_files()
 
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
@@ -448,9 +449,11 @@ class galfit_dir():
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         self.galfit = f"{self.gname}-{band}-out2.fits"
+        print("looking for galfit file {self.galfit}")
         if os.path.exists(self.galfit):
             # store fit results
-
+            if args.verbose:
+                print("making png and storing results from galfit model ",self.galfit)
             mask = fits.getdata(self.maskimage)
             mask = mask > 0
 
