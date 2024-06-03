@@ -467,7 +467,11 @@ class galfit_dir():
             # store fit results
             if args.verbose:
                 print("making png and storing results from galfit model ",self.galfit)
-            mask = fits.getdata(self.maskimage)
+
+            if 'W' in band:
+                mask = fits.getdata(self.wisemaskimage)
+            else:
+                mask = fits.getdata(self.maskimage)
             mask = mask > 0
 
 
