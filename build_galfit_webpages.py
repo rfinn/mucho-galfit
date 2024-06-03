@@ -442,7 +442,7 @@ class galfit_dir():
 
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
-        self.galfit = f"{self.galname}-{band}-out2.fits"
+        self.galfit = f"{self.gname}-{band}-out2.fits"
         if os.path.exists(self.galfit):
             # store fit results
 
