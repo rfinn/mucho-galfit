@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 '''
 GOAL:
-* create web page to inspect the cutouts
+* create web page to inspect the galfit results
+* adapting code from build_web_cutouts2.py
+* create one page per galaxy, and show results for
+  * g, r, z
+  * W1, w/conv, fixedBA
+  * W2
+  * W3, w/conv, fixedBA
+  * W4
 
 USAGE:
 * run from cutouts directory
@@ -10,16 +17,9 @@ NOTES:
 * using John Moustakas's code as a reference (https://github.com/moustakas/legacyhalos/blob/main/py/legacyhalos/virgofilaments.py#L1131-L1202)
 * https://docs.astropy.org/en/stable/visualization/normalization.html#:~:text=The%20astropy.visualization%20module%20provides%20a%20framework%20for%20transforming,x%20represents%20the%20values%20in%20the%20original%20image%3A
 
-TO DO: (I think these are all fixed!)
-* DONE need to figure out how to handle repeated observations
-  - don't overwrite directory
+* on draco, the results are in /mnt/astrophysics/muchogalfit-output/
 
-* fix how I combine unwise images when multiple images are returned
-* same for galex
 
-2024-03-10 : 
-* add panel to show color-based continuum subtract (added this to Halpha panel, instead of showing CS with two stretches)
-* stellar mass, sfr and ssfr images
 
 '''
 
@@ -111,7 +111,7 @@ def buildone(subdir,outdir,flist):
         if not os.path.exists(gal_outdir):
             os.mkdir(gal_outdir)
 
-        p = cutout_dir(cutoutdir=subdir,outdir=gal_outdir)
+        p = galfit_dir(cutoutdir=subdir,outdir=gal_outdir)
         p.runall()
         #p.get_galfit_model(band='r')
         i = flist.index(args.oneimage)            
@@ -342,20 +342,20 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
 
     
     
-class cutout_dir():
+class galfit_dir():
 
     def __init__(self,cutoutdir=None,outdir=None):
         '''
         INPUT:
-        * directory containing cutouts
+        * directory containing galfit results
         * output directory for png images
 
         This creates the png images for different cutouts
         '''
-        self.gname = os.path.basename(os.path.dirname(cutoutdir))
-        if len(self.gname) < 1:
-            self.gname = cutoutdir
-        self.vfid = self.gname.split('-')[0]
+        # this returns the VFID
+        # the galname should be the NED name that JM uses
+
+        self.vfid = cutoutdir
         #print('inside cutoutdir, gname = ',self.gname)
         #print('cutoutdir = ',cutoutdir)
         #print('outdir = ',outdir)        
@@ -363,27 +363,23 @@ class cutout_dir():
             os.mkdir(outdir)
         self.outdir = outdir
         self.cutoutdir = cutoutdir
-    def runall(self):
+        self.get_ned_name()
         self.get_file_names()
-        self.get_ellipse_params()
-        self.make_png_mask()
-        #self.get_galfit_model()
+    def get_ned_name(self):
+        """ get galaxy NED name by grabbing an image """
+        t = glob.glob(self.cutoutdir+'/*-custom-image-r.fits')[0]
+        self.gname = os.path.basename(t).split('-custom')[0]
+        print("galaxy nedname = ",self.gname)
+        
+                
     def get_file_names(self):
         search_string = os.path.join(self.cutoutdir,'*custom-image-r.fits')
         #print(search_string)
         t = glob.glob(search_string)
         #print(t)
         
-        self.rimage = t[0]
-        self.galname = self.rimage.split('-custom')[0]
-        self.gimage = self.rimage.replace('-r.fits','-g.fits')
-
-        self.w1 = self.rimage.replace('-r.fits','-W1.fits')
-        self.w2 = self.rimage.replace('-r.fits','-W2.fits')
-        self.w3 = self.rimage.replace('-r.fits','-W3.fits')
-        self.w4 = self.rimage.replace('-r.fits','-W4.fits')
         
-        self.maskimage = self.rimage.replace('.fits','-mask.fits')
+        self.maskimage = self.gname+'-custom-image-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
 
     def get_ellipse_params(self):
@@ -400,91 +396,6 @@ class cutout_dir():
             print("\nWARNING: mask file was not found!!! ",self.maskimage)
             self.ellipseparams = None
         
-    def get_legacy_names(self):
-        ''' get names of legacy images  '''
-        legdir = os.path.join(self.cutoutdir,'legacy')
-        self.legacy_g = glob.glob(legdir+'/*-g.fits')[0]
-        self.legacy_r = glob.glob(legdir+'/*-r.fits')[0]
-        self.legacy_z = glob.glob(legdir+'/*-z.fits')[0]
-    def get_legacy_jpg(self):
-        ''' copy jpg to local directory '''
-        legdir = os.path.join(self.cutoutdir,'legacy')        
-        legacy_jpg = glob.glob(legdir+'/*.jpg')[0]
-        jpeg_data = Image.open(legacy_jpg)
-        fig = plt.figure(figsize=(6,6))
-
-
-        #hdu = fits.open(filename)[0]
-        header = fits.getheader(self.legacy_g)
-        imwcs = wcs.WCS(header)
-        plt.subplot(projection=imwcs)
-        plt.subplots_adjust(left=.2,bottom=.15,top=.95,right=.95)        
-        plt.imshow(jpeg_data, origin='lower')
-        plt.xlabel('RA (deg)',fontsize=16)
-        plt.ylabel('Dec (deg)',fontsize=16)
-        self.legacy_jpg = os.path.join(self.outdir,os.path.basename(legacy_jpg))        
-        plt.savefig(self.legacy_jpg)
-        plt.close(fig)
-
-
-
-    def make_png_plots(self):
-        # fitsimages and pngimages should be dictionaries
-        # so I am not relying on where they are in the list
-        imnames = ['r','ha','cs','csgr','legacy_g','legacy_r','legacy_z',\
-                   'w1','w2','w3','w4',\
-                   'mask','nuv']
-        self.image_keys = imnames
-        # build dictionaries to store fits and png images,
-        # setting to None if image is not available
-        self.fitsimages = {i:None for i in imnames}
-        self.pngimages = {i:None for i in imnames}
-        keys = imnames[0:4]
-        imlist = [self.rimage,self.haimage,self.csimage,self.csgrimage]
-        for i,k in enumerate(keys):
-            self.fitsimages[k] = imlist[i]
-        
-        if self.legacy_flag:
-            keys = imnames[4:7]
-            imlist = [self.legacy_g,self.legacy_r,self.legacy_z]
-            for i,k in enumerate(keys):
-                self.fitsimages[k] = imlist[i]
-            
-        if self.wise_flag:
-            keys = imnames[7:11]            
-            imlist = [self.w1,self.w2,self.w3,self.w4]
-            for i,k in enumerate(keys):
-                self.fitsimages[k] = imlist[i]
-            
-        self.fitsimages['mask'] = self.maskimage
-        if self.nuv_flag:
-            self.fitsimages['nuv'] = self.nuv
-
-        mask = fits.getdata(self.maskimage)
-        mask = mask > 0
-            
-        for i,f in enumerate(self.fitsimages): # loop over keys
-
-            try:
-                pngfile = os.path.join(self.outdir,os.path.basename(self.fitsimages[f]).replace('.fits','.png'))
-            except TypeError:
-                continue
-            try:
-                if i < 4:
-                    make_png(self.fitsimages[f],pngfile,mask=mask)
-                elif i == (len(self.fitsimages)-2): # add ellipse to mask image
-                    if self.ellipseparams is not None:
-                        make_png(self.fitsimages[f],pngfile,ellipseparams=self.ellipseparams)
-                    else:
-                        make_png(self.fitsimages[f],pngfile)
-                else:
-                    make_png(self.fitsimages[f],pngfile)                    
-                self.pngimages[f] = pngfile
-            except FileNotFoundError:
-                print('WARNING: can not find ',self.fitsimages[f])
-
-            except TypeError:
-                print('WARNING: problem making png for ',self.fitsimages[f])
 
 
     def make_png_mask(self):
@@ -527,47 +438,6 @@ class cutout_dir():
                 print('WARNING: problem making png for ',self.fitsimages[f])
                 
 
-    def make_cs_png(self,gr=False):
-        if gr:
-            csdata,csheader = fits.getdata(self.csgrimage,header=True)
-            imx,imy,keepflag = get_galaxies_fov(self.csimage,vfmain['RA'],vfmain['DEC'])
-        else:
-            csdata,csheader = fits.getdata(self.csimage,header=True)
-            imx,imy,keepflag = get_galaxies_fov(self.csimage,vfmain['RA'],vfmain['DEC'])
-            
-        mask = fits.getdata(self.maskimage)
-        mask = mask > 0
-        #galsize=60/(abs(csheader['CD1_1'])*3600)        
-        p2 = [99.5,99.9]
-        stretchs = ['asinh','linear']
-        for i,s in enumerate(stretchs):
-            fig = plt.figure(figsize=(6,6))
-            plt.subplot(projection = wcs.WCS(csheader))
-            plt.subplots_adjust(bottom=.15,left=.2,right=.95,top=.95)
-            ax = plt.gca()
-            #clipped_data = sigma_clip(image[xmin:xmax,ymin:ymax],sigma_lower=1.5,sigma_upper=1.5,grow=10,stdfunc='mad_std')            
-            display_image(csdata,stretch=s,percentile1=.15,percentile2=p2[i],mask=mask)
-            # mark VF galaxies
-            #plot_vf_gals(imx,imy,keepflag,vfmain,ax,galsize=galsize)
-            suffix = "-{}.png".format(p2[i])
-            if gr:
-                pngfile = os.path.join(self.outdir,os.path.basename(self.csgrimage).replace('.fits',suffix))
-            else:
-                pngfile = os.path.join(self.outdir,os.path.basename(self.csimage).replace('.fits',suffix))
-            plt.xlabel('RA (deg)',fontsize=16)
-            plt.ylabel('DEC (deg)',fontsize=16)        
-            plt.savefig(pngfile)
-            plt.close(fig)
-            if i == 0:
-                if gr:
-                    self.csgr_png1 = pngfile
-                else:
-                    self.cs_png1 = pngfile
-            elif i == 1:
-                if gr:
-                    self.csgr_png2 = pngfile
-                else:
-                    self.cs_png2 = pngfile 
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         self.galfit = f"{self.galname}-{band}-out2.fits"
@@ -607,151 +477,15 @@ class cutout_dir():
         pass
     
 
-    def get_phot_tables(self):
-        ''' read in phot tables and make plot of flux and sb vs sma '''
-
-
-        # open data files
-        cs_galfit_phot = self.csimage.replace('.fits','-GAL-phot.fits')
-        cs_gphot = fits.getdata(cs_galfit_phot)
-        #cs_phot = self.csimage.replace('.fits','-phot.fits')        
-        r_galfit_phot = self.rimage.replace('.fits','-GAL-phot.fits')
-        r_gphot = fits.getdata(r_galfit_phot)
-
-        # photutils flux
-        cs_galfit_phot = self.csimage.replace('.fits','-phot.fits')
-        cs_phot = fits.getdata(cs_galfit_phot)
-        #cs_phot = self.csimage.replace('.fits','-phot.fits')        
-        r_galfit_phot = self.rimage.replace('.fits','-phot.fits')
-        r_phot = fits.getdata(r_galfit_phot)
-        
-
-        # define colors - need this for plotting line and fill_between in the same color
-        mycolors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-
-        # plot enclosed flux        
-        fig = plt.figure(figsize=(6,6))
-        plt.subplots_adjust(left=.15,bottom=.1,right=.95,top=.95)
-        tabs = [r_gphot,cs_gphot,r_phot,cs_phot]
-        labels = ['galfit r','galfit Halphax100','photutil r','photutil Halphax100']
-        alphas = [1,.4,.6,.4]
-        for i,t in enumerate(tabs):
-            y0 = t['flux_erg']            
-            y1 = t['flux_erg']+t['flux_erg_err']
-            y2 = t['flux_erg']-t['flux_erg_err']
-
-            if (i == 1) + (i == 3):
-                y0=y0*100
-                y1 = y1*100
-                y2 = y2*100
-            plt.fill_between(t['sma_arcsec'],y1,y2,label=labels[i],alpha=alphas[i],color=mycolors[i])
-            # also plot line because you can't see the result when the error is small
-            # this should fix issue #18 in Virgo github
-            plt.plot(t['sma_arcsec'],y0,'-',lw=2,color=mycolors[i])
-
-        plt.xlabel('SMA (arcsec)',fontsize=16)
-        plt.ylabel('Flux (erg/s/cm^2/Hz)',fontsize=16)
-        plt.gca().set_yscale('log')
-        plt.gca().set_xscale('log')
-        plt.legend(loc='lower right')        
-        self.efluxsma_png = os.path.join(self.outdir,self.gname+'-enclosed-flux.png')
-        plt.savefig(self.efluxsma_png)
-        plt.close(fig)
-        
-        # plot mag sma
-        fig = plt.figure(figsize=(6,6))
-        plt.subplots_adjust(left=.15,bottom=.1,right=.95,top=.95)
-        #tabs = [r_gphot,cs_gphot]
-        #labels = ['r','Halpha']
-        tabs = [r_gphot,cs_gphot,r_phot,cs_phot]
-        labels = ['galfit r','galfit Halpha','photutil r','photutil Halpha']
-        ncolor = 0
-        for i,t in enumerate(tabs):
-            y0 = t['mag']
-            y1 = t['mag']+t['mag_err']
-            y2 = t['mag']-t['mag_err']
-            if (i == 1) + (i == 3):
-                alpha=.4
-            else:
-                alpha=1
-
-            plt.fill_between(t['sma_arcsec'],y1,y2,label=labels[i],alpha=alphas[i],color=mycolors[i])
-            # also plot line because you can't see the result when the error is small
-            # this should fix issue #18 in Virgo github
-            plt.plot(t['sma_arcsec'],y0,'-',lw=2,color=mycolors[i])
-
-            
-        plt.xlabel('SMA (arcsec)',fontsize=16)
-        plt.ylabel('magnitude (AB)',fontsize=16)
-        plt.gca().set_xscale('log')
-        plt.gca().invert_yaxis()        
-        self.emagsma_png = os.path.join(self.outdir,self.gname+'-mag-sma.png')
-        plt.legend(loc='lower right')        
-        plt.savefig(self.emagsma_png)
-        plt.close(fig)
-        
-        # plot sb erg vs sma
-        fig = plt.figure(figsize=(6,6))
-        plt.subplots_adjust(left=.15,bottom=.1,right=.95,top=.95)
-        tabs = [r_gphot,cs_gphot,r_phot,cs_phot]
-        labels = ['galfit r','galfit Halphax100','photutil r','photutil Halphax100']
-
-        for i,t in enumerate(tabs):
-            y0 = t['sb_erg_sqarcsec']
-            y1 = t['sb_erg_sqarcsec']+t['sb_erg_sqarcsec_err']
-            y2 = t['sb_erg_sqarcsec']-t['sb_erg_sqarcsec_err']
-            if (i == 1) + (i == 3):
-                y0 = y0*100
-                y1 = y1*100
-                y2 = y2*100
-            plt.fill_between(t['sma_arcsec'],y1,y2,label=labels[i],alpha=alphas[i],color=mycolors[i])
-            # also plot line because you can't see the result when the error is small
-            # this should fix issue #18 in Virgo github
-            plt.plot(t['sma_arcsec'],y0,'-',lw=2,color=mycolors[i])
-
-                
-        plt.xlabel('SMA (arcsec)',fontsize=16)
-        plt.ylabel('SB (erg/s/cm^2/Hz/arcsec^2)',fontsize=16)
-        plt.gca().set_yscale('log')
-        plt.gca().set_xscale('log')
-        plt.legend()
-        self.sbfluxsma_png = os.path.join(self.outdir,self.gname+'-sb-sma.png')
-        plt.savefig(self.sbfluxsma_png)
-        plt.close(fig)
-                             
-        # plot mag sma
-        fig = plt.figure(figsize=(6,6))
-        plt.subplots_adjust(left=.15,bottom=.1,right=.95,top=.95)
-        tabs = [r_gphot,cs_gphot,r_phot,cs_phot]
-        labels = ['galfit r','galfit Halpha','photutil r','photutil Halpha']
-        
-        for i,t in enumerate(tabs):
-            y0 = t['sb_mag_sqarcsec']
-            y1 = t['sb_mag_sqarcsec']+t['sb_mag_sqarcsec_err']
-            y2 = t['sb_mag_sqarcsec']-t['sb_mag_sqarcsec_err']
-
-            plt.fill_between(t['sma_arcsec'],y1,y2,label=labels[i],alpha=alphas[i],color=mycolors[i])
-            # also plot line because you can't see the result when the error is small
-            # this should fix issue #18 in Virgo github
-            plt.plot(t['sma_arcsec'],y0,'-',lw=2,color=mycolors[i])
-            
-        plt.xlabel('SMA (arcsec)',fontsize=16)
-        plt.ylabel('Surface Brightness (mag/arcsec^2)',fontsize=16)
-        plt.gca().set_xscale('log')
-        plt.gca().invert_yaxis()
-        plt.legend()        
-        self.sbmagsma_png = os.path.join(self.outdir,self.gname+'-sbmag-sma.png')
-        plt.savefig(self.sbmagsma_png)
-        plt.close(fig)
     
 class build_html_cutout():
 
     def __init__(self,cutoutdir,outdir,previous=None,next=None,tel=None,run=None):
         ''' pass in instance of cutout_dir class and output directory '''
         #print("in build_html_cutout!")
+        
         # instance of class cutout_dir
         self.cutout = cutoutdir
-
 
         outfile = os.path.join(outdir,self.cutout.gname+'.html')
         print("outfile = ",outfile)
@@ -765,8 +499,6 @@ class build_html_cutout():
         self.next = next
         self.previous = previous
 
-        self.telescope = tel
-        self.run=run
         
         # for reference, this is the order of the png images
         #self.fitsimages = [self.rimage,self.haimage,self.csimage,\
@@ -783,7 +515,7 @@ class build_html_cutout():
 
         bands = ['r','g','W1','W2','W3','W4']
         bands = ['g','r','W1','W1-fixBA','W2','W3','W3-fixBA','W4']
-        bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
+        #bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
         for b in bands:
             self.cutout.get_galfit_model(band=b)
         
@@ -833,163 +565,7 @@ class build_html_cutout():
             self.html.write('<a href="../{}/{}">Next ({})</a>\n'.format(self.next,nexthtml,self.next))
             self.html.write('<br />\n')
 
-    def write_image_stats(self):
-        self.html.write('<h2>Image Statistics</h2>\n')        
-        labels=['Telescope','Run','Pointing','R FWHM <br> (arcsec)','H&alpha; FWHM <br> (arcsec)','Filter Ratio','Filter Correction']
-        if 'BOK' in self.cutout.cutoutdir:
-            tel = 'BOK'
-        elif 'HDI' in self.cutout.cutoutdir:
-            tel = 'HDI'
-        elif 'INT' in self.cutout.cutoutdir:
-            tel = 'INT'
-        elif 'MOS' in self.cutout.cutoutdir:
-            tel = 'MOS'
-
-
-        # add code to match to the correct line in the full halpha table
-        telescope,dateobs,pointing = get_params_from_name(self.cutout.cutoutdir+".fits")
-
-        # find matching rows
-        vfid_match_index = np.arange(len(fullha))[fullha['VFID'] == self.cutout.vfid]
-        if len(vfid_match_index) > 1:
-            print("found duplicate",telescope,dateobs)
-            print("directory name = ",self.cutout.cutoutdir)
-            # duplicates - need to find the correct match
-
-            # check if telescope matches directory
-            for j in vfid_match_index:
-                #print(fullha['TEL'][j],telescope, fullha['DATE-OBS'][j],dateobs)
-                if fullha['TEL'][j] in telescope:
-                    #print("Matched telescope")
-                    if (int(fullha['DATE-OBS'][j]) == int(dateobs)):
-                        #print("found a match!")
-                        fullhaindex = j
-                        break
-        else:
-            fullhaindex = vfid_match_index[0]
-        self.fullhaindex = fullhaindex            
-        myrow = fullha[fullhaindex]
-        #print('HALPHA FILE')
-        #print(self.vfindex)
-        #print(myrow)
-        colnames = ['POINTING','R_FWHM','H_FWHM','FILTER_RATIO','FILT_COR']
-
-
-        
-        # the pointing name from the vfha table might not be correct
-        # b/c if the galaxy was observed multiple times, only one pointing will be included
-        # I should instead construct the pointing from the image names
-        pointing = myrow['POINTING']
-
-        
-        ## get telescope name to use to split on
-        ##print('I think the cutout directory name is ',self.cutout.cutoutdir)
-        #t = self.cutout.cutoutdir.split(tel)        
-        #matchstring =  f"{tel}{t[1]}"
-        ## check in coadd list for matching file name
-        #coadd_list = open('../virgo-coadds-fullpath.txt')
-        #
-        #for line in coadd_list:
-        #    if matchstring in line:
-        #        pointing = line.rstrip()
-        #        pointing = os.path.basename(pointing).replace("-r.fits","").replace('-r-shifted.fits','').replace('-R.fits','')
-        #        #print("found matching coadd")
-        #        break
-
-        #data = [f'<a href="http://facultyweb.siena.edu/~rfinn/virgo/coadds/{pointing}/{pointing}.html">{pointing}</a>', \
-        #        "{:.2f}".format(myrow['R_FWHM'][0]),\
-        #        "{:.2f}".format(myrow['H_FWHM'][0]),\
-        #        "{:.4f}".format(myrow['FILTER_RATIO'][0]),\
-        #        "{:.2f}".format(myrow['FILT_COR'][0])]
-        data = [f'<a href="../../coadds/{pointing}/{pointing}.html">{pointing}</a>', \
-                "{:.2f}".format(myrow['R_FWHM']),\
-                "{:.2f}".format(myrow['H_FWHM']),\
-                "{:.4f}".format(myrow['FILTER_RATIO']),\
-                "{:.2f}".format(myrow['FILT_COR'])]
-
-        #print('self.run = ',self.run)
-        data.insert(0,self.run)
-        data.insert(0,self.telescope)
-        write_text_table(self.html,labels,data)        
-    def write_sfr_images(self):
-        ''' legacy jpeg, galex nuv, halpha, w4 '''
-        self.html.write('<h2>Star-Formation Indicators</h2>\n')
-        #self.fitsimages = [self.rimage,self.haimage,self.csimage,\ # 0,1,2
-        #                   self.legacy_g,self.legacy_r,self.legacy_z,\ # 3,4,5
-        #                   self.w1,self.w2,self.w3,self.w4] # 6,7,8,9
-
-        if self.cutout.nuv_flag:
-            images = [self.cutout.pngimages['nuv'],\
-                      self.cutout.cs_png1,\
-                      self.cutout.pngimages['w3'],self.cutout.pngimages['w4']]
-            labels = ['NUV','H&alpha;','W3','W4']
-        else:
-            try:
-                images = [self.cutout.legacy_jpg,\
-                          self.cutout.pngimages['cs'],\
-                          self.cutout.pngimages['w3'],self.cutout.pngimages['w4']]                      
-
-                labels = ['Legacy','H&alpha;','W3','W4']
-            except IndexError:
-                print("WARNING: problem plotting sfr images")
-                return
-            except AttributeError:
-                print("WARNING: problem plotting sfr images, probably with legacy jpg")
-                return
-        newim = []
-        for i in images:
-            if i is not None:
-                newim.append(os.path.basename(i))
-            else:
-                newim.append(i)
-        images = newim
-        #images = [os.path.basename(i) for i in images]            
-        write_table(self.html,images=images,labels=labels)
-        pass
-
     
-    def write_halpha_images(self):
-        '''  r, halpha, cs, and mask images '''
-        self.html.write('<h2>Halpha Images</h2>\n')        
-        #images = [self.cutout.pngimages['r'],self.cutout.pngimages['ha'],self.cutout.cs_png1,self.cutout.cs_png2]
-        images = [self.cutout.pngimages['r'],self.cutout.pngimages['ha'],self.cutout.cs_png1,self.cutout.csgr_png1]
-        # just changing order to see if halpha image is still the biggest in the table, re issue #15
-        # the second was still the biggest
-        # so what if we also change the label
-        # seems to scale with label
-        #images = [self.cutout.pngimages['ha'],self.cutout.pngimages['r'],self.cutout.cs_png1,self.cutout.cs_png2]        
-        images = [os.path.basename(i) for i in images]
-
-        #labels = ['R-band Image','H&alpha;+Cont','CS, stretch 1','CS, stretch 2']
-
-        labels = ['R-band Image','H&alpha;+Cont','CS from ZP ratio','CS from ZP and g-r cor']        
-        #labels = ['Halpha+Cont','R','CS, stretch 1','CS, stretch 2']        
-        write_table(self.html,images=images,labels=labels)
-
-    def write_mstar_sfr_images(self):
-        '''  TODO : add panel for stellar mass, sfr and ssfr '''
-        self.html.write('<h2>Halpha Images</h2>\n')        
-        images = [self.cutout.pngimages['r'],self.cutout.pngimages['ha'],self.cutout.cs_png1,self.cutout.cs_png2]
-        # just changing order to see if halpha image is still the biggest in the table, re issue #15
-        # the second was still the biggest
-        # so what if we also change the label
-        # seems to scale with label
-        #images = [self.cutout.pngimages['ha'],self.cutout.pngimages['r'],self.cutout.cs_png1,self.cutout.cs_png2]        
-        images = [os.path.basename(i) for i in images]
-
-        labels = ['R-band Image','H&alpha;+Cont','CS, stretch 1','CS, stretch 2']
-        #labels = ['Halpha+Cont','R','CS, stretch 1','CS, stretch 2']        
-        write_table(self.html,images=images,labels=labels)
-        
-    def write_legacy_images(self):
-        ''' jpg, g,r,z legacy images '''
-        self.html.write('<h2>Legacy Images</h2>\n')
-
-        images = [self.cutout.pngimages['legacy_g'],self.cutout.pngimages['legacy_r'],self.cutout.pngimages['legacy_z']]
-        images = [os.path.basename(i) for i in images]        
-        images.insert(0,os.path.basename(self.cutout.legacy_jpg))        
-        labels = ['grz','g','r','z']
-        write_table(self.html,images=images,labels=labels)
 
     def write_wise_images(self):
         ''' w1 - w4 images '''
@@ -1006,10 +582,6 @@ class build_html_cutout():
 
         write_table(self.html,images=images,labels=labels)
     
-    def write_galex_images(self):
-        ''' right now just nuv '''
-        self.html.write('<h2>GALEX Images</h2>\n')                
-        pass
 
     def write_galfit_images(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
@@ -1041,55 +613,6 @@ class build_html_cutout():
         write_text_table(self.html,labels,data)
         pass
 
-    def write_phot_profiles(self):
-        ''' photometry table with galfit and photutil results '''
-        self.html.write('<h2>Elliptical Photometry</h2>\n')
-        self.html.write('<p>using galfit and photutil geometry</p>\n')                        
-        images = [self.cutout.efluxsma_png,self.cutout.emagsma_png,self.cutout.sbfluxsma_png,self.cutout.sbmagsma_png]
-        images = [os.path.basename(i) for i in images]
-        labels = ['Enclosed Flux','Enclosed Magnitude','Surface Brightness','Surface Brightness']
-        write_table(self.html,images=images,labels=labels)
-
-    def write_mag_table(self):
-        self.html.write('<h2>R-band AB Magnitudes</h2>\n')        
-        labels=['mag24','mag25', 'mag26','mag_petro','mag_galfit','mag_photutil'] 
-        #myrow = vfha[self.vfindex]
-        myrow = fullha[self.fullhaindex]
-        colnames = ['M24','M25','M26','PETRO_MAG','GAL_MAG','ELLIP_SUM_MAG']
-        #data = ["{:.2f}".format(myrow[c][0]) for c in colnames]
-        data = ["{:.2f}".format(myrow[c]) for c in colnames]
-        write_text_table(self.html,labels,data)        
-
-        self.html.write('<h2>Halpha AB Magnitudes/SFR</h2>\n')        
-        labels=['mag16','mag17','mag_petro','SSFR_IN','SSFR_OUT'] 
-        #myrow = vfha[self.vfindex]
-        myrow = fullha[self.fullhaindex]
-        colnames = ['HM16','HM17','HPETRO_MAG','SSFR_IN','SSFR_OUT']
-        try:
-            data = ["{:.2f}".format(myrow[c][0]) for c in colnames]
-        except IndexError:
-            data = ["{:.2f}".format(myrow[c]) for c in colnames]            
-        write_text_table(self.html,labels,data)        
-        
-    def write_morph_table(self):
-        self.html.write('<h2>Morphology Parameters</h2>\n')        
-        labels=['Band','Gini','M20','Asym','C30','Petro Con']
-        
-        #myrow = vfha[self.vfindex]
-        myrow = fullha[self.fullhaindex]
-        colnames = ['ELLIP_GINI','ELLIP_M20','ELLIP_ASYM','C30','PETRO_CON']
-        colnames2 = ['ELLIP_HGINI','ELLIP_HM20','ELLIP_HASYM','HC30','HPETRO_CON']
-        try: # this is required to work with fullha instead of vfha
-            data = ["{:.2f}".format(myrow[c][0]) for c in colnames]
-        except IndexError:
-            data = ["{:.2f}".format(myrow[c]) for c in colnames]            
-        data.insert(0,'r')
-        try:
-            data2 = ["{:.2f}".format(myrow[c][0]) for c in colnames2]
-        except IndexError:
-            data2 = ["{:.2f}".format(myrow[c]) for c in colnames2]            
-        data2.insert(0,'Halpha')
-        write_text_table(self.html,labels,data,data2=data2)
     def close_html(self):
         self.html.close()
 # wrap
@@ -1110,10 +633,7 @@ if __name__ == '__main__':
 
     # get tables, define as a global variable
     vfmain = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_main.fits')
-    vfha = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_halpha.fits')
-    #fullha = fits.getdata('../halphagui-output-combined-2023-Aug-27.fits')
-    # adding new filename
-    #fullha = fits.getdata('../halphagui-output-combined-2024-Jan-04.fits')        
+    ephot = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_legacy_ephot.fits')
 
     
     if args.cutoutdir is not None:
@@ -1126,29 +646,14 @@ if __name__ == '__main__':
     if not os.path.exists(outdir):
         os.mkdir(outdir)
 
-    if args.oneimage is not None:
-        # make sure that the image exists
-        if not os.path.exists(args.oneimage):
-            print(f"Could not find {args.oneimage} - please check the cutout directory name you provided")
-            sys.exit()
-        # find index in rfiles that corresponds to image
-        #try:
-        coadd_index = rfiles.index(args.oneimage)
-        indices = [np.arange(len(rfiles))[coadd_index]]
-        #print('when selecting one image, indices = ',indices,rfiles[indices[0]])
-        buildone(args.oneimage,outdir,rfiles)
-        #except ValueError:
-        #    rfiles = [args.oneimage]
-        #    indices = np.arange(len(rfiles))
-    else:
-        indices = np.arange(len(rfiles))
+    # always run with one image
+    # make sure that the image exists
+    if not os.path.exists(args.oneimage):
+        print(f"Could not find {args.oneimage} - please check the cutout directory name you provided")
+        sys.exit()
+    # find index in rfiles that corresponds to image
+    coadd_index = rfiles.index(args.oneimage)
+    indices = [np.arange(len(rfiles))[coadd_index]]
 
-        image_pool = mp.Pool(mp.cpu_count())
-        #image_pool = mp.pool.ThreadPool(mp.cpu_count())    
-        myresults = [image_pool.apply_async(buildone,args=(subdir,outdir,rfiles,)) for subdir in rfiles]
-    
-        image_pool.close()
-        image_pool.join()
-        #image_results = [r.get() for r in myresults]
-
+    buildone(args.oneimage,outdir,rfiles)
     
