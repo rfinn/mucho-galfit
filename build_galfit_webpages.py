@@ -379,7 +379,7 @@ class galfit_dir():
     def runall(self):
         self.get_ned_name()
         self.get_file_names()
-        self.make_png_mask()
+        #self.make_png_mask()
 
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
@@ -475,7 +475,7 @@ class galfit_dir():
             mask = mask > 0
 
 
-            display_galfit_model(self.galfit,outdir=self.outdir,mask=None,ellipseparams=self.ellipseparams,suffix=f"_{band}")
+            display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
             outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png']
         
