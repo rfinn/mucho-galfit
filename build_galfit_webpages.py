@@ -380,7 +380,7 @@ class galfit_dir():
         self.get_ned_name()
         self.get_file_names()
         self.get_ellipse_params()
-        #self.make_png_mask()
+        self.make_png_mask()
 
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
@@ -444,7 +444,7 @@ class galfit_dir():
                 continue
             try:
                 if i < 4:
-                    make_png(self.fitsimages[f],pngfile,mask=mask)
+                    make_png(self.fitsimages[f],pngfile,mask=None)
                 elif i == (len(self.fitsimages)-2): # add ellipse to mask image
                     if self.ellipseparams is not None:
                         make_png(self.fitsimages[f],pngfile,ellipseparams=self.ellipseparams)
@@ -485,6 +485,9 @@ class galfit_dir():
             self.galresidual = os.path.join(self.outdir,outim[2])        
 
             # store fitted parameters
+
+
+            # make png of mask
 
             t = rg.parse_galfit_1comp(self.galfit)
         
@@ -615,7 +618,11 @@ class build_html_cutout():
     def write_galfit_images(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
         if self.cutout.galimage is not None:
-            self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')                
+            self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')
+            if 'W' in band:
+                maskpng = self.gname+'-custom-image-wise-mask.png'
+            else:
+                maskpng = self.gname+'-custom-image-r-mask.png'
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
                       self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
