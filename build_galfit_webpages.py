@@ -620,9 +620,9 @@ class build_html_cutout():
         if self.cutout.galimage is not None:
             self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')
             if 'W' in band:
-                maskpng = self.gname+'-custom-image-wise-mask.png'
+                maskpng = self.cutout.gname+'-custom-image-wise-mask.png'
             else:
-                maskpng = self.gname+'-custom-image-r-mask.png'
+                maskpng = self.cutout.gname+'-custom-image-r-mask.png'
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
                       self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
