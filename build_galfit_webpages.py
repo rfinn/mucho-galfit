@@ -371,7 +371,7 @@ class galfit_dir():
     def runall(self):
         self.get_ned_name()
         self.get_file_names()
-        self.make_png_files()
+        self.make_png_mask()
 
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
