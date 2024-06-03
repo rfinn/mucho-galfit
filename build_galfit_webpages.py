@@ -363,8 +363,10 @@ class galfit_dir():
             os.mkdir(outdir)
         self.outdir = outdir
         self.cutoutdir = cutoutdir
+    def runall(self):
         self.get_ned_name()
         self.get_file_names()
+
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
         t = glob.glob(self.cutoutdir+'/*-custom-image-r.fits')[0]
