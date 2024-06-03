@@ -105,7 +105,7 @@ def buildone(subdir,outdir,flist):
         # adding the telescope and run so that we don't write over
         # images if galaxy was observed more than once
         gal_outdir = os.path.join(outdir,subdir+"")
-        #print('out directory for this galaxy = ',gal_outdir)
+        print('out directory for this galaxy = ',gal_outdir)
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         if not os.path.exists(gal_outdir):
@@ -354,15 +354,20 @@ class galfit_dir():
         '''
         # this returns the VFID
         # the galname should be the NED name that JM uses
-
         self.vfid = cutoutdir
-        #print('inside cutoutdir, gname = ',self.gname)
+        
+        print('inside cutoutdir, vfid = ',self.vfid)
         #print('cutoutdir = ',cutoutdir)
         #print('outdir = ',outdir)        
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         self.outdir = outdir
+        if args.verbose:
+            print("self.outdir = ",self.outdir)
         self.cutoutdir = cutoutdir
+        if args.verbose:
+            print("self.cutoutdir = ",self.cutoutdir)
+        
     def runall(self):
         self.get_ned_name()
         self.get_file_names()
@@ -489,8 +494,9 @@ class build_html_cutout():
         # instance of class cutout_dir
         self.cutout = cutoutdir
 
-        outfile = os.path.join(outdir,self.cutout.gname+'.html')
-        print("outfile = ",outfile)
+        outfile = os.path.join(outdir,self.cutout.vfid+'.html')
+        if args.verbose:
+            print("outfile = ",outfile)
         vfindices = np.arange(len(vfmain))
         self.vfindex = vfindices[vfmain['VFID'] == self.cutout.vfid]
         #print('inside build html')
@@ -554,7 +560,7 @@ class build_html_cutout():
 
     def write_navigation_links(self):
         # Top navigation menu--
-        self.html.write('<h1>{}</h1>\n'.format(self.cutout.gname))
+        self.html.write(f'<h1>{self.cutout.vfid}-{self.cutout.gname}</h1>\n')
 
         self.html.write('<a href="../{}">Home</a>\n'.format(self.htmlhome))
         self.html.write('<br />\n')
@@ -628,6 +634,7 @@ if __name__ == '__main__':
 
     #parser.add_argument('--table-path', dest = 'tablepath', default = '/Users/rfinn/github/Virgo/tables/', help = 'path to github/Virgo/tables')
     parser.add_argument('--cutoutdir',dest = 'cutoutdir', default=None, help='set to cutout directory. default is the current directory, like you are running from the cutouts/ directory')
+    parser.add_argument('--verbose',dest = 'verbose',default=False, action='store_true', help='set for additional print statements')    
     parser.add_argument('--oneimage',dest = 'oneimage',default=None, help='give directory for one image')
     parser.add_argument('--outdir',dest = 'outdir',default='/data-pool/Halpha/html_dev/galfit/', help='output directory.  default is /data-pool/Halpha/html_dev/galfit/')    
      
