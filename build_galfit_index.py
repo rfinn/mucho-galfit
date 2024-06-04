@@ -93,11 +93,11 @@ class build_html_coadd():
         self.html.write('<style type="text/css">\n')
         self.html.write('table, td, th {padding: 5px; text-align: center; border: 1px solid black}\n')
         self.html.write('</style>\n')
-        self.html.write('<h1>VF Coadds</h1>\n')        
+        self.html.write('<h1>VF Galfit Analysis</h1>\n')        
     def write_coadd_list(self):
         self.html.write('<table width="50%">\n')
         self.html.write('<tr>')
-        colnames = ['Index','COADD']
+        colnames = ['Index','Galaxy']
         for i,l in enumerate(colnames):
             if i == 1:
                 colspan=2
