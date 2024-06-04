@@ -340,7 +340,8 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
               # plot the ellipse
               plot_ellipse(plt.gca(),ellipseparams)
           plt.savefig(outim[i])
-          #plt.close(fig)
+
+      plt.close(fig)
 
 ###########################################################
 ####  CLASSES
