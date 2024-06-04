@@ -54,6 +54,8 @@ import rungalfit as rg #This code has galfit defined functions
 
 #from build_web_coadds import get_galaxies_fov, plot_vf_gals
 from build_web_common import *
+
+
 ###########################################################
 ####  GLOBAL VARIABLES
 ###########################################################
@@ -87,6 +89,61 @@ def get_params_from_name(image_name):
 
     return telescope,dateobs,pointing
 
+def get_galfit_results(galfit_output_image,ngal=1):
+
+    """
+    INPUT:
+    * galfit_output_image : will have model fits in header 2
+    * ngal : number of galaxies modeled in galfit image.  the default is 1
+
+    RETURN:
+    results : [list], output assuming two galaxies would be:
+              first entry: 'XC','YC','MAG','RE','N','AR','PA','NUMERROR' for gal 1
+              second entry: 'XC','YC','MAG','RE','N','AR','PA','NUMERROR' for gal 2
+              third entry: SKY
+              fourth entry: CHISQNU
+
+
+    """
+    # read in image header
+    hdu = fits.open(infile1[0])
+    # extension 2 has the model info
+    imheader = hdu[2].header
+    #print(imheader)
+    hdu.close()
+    
+
+    
+    header=['XC','YC','MAG','RE','N','AR','PA','SKY','CHI2NU']
+    header_err = [f"{h}_ERR" for h in header[:-1]]
+
+    # create empty list for each header
+    results = []
+    # loop over galaxies
+    for i in range(ngal):
+        # build header keywords
+        galparams = []
+        for h in header[:-2]:
+            hkey = f"{i+1}_{h}"
+
+            # query galheader
+            galparams.append(imheader[hkey])
+        numerror = False
+        for g in galparams:
+            if '*' in g:
+                numerror = True
+        galparams.append(numerror)
+        results.append(galparams)
+    # get sky
+    nsky = ngal + 1
+    #print("HEYYYY: nsky = ",nsky)
+    t = imheader[f"{nsky}_SKY"]
+    results.append(t)
+    # get chisqy
+    results.append(imheader['CHI2NU'])
+
+    return results
+    
 def buildone(subdir,outdir,flist):
     print(subdir)
 
@@ -383,6 +440,15 @@ class galfit_dir():
         self.get_ellipse_params()
         self.make_png_mask()
 
+    def ngal(self):
+        """check to see how many galaxies in FOV  """
+        infile = open('galsFOV.txt','r')
+        mylines = infile.readlines()
+        self.ngal = len(mylines)
+
+        if args.verbose:
+            print(f"number of galaxies = {self.ngal}")
+            
     def get_ned_name(self):
         """ get galaxy NED name by grabbing an image """
 
@@ -487,22 +553,22 @@ class galfit_dir():
 
             # store fitted parameters
 
-
+            self.results = get_galfit_results(self.galfit,ngal=self.ngal)
             # make png of mask
 
-            t = rg.parse_galfit_1comp(self.galfit)
+            #t = rg.parse_galfit_1comp(self.galfit)
         
             #header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','ERROR','CHI2NU']
-            self.xc, self.xc_err = t[0]
-            self.yc, self.yc_err = t[1]
-            self.mag, self.mag_err = t[2]
-            self.re, self.re_err = t[3]
-            self.nsersic, self.nsersic_err = t[4]
-            self.BA, self.BA_err = t[5]
-            self.PA, self.PA_err = t[6]
-            self.sky, self.sky_err = t[7]
-            self.error = t[8]
-            self.chi2nu = t[9]
+            #self.xc, self.xc_err = t[0]
+            #self.yc, self.yc_err = t[1]
+            #self.mag, self.mag_err = t[2]
+            #self.re, self.re_err = t[3]
+            #self.nsersic, self.nsersic_err = t[4]
+            #self.BA, self.BA_err = t[5]
+            #self.PA, self.PA_err = t[6]
+            #self.sky, self.sky_err = t[7]
+            #self.error = t[8]
+            #self.chi2nu = t[9]
         else:
             self.galimage = None
         
@@ -634,21 +700,26 @@ class build_html_cutout():
     def write_galfit_table(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
         self.html.write(f'<h4>GALFIT Sersic Parameters for {band}</h4>\n')                
-        labels=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','ERROR','CHI2NU']
-        data = ['{:.1f}+/-{:.1f}'.format(self.cutout.xc, self.cutout.xc_err),
-                '{:.1f}+/-{:.1f}'.format(self.cutout.yc, self.cutout.yc_err),
-                '{:.2f}+/-{:.2f}'.format(self.cutout.mag, self.cutout.mag_err), 
-                '{:.2f}+/-{:.2f}'.format(self.cutout.re, self.cutout.re_err),
-                '{:.2f}+/-{:.2f}'.format(self.cutout.nsersic, self.cutout.nsersic_err),
-                '{:.2f}+/-{:.2f}'.format(self.cutout.BA, self.cutout.BA_err),
-                '{:.1f}+/-{:.1f}'.format(self.cutout.PA, self.cutout.PA_err),
-                '{:.2f}+/-{:.2f}'.format(self.cutout.sky, self.cutout.sky_err),
-                '{}'.format(self.cutout.error),
-                '{:.2f}'.format(self.cutout.chi2nu)]
+        labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
+
+
+        self.html.write('<table width="90%"; table-layout: fixed>\n')
+        self.html.write('<tr>')
+        for l in labels:
+            self.html.write('<th>{}</th>'.format(l))
+        self.html.write('</tr></p>\n')        
+
+        sky = self.cutout.results[self.cutout.ngal]
+        chisqnu = self.cutout.results[self.cutout.ngal+1]
+        for i in range(self.cutout.ngal):
+            data = self.cutout.results[0]
+            self.html.write('<tr>')
+            for d in data:
+                self.html.write('<td>{}</td>'.format(d))
+            self.html.write('</tr>\n')            
+
+        self.html.write('</table>\n')
         
-        #print(data)
-        write_text_table(self.html,labels,data)
-        pass
 
     def close_html(self):
         self.html.close()

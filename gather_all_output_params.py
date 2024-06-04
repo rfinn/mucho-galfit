@@ -101,7 +101,7 @@ for i in range(nvirgo):
 # create a dictionary to link the VFID and row in table?
 topdir = os.getcwd()
 os.chdir(topdir)
-# TODO get list of directories
+# TODONE get list of directories
 dirlist = glob.glob('VFID????')
 dirlist.sort()
 #print(dirlist)
@@ -139,7 +139,7 @@ for d in dirlist:
             print(f"no out{k+1} file for ",d)
             continue
 
-        # TODO : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
+        # TODONE : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
 
         # read in image header
         hdu = fits.open(infile1[0])
