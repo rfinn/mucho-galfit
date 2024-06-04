@@ -137,8 +137,12 @@ if __name__ == '__main__':
     #outdir = '/home/rfinn/Virgo-dev/html-dev/coadds/'    
 
     # this should contain a list of all the galaxy folders
-    flist1 = os.listdir(outdir)
-    flist1.sort()
+    temp = os.listdir(outdir)
+    temp.sort()
+    flist1 = []
+    for t in temp:
+        if 'VFID' in t:
+            flist.append(t)
     #print(flist1)
     galnames=[]
     for i,subdir in enumerate(flist1): # loop through list
