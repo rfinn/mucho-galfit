@@ -374,7 +374,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         for i in range(len(all_lines)):
             
             line = all_lines[i]
-            if 'MAG' in line:
+            if 'sersic' in line:
                 objnum += 1
                 
             if line.startswith('B)'):
@@ -624,6 +624,7 @@ if __name__ == '__main__':
             # get the PA and BA for this galaxy
             rPA = rgalfit['PA'][matchindex]
             rBA = rgalfit['AR'][matchindex]
+            print("r-band axis ratio(s): ",rBA)
             fixBA = True
             fixPA = True
             
