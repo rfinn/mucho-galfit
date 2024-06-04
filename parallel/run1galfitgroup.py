@@ -564,6 +564,7 @@ if __name__ == '__main__':
             sys.exit()
 
     matchindex_primary = etab['VFID'] == vfid
+    print(f"number of matches to {vfid} = {np.sum(matchindex_primary)}")
     objname = etab['GALAXY'][matchindex_primary]
     print(f"objname = {objname}")
     # look in vf tables to find if file is group or not
