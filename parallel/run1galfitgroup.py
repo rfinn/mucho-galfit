@@ -374,7 +374,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         for i in range(len(all_lines)):
             
             line = all_lines[i]
-            if 'sersic' in line:
+            if '0) sersic' in line:
                 objnum += 1
                 
             if line.startswith('B)'):
