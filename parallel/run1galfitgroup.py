@@ -613,8 +613,8 @@ if __name__ == '__main__':
         # open the galfit output table from rband
         rgalfit = Table.read(topdir+'/vf_v2_galfit_r.fits')
         # check numerical error flag
-        print(rgalfit['Numerical_Error'][primary_matchindex])
-        if rgalfit['Numerical_Error'][primary_matchindex]:
+        print(rgalfit['Numerical_Error'][matchindex_primary])
+        if rgalfit['Numerical_Error'][matchindex_primary]:
             print("not using r-band params b/c they are not reliable")
             rPA = None
             rBA = None
