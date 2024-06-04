@@ -142,7 +142,7 @@ if __name__ == '__main__':
     flist1 = []
     for t in temp:
         if 'VFID' in t:
-            flist.append(t)
+            flist1.append(t)
     #print(flist1)
     galnames=[]
     for i,subdir in enumerate(flist1): # loop through list
