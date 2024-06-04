@@ -115,7 +115,7 @@ def get_galfit_results(galfit_output_image,ngal=1):
 
     
     header=['XC','YC','MAG','RE','N','AR','PA','SKY','CHI2NU']
-    header_err = [f"{h}_ERR" for h in header[:-1]]
+
 
     # create empty list for each header
     results = []
@@ -125,7 +125,6 @@ def get_galfit_results(galfit_output_image,ngal=1):
         galparams = []
         for h in header[:-2]:
             hkey = f"{i+1}_{h}"
-
             # query galheader
             galparams.append(imheader[hkey])
         numerror = False
@@ -714,7 +713,7 @@ class build_html_cutout():
         sky = self.cutout.results[self.cutout.ngal]
         chisqnu = self.cutout.results[self.cutout.ngal+1]
         for i in range(self.cutout.ngal):
-            data = self.cutout.results[0]
+            data = self.cutout.results[i]
             self.html.write('<tr>')
             for d in data:
                 self.html.write('<td>{}</td>'.format(d))
