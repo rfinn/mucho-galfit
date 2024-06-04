@@ -435,12 +435,14 @@ class galfit_dir():
             print("self.cutoutdir = ",self.cutoutdir)
         
     def runall(self):
+        self.get_ngal()        
         self.get_ned_name()
         self.get_file_names()
         self.get_ellipse_params()
         self.make_png_mask()
 
-    def ngal(self):
+        
+    def get_ngal(self):
         """check to see how many galaxies in FOV  """
         infile = open('galsFOV.txt','r')
         mylines = infile.readlines()
