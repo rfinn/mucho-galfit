@@ -564,6 +564,7 @@ if __name__ == '__main__':
             sys.exit()
 
     matchindex_primary = etab['VFID'] == vfid
+
     print(f"number of matches to {vfid} = {np.sum(matchindex_primary)}")
     objname = etab['GALAXY'][matchindex_primary][0]
     print(f"objname = {objname}")
@@ -612,7 +613,8 @@ if __name__ == '__main__':
         # open the galfit output table from rband
         rgalfit = Table.read(topdir+'/vf_v2_galfit_r.fits')
         # check numerical error flag
-        if rgalfit['Numerical_Error'][matchindex]:
+        print(rgalfit['Numerical_Error'][primary_matchindex])
+        if rgalfit['Numerical_Error'][primary_matchindex]:
             print("not using r-band params b/c they are not reliable")
             rPA = None
             rBA = None
