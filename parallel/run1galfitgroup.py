@@ -196,7 +196,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     for i in range(len(vfids)):
         outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
     outfile.close()
-    return x,y
+    return x,y,vfids
 
 
 
@@ -211,7 +211,8 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
     * fixBA : hold BA fixed
     * PA : PA value to start with
     * fixPA : hold PA fixed; use this if holding r-band values fixed
-
+    * rBA : a list of BA from r-band fits, will have more than one entry for a group image
+    * rOA : a list of PA from r-band fits, will have more than one entry for a group image
     """
  
     if mask_image is not None:
@@ -332,16 +333,16 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             if rBA is not None:
                 if fixBA:
                     print("Fixing BA")
-                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
+                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA[objnum-1],0))
                 else:
-                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
+                    outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA[objnum-1],1))
             else:
                 outfile.write(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(BA,int(fitBA)))
             if rPA is not None:
                 if fixPA:
-                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
+                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA[objnum-1],0))
                 else:
-                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
+                    outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA[objnum-1],1))
             else:
                 outfile.write('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(PA,int(fitPA)))
             outfile.write(" Z) 0                  # Output option (0 = residual, 1 = Don't subtract)  \n")
@@ -559,11 +560,21 @@ if __name__ == '__main__':
             print("ERROR: problem locating astrophysics drive - exiting")
             sys.exit()
 
-    matchflag = etab['VFID'] == vfid
+    # get galaxies in the FOV
+    # def get_galaxies_in_fov(image,bandpass='W3'):    
+    x,y,vfids = get_galaxies_in_fov(image, bandpass=bandpass)
+
+    matchflag = np.zeros(len(etab),'bool')
+    # TODO - need to fix this for group pointings
+    for vfid in vfids:
+        mindex = etab['VFID'] == vfid 
+        matchflag[mindex] = True 
+
+    
     
     if np.sum(matchflag) < 1:
         print("ERROR: did not find a matching VFID for ",vfid)
-    matchindex = np.arange(len(etab))[matchflag][0]
+    matchindex = np.arange(len(etab))[matchflag]
 
 
     ########################################################
@@ -573,6 +584,7 @@ if __name__ == '__main__':
     ########################################################
 
     if len(sys.argv) > 3:
+        # TODO - need to fix this to properly account for the group galaxies
         # open the galfit output table from rband
         rgalfit = Table.read(topdir+'/vf_v2_galfit_r.fits')
         # check numerical error flag
@@ -638,9 +650,6 @@ if __name__ == '__main__':
     os.system('rm galfit.??')
     os.system('rm galfit.input?')
 
-    # get galaxies in the FOV
-    # def get_galaxies_in_fov(image,bandpass='W3'):    
-    x,y = get_galaxies_in_fov(image, bandpass=bandpass)
     
     # TODONE: add code to generate galfit input for first run, no convolution, generic starting point
     #write_galfit_input(output_dir, image, sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
