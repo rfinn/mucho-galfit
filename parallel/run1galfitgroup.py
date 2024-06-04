@@ -563,20 +563,39 @@ if __name__ == '__main__':
             print("ERROR: problem locating astrophysics drive - exiting")
             sys.exit()
 
+    matchindex_primary = etab['VFID'] == vfid
+    objname = etab['GALAXY'][matchindex_primary]
+    # look in vf tables to find if file is group or not
+    if etab['GROUP_MULT'][matchindex_primary] > 1:
+        image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
+        invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'
+        std_image = f'{objname}_GROUP-custom-std-{bandpass}.fits'            
+        psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
+    else:
+        image = f'{objname}-custom-image-{bandpass}.fits'
+        invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'
+        std_image = f'{objname}-custom-std-{bandpass}.fits'    
+        psf_image = f'{objname}-custom-psf-{bandpass}.fits'
+            
+    print("image = ",image)
+
+
     # get galaxies in the FOV
     # def get_galaxies_in_fov(image,bandpass='W3'):    
     x,y,vfids = get_galaxies_in_fov(image, bandpass=bandpass)
 
     matchflag = np.zeros(len(etab),'bool')
     # TODO - need to fix this for group pointings
-    for vfid in vfids:
-        mindex = etab['VFID'] == vfid 
+    for v in vfids:
+        mindex = etab['VFID'] == v
         matchflag[mindex] = True 
 
     
     
     if np.sum(matchflag) < 1:
         print("ERROR: did not find a matching VFID for ",vfid)
+
+    # this can now contain multiple ids if this is a group image
     matchindex = np.arange(len(etab))[matchflag]
 
 
@@ -628,20 +647,6 @@ if __name__ == '__main__':
         fixCPA = False
         
 
-    objname = etab['GALAXY'][matchindex]
-    # look in vf tables to find if file is group or not
-    if etab['GROUP_MULT'][matchindex] > 1:
-        image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
-        invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'
-        std_image = f'{objname}_GROUP-custom-std-{bandpass}.fits'            
-        psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
-    else:
-        image = f'{objname}-custom-image-{bandpass}.fits'
-        invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'
-        std_image = f'{objname}-custom-std-{bandpass}.fits'    
-        psf_image = f'{objname}-custom-psf-{bandpass}.fits'
-            
-    print("image = ",image)
 
         
 
