@@ -565,6 +565,7 @@ if __name__ == '__main__':
 
     matchindex_primary = etab['VFID'] == vfid
     objname = etab['GALAXY'][matchindex_primary]
+    print(f"objname = {objname}")
     # look in vf tables to find if file is group or not
     if etab['GROUP_MULT'][matchindex_primary] > 1:
         image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
