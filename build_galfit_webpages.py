@@ -106,7 +106,7 @@ def get_galfit_results(galfit_output_image,ngal=1):
 
     """
     # read in image header
-    hdu = fits.open(infile1[0])
+    hdu = fits.open(galfit_output_image)
     # extension 2 has the model info
     imheader = hdu[2].header
     #print(imheader)
