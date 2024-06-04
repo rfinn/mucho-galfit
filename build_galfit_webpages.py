@@ -717,6 +717,8 @@ class build_html_cutout():
             self.html.write('<tr>')
             for d in data:
                 self.html.write('<td>{}</td>'.format(d))
+            self.html.write('<td>{}</td>'.format(sky))
+            self.html.write('<td>{}</td>'.format(chisqnu))            
             self.html.write('</tr>\n')            
 
         self.html.write('</table>\n')
