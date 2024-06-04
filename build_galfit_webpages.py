@@ -531,7 +531,7 @@ class galfit_dir():
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         self.galfit = f"{self.gname}-{band}-out2.fits"
-        print("looking for galfit file {self.galfit}")
+        print(f"looking for galfit file {self.galfit}")
         if os.path.exists(self.galfit):
             # store fit results
             if args.verbose:
