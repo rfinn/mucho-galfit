@@ -615,7 +615,7 @@ class build_html_cutout():
 
         bands = ['r','g','W1','W2','W3','W4']
         bands = ['g','r','W1','W1-fixBA','W2','W3','W3-fixBA','W4']
-        #bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
+        bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
         for b in bands:
             self.cutout.get_galfit_model(band=b)
         
