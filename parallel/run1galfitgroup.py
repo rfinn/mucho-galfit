@@ -370,10 +370,13 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         i = 0
         holdfixed = False
         skyobject = True
+        objnum=0
         for i in range(len(all_lines)):
             
             line = all_lines[i]
-            
+            if 'MAG' in line:
+                objnum += 1
+                
             if line.startswith('B)'):
                 outlines.append(line.replace('out1.fits','out2.fits'))
                 holdfixed = False
@@ -450,9 +453,9 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                 if rBA is not None:
                     if fixBA:
                         print("fixing BA!")                        
-                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,0))
+                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA[objnum-1],0))
                     else:
-                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA,1))
+                        outlines.append(' 9) %5.2f       %i       # axis ratio (b/a)    \n'%(rBA[objnum-1],1))
                         
                 elif holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
@@ -472,9 +475,9 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                 if rPA is not None:
                     if fixPA:
                         print("fixing PA!")
-                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,0))
+                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA[objnum-1],0))
                     else:
-                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA,1))
+                        outlines.append('10) %5.2f       %i       # position angle (PA)  [Degrees: Up=0, Left=90] \n'%(rPA[objnum-1],1))
                 
                 elif holdfixed and not skyobject:
                     outlines.append(line.replace(' 1 ',' 0 '))
