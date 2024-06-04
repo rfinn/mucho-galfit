@@ -73,7 +73,7 @@ image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W
 minmag2fit = {'FUV':18,'NUV':18,'g':20,'r':20,'z':20,'W1':17,'W2':17,'W3':17,'W4':17}
 
 # this is approx the peak mag of COG_MTOT_ histogram
-guess_mag = {'FUV':15.5,'NUV':15.5,'g':14.5,'r':14.5,'z':14.5,'W1':11,'W2':11,'W3':11,'W4':11}
+guess_mag = {'FUV':15.5,'NUV':15.5,'g':14.5,'r':14.5,'z':14.5,'W1':9,'W2':9,'W3':9,'W4':10}
 
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
@@ -301,7 +301,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         sky = 0
         # set initial guess to 25 arcsec,
         # and translate into pixels based on pixelscale of bandpass 
-        rad = 25/pixel_scale[bandpass]
+        rad = 30/pixel_scale[bandpass]
         fitrad = 1
         
 
