@@ -86,6 +86,39 @@ guess_mag = {'FUV':15.5,'NUV':15.5,'g':14.5,'r':14.5,'z':14.5,'W1':9,'W2':9,'W3'
 ### FUNCTIONS
 ##########################################################################     
 
+def get_galfit_nsersic(galfit_output_image,ngal=1):
+
+    """
+    INPUT:
+    * galfit_output_image : will have model fits in header 2
+    * ngal : number of galaxies modeled in galfit image.  the default is 1
+
+    RETURN:
+    nsersic : sersic index for each galaxy that was fit 
+
+    """
+    # read in image header
+    hdu = fits.open(galfit_output_image)
+    # extension 2 has the model info
+    imheader = hdu[2].header
+    #print(imheader)
+    hdu.close()
+    
+    nsersic = np.zeros(ngal)
+    high_nsersic_flag = np.zeros(ngal,'bool')
+    for i in range(ngal):
+        # build header keywords
+        hkey = f"{i+1}_N"
+        
+        # query galheader
+        t = float(imheader[hkey])
+        if t > 6:
+            nsersic_flag[i] = True
+        nsersic[i] = t
+
+    return nsersic, high_nsersic_flag
+    
+
 def get_maskname(image):
     """ return the wise mask for wise images and the r mask for legacy images  """
     # check for wise extenstion
@@ -203,7 +236,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
         
 def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True,\
-                       rBA=None,fixBA=False,rPA=None,fixPA=False):
+                       rBA=None,fixBA=False,rPA=None,fixPA=False,nsersic_flag=None):
     """
     
     PARAMS:
@@ -213,6 +246,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
     * fixPA : hold PA fixed; use this if holding r-band values fixed
     * rBA : a list of BA from r-band fits, will have more than one entry for a group image
     * rOA : a list of PA from r-band fits, will have more than one entry for a group image
+    * nsersic_flag : boolean to hold n=6 for particular galaxies
     """
  
     if mask_image is not None:
@@ -360,7 +394,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
         outfile.close()
     else:
         # read in output from first pass
-
+        # and use results as input into second pass
         
         input = open('galfit.01','r')
         all_lines = input.readlines()
@@ -376,6 +410,7 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             line = all_lines[i]
             if '0) sersic' in line:
                 objnum += 1
+                fixn = nsersic_flag[objnum-1]
                 
             if line.startswith('B)'):
                 outlines.append(line.replace('out1.fits','out2.fits'))
@@ -443,7 +478,9 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     gparams = line.split()
                     n = float(gparams[1].replace('*',''))
                     #print(f"HEY::::: ba from round one = {rad:.3f}")
-                    if (n < 0.5) | (n > 5):
+                    if fixn:
+                        outlines.append(' 5) 6      1       #     Sersic index n \n')
+                    elif (n < 0.5) | (n > 5):
                         #print("setting radius to min value")
                         outlines.append(' 5) 2      1       #     Sersic index n \n')
                     else:
@@ -586,7 +623,7 @@ if __name__ == '__main__':
     # get galaxies in the FOV
     # def get_galaxies_in_fov(image,bandpass='W3'):    
     x,y,vfids = get_galaxies_in_fov(image, bandpass=bandpass)
-
+    ngal = len(vfids)
     matchflag = np.zeros(len(etab),'bool')
     # TODO - need to fix this for group pointings
     for v in vfids:
@@ -674,6 +711,7 @@ if __name__ == '__main__':
     os.system(f"galfit galfit.input1")
 
 
+    
     # TODONE: read galfit output, and create new input to run with convolution
     write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA)
 
@@ -686,6 +724,21 @@ if __name__ == '__main__':
     # rerun galfit and hold n fixed at n=6
 
     # check index from prior run
+    # TODO : check output sersic index.  If it's n > 6, then rerun and hold n=6.
 
+    t = image.split('-')
+    if fixBA:
+        output_image = f'{t[0]}-{bandpass}-fixBA-out2.fits'
+    else:
+        output_image = f'{t[0]}-{bandpass}-out2.fits'
     
+    nsersic, high_nsersic_flag = get_galfit_nsersic(output_image,ngal=ngal)
+
+    if np.sum(high_nsersic_flag) > 0:
+        print("running again and holding the sersic index fixed for {np.sum(high_nsersic_flag)}")
+        write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA,nsersic_flag=high_nsersic_flag)
+
+        print('running galfit third time to hold fixed n=6')
+        os.system(f"galfit galfit.input2")
+
     os.chdir(topdir)
