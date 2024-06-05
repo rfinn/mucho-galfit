@@ -487,6 +487,8 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
                     #print(f"HEY::::: ba from round one = {rad:.3f}")
                     if fixn:
                         outlines.append(' 5) 6      0       #     Sersic index n \n')
+                        fixBA = False
+                        fixPA = False
                     elif (n < 0.5) | (n > 5):
                         #print("setting radius to min value")
                         outlines.append(' 5) 2      1       #     Sersic index n \n')
