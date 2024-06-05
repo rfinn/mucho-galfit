@@ -117,7 +117,7 @@ def get_galfit_nsersic(galfit_output_image,ngal=1):
         # parse output : '*16.1052* +/- *1545.5958*'
         n = float(t.replace('*','').split('+/-')[0])
         if n > 6:
-            nsersic_flag[i] = True
+            high_nsersic_flag[i] = True
         nsersic[i] = t
 
     return nsersic, high_nsersic_flag
