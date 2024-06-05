@@ -109,10 +109,14 @@ def get_galfit_nsersic(galfit_output_image,ngal=1):
     for i in range(ngal):
         # build header keywords
         hkey = f"{i+1}_N"
+
+
         
         # query galheader
-        t = float(imheader[hkey])
-        if t > 6:
+        t = imheader[hkey]
+        # parse output : '*16.1052* +/- *1545.5958*'
+        n = t.replace('*','').split('+/-')[0]
+        if n > 6:
             nsersic_flag[i] = True
         nsersic[i] = t
 
