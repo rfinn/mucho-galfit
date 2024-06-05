@@ -410,7 +410,10 @@ def write_galfit_input(output_dir, image,sigma_image,psf_image,bandpass,xgal=Non
             line = all_lines[i]
             if '0) sersic' in line:
                 objnum += 1
-                fixn = nsersic_flag[objnum-1]
+                if nsersic_flag is None:
+                    fixn = False
+                else:
+                    fixn = nsersic_flag[objnum-1]
                 
             if line.startswith('B)'):
                 outlines.append(line.replace('out1.fits','out2.fits'))
