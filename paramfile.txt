@@ -12,7 +12,6 @@ main_catalog   /mnt/astrophysics/lsdr9-wisesize/wisesize_main.fits      #full pa
                                                                         #this will also be to where merge_ns_catalogs.py 
                                                                         #writes the output
 phot_catalog   //.fits                                                  #full path (including filename) to phot catalog
-gaia_star_cat  /mnt/astrophysics/catalogs/gaia-mask-dr9.virgo.fits      #path to gaia star reference catalog (for masking)
 
 
 objid_col            OBJID                                  #name of the objid column in the above catalogs
