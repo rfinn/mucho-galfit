@@ -4,6 +4,7 @@ main_dir          /mnt/astrophysics/kconger_wisesize/       #mounted dir for inp
 path_to_scripts   github/wisesize/mucho-galfit/             #draco path for galfit code, starting from main_dir
 path_to_images    mg_output_wisesize/                       #output path to image dirs for each galaxy, starting from main_dir
 data_root_dir     /mnt/astrophysics/lsdr9-wisesize/         #where JM images are stored (RA directories)
+tile_path         github/wisesize/unwise_PSFs/tiles.fits    #location of tiles.fits, needed for pulling unWISE PSF images
 
 north_cat_name    wisesize-parent-dr9-north.fits            #north galaxies catalog, located in data_root_dir
 south_cat_name    wisesize-parent-dr9-south.fits            #south galaxies catalog, located in data_root_dir
