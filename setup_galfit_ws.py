@@ -86,7 +86,7 @@ def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
 #convert invvar image to noise
 def convert_invvar_noise(invvar_image, noise_image):
     # read in invvar image
-    print('invvar image = ',invvar_image, os.path.basename(invvar_image))
+    # print('invvar image = ',invvar_image, os.path.basename(invvar_image))
     hdu = fits.open(invvar_image)
     data = hdu[0].data
     header = hdu[0].header
@@ -149,13 +149,13 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
-            invvar_image = f'{im_name_grz.replace('.fits','')}-invvar-{bandpass}.fits'
+        invvar_image = f'{im_name_grz.replace('.fits','')}-invvar-{bandpass}.fits'
 
-    # check if noise image exists in output_dir, if not make it from invvar 
-    sigma_image = invvar_image.replace('invvar','std')
-    if not os.path.exists(output_dir+sigma_image):
-        convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
-        
+        # check if noise image exists in output_dir, if not make it from invvar 
+        sigma_image = invvar_image.replace('invvar','std')
+        if not os.path.exists(output_dir+sigma_image):
+            convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
+
 
     ###############################################################################
     ### END GET IMAGES
@@ -267,7 +267,7 @@ if __name__ == '__main__':
         #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
        
         # for testing
-        if i > 1:
+        if i > 0:
             os.chdir(outdir)
             sys.exit()
         
