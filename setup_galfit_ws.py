@@ -274,8 +274,8 @@ if __name__ == '__main__':
         #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
        
         # for testing
-        if i == 1:
-            os.chdir(outdir)
-            sys.exit()
+        #if i == 1:
+        #    os.chdir(outdir)
+        #    sys.exit()
         
     os.chdir(outdir)
