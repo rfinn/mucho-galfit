@@ -46,7 +46,6 @@ def funpack_image(input,output,nhdu=1):
     #print('finished unpacking image')
 
 #unpack composite images into their constituent wavelength bands
-#save results in the same spot as where JM images are stored? (path_to_im=data_root_dir)
 def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
     if grz:
         ims=fits.open(path_to_im+im_name)
@@ -147,19 +146,16 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     im_name_wise = im_name_grz.replace('.fits','-unwise.fits')
     extract_bands(data_dir,output_dir,im_name=im_name_wise,WISE=True)
     
-    for bandpass in ['r','g','z','W1','W2','W3','W4']:
-        image = f'{im_name_grz.replace('.fits','')}-im-{bandpass}.fits'
-        invvar_image = f'{im_name.replace('.fits','')}-invvar-{bandpass}.fits'
-        #psf_image = f'{group_name}-custom-psf-{bandpass}.fits.fz'
+    #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
+    for n,bandpass in enumerate(['g','r','z','W1','W2','W3','W4']):
+        if n<3:
+            invvar_image = f'{im_name_grz.replace('.fits','')}-invvar-{bandpass}.fits'
+        if n>3:
+            invvar_image = f'{im_name_wise.replace('.fits','')}-invvar-{bandpass}.fits'
 
-        os.system(f'cp {image} {output_dir}')
-        os.system(f'cp {invvar_image} {output_dir}')
-        
-        # created images
+        # check if noise image exists in output_dir, if not make it from invvar 
         sigma_image = invvar_image.replace('invvar','std')
-
-        # check if noise image exists, if not make it from invvar    
-        if not os.path.exists(sigma_image):
+        if not os.path.exists(output_dir+sigma_image):
             convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
         
 
@@ -273,8 +269,8 @@ if __name__ == '__main__':
         #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
        
         # for testing
-        #if i > 1:
-        #    os.chdir(outdir)
-        #    sys.exit()
+        if i > 1:
+            os.chdir(outdir)
+            sys.exit()
         
     os.chdir(outdir)
