@@ -220,7 +220,7 @@ if __name__ == '__main__':
     tile_table = read_tiles(tile_path)    
     
     #check that outdir exists! if not, create it.
-    if os.path_exists(outdir):
+    if os.path.exists(outdir):
         os.chdir(outdir)
     else:
         os.system(f'mkdir {outdir}')
