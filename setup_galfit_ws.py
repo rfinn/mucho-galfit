@@ -218,8 +218,12 @@ if __name__ == '__main__':
     #read in tiles. the rest will follow at the bottom of the forthcoming loop
     tile_path = main_dir+param_dict['tile_path']   #contains COADD IDs and the RA+DEC of tile centers
     tile_table = read_tiles(tile_path)    
-        
-    os.chdir(outdir)
+    
+    #check that outdir exists! if not, create it.
+    if os.path_exists(outdir):
+        os.chdir(outdir)
+    else:
+        os.system(f'mkdir {outdir}')
     
     # for each galaxy, create a directory (and write sourcelist?)
     for i in range(len(maintab)):
