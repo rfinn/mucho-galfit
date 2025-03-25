@@ -47,7 +47,7 @@ def funpack_image(input,output,nhdu=1):
 
 #unpack composite images into their constituent wavelength bands
 #save results in the same spot as where JM images are stored? (path_to_im=data_root_dir)
-def extract_bands(path_to_im,im_name=None,grz=False,WISE=False):
+def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
     if grz:
         ims=fits.open(path_to_im+im_name)
         header_im = ims[0].header
@@ -63,7 +63,7 @@ def extract_bands(path_to_im,im_name=None,grz=False,WISE=False):
         
         for i,filename in enumerate(grz_im_names):
             header = header_im if i<=2 else header_invvar
-            fits.writeto(path_to_im+filename,grz_ims[i],header=header,overwrite=True)
+            fits.writeto(output_dir+filename,grz_ims[i],header=header,overwrite=True)
         
     if WISE:
         ims=fits.open(path_to_im+im_name)
@@ -81,7 +81,7 @@ def extract_bands(path_to_im,im_name=None,grz=False,WISE=False):
         
         for i,filename in enumerate(wise_im_names):
             header = header_im if i<=2 else header_invvar
-            fits.writeto(path_to_im+filename,wise_ims[i],header=header,overwrite=True)
+            fits.writeto(output_dir+filename,wise_ims[i],header=header,overwrite=True)
     
 #convert invvar image to noise
 def convert_invvar_noise(invvar_image, noise_image):
@@ -123,9 +123,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     dec_val = str(int(dec)) if len(str(int(dec)))==2 else '0'+str(int(dec))
     
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog
-        data_dir = f'{data_root_dir}/dr9-north/native/{ra_val}/'
+        data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
     if dec<32.:
-        data_dir = f'{data_root_dir}/dr9-south/native/{ra_val}/'
+        data_dir = f'{data_root_dir}dr9-south/native/{ra_val}/'
     
     
     if not os.path.exists(data_dir):
@@ -142,10 +142,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     dec_string = dec_val + (str(np.modf(dec)[0])+'000')[1:6]
     
     im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
-    extract_bands(data_dir,im_name=im_name_grz,grz=True)
+    extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
     
     im_name_wise = im_name_grz.replace('.fits','-unwise.fits')
-    extract_bands(data_dir,im_name=im_name_wise,WISE=True)
+    extract_bands(data_dir,output_dir,im_name=im_name_wise,WISE=True)
     
     for bandpass in ['r','g','z','W1','W2','W3','W4']:
         image = f'{im_name_grz.replace('.fits','')}-im-{bandpass}.fits'
