@@ -92,7 +92,8 @@ def convert_invvar_noise(invvar_image, noise_image):
     header = hdu[0].header
     hdu.close()
     # operate on pixels to take sqrt(1/x)
-    noise_data = np.sqrt(1/data)
+    with np.errstate(invalid='ignore'):
+        noise_data = np.sqrt(1/data)
     
     # check for bad values, nan, inf
     # set bad pixels to very high value, like 1e6
@@ -107,6 +108,8 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     ### GET IMAGES
     ###############################################################################
 
+    print(objid)
+    
     #output_loc is the directory holding the individual galaxy output directories (which GALFIT will be pulling from!)
     #e.g., /mnt/astrophysics/kconger_wisesize/mg_output_wisesize/OBJ1000/
     output_dir = os.path.join(output_loc,objid+'/')
@@ -132,7 +135,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
 
-    print("source directory for JM images = ",data_dir)
+    #print("source directory for JM images = ",data_dir)
     
     #np.modf()[0] isolates the decimals
     #str() converts to string
@@ -267,7 +270,7 @@ if __name__ == '__main__':
         #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
        
         # for testing
-        if i > 0:
+        if i == 1:
             os.chdir(outdir)
             sys.exit()
         
