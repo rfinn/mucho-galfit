@@ -85,15 +85,19 @@ def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
     
 #convert invvar image to noise
 def convert_invvar_noise(invvar_image, noise_image):
+    import warnings
+    
     # read in invvar image
     # print('invvar image = ',invvar_image, os.path.basename(invvar_image))
     hdu = fits.open(invvar_image)
     data = hdu[0].data
     header = hdu[0].header
     hdu.close()
+    
+    warnings.simplefilter("ignore", RuntimeWarning)
+    
     # operate on pixels to take sqrt(1/x)
-    with np.errstate(invalid='ignore'):
-        noise_data = np.sqrt(1/data)
+    noise_data = np.sqrt(1/data)
     
     # check for bad values, nan, inf
     # set bad pixels to very high value, like 1e6
