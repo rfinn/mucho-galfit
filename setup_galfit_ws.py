@@ -63,7 +63,7 @@ def extract_bands(path_to_im,im_name=None,grz=False,WISE=False):
         
         for i,filename in enumerate(grz_im_names):
             header = header_im if i<=2 else header_invvar
-            fits.writeto(path_to_im+filename,ims[i],header=header,overwrite=True)
+            fits.writeto(path_to_im+filename,grz_ims[i],header=header,overwrite=True)
         
     if WISE:
         ims=fits.open(path_to_im+im_name)
@@ -81,7 +81,7 @@ def extract_bands(path_to_im,im_name=None,grz=False,WISE=False):
         
         for i,filename in enumerate(wise_im_names):
             header = header_im if i<=2 else header_invvar
-            fits.writeto(path_to_im+filename,ims[i],header=header,overwrite=True)
+            fits.writeto(path_to_im+filename,wise_ims[i],header=header,overwrite=True)
     
 #convert invvar image to noise
 def convert_invvar_noise(invvar_image, noise_image):
