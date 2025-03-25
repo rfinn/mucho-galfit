@@ -253,7 +253,7 @@ if __name__ == '__main__':
         ############
         
         #directory of (primary) galaxy
-        path+to_image_dir = outdir+obj_id+'/'
+        path_to_image_dir = outdir+obj_id+'/'
         
         #get coadd id of (primary) galaxy image
         coadd_id = get_coadd_id(tile_path, path_to_image_dir, tile_table=tile_table)
