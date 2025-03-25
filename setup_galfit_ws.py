@@ -125,9 +125,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if not os.path.exists(data_root_dir):
         print(f"could not find data_root_dir - exiting")
         sys.exit()
-
-    ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
-    dec_val = str(int(dec)) if len(str(int(dec)))==2 else '0'+str(int(dec))
     
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog
         data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
@@ -139,19 +136,25 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
 
-    #print("source directory for JM images = ",data_dir)
+    ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
+    dec_val = str(int(dec)) if len(str(int(dec)))==2 else '0'+str(int(dec)) 
     
     #np.modf()[0] isolates the decimals
     #str() converts to string
     #+'000' ensures that there are at least 4 decimal places (including the required 1 from np.modf()
     #[1:6] isolates '.xxxx', where xxxx are the 4 decimal places 
     ra_string = ra_val + (str(np.modf(ra)[0])+'000')[1:6]    
-    dec_string = dec_val + (str(np.modf(dec)[0])+'000')[1:6]
+    dec_string = dec_val + (str(np.modf(abs(dec))[0])+'000')[1:6]   #abs(dec) is needed to preserve formatting
     
-    im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
+    if dec > 0.:
+        im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
+    else:
+        #if dec < 0., then the 'string' will have a negative in front that must be accounted for
+        im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
+
     extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
     
-    im_name_wise = im_name_grz.replace('.fits','-unwise.fits')
+    im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
     extract_bands(data_dir,output_dir,im_name=im_name_wise,WISE=True)
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
@@ -279,3 +282,4 @@ if __name__ == '__main__':
         #    sys.exit()
         
     os.chdir(outdir)
+    
