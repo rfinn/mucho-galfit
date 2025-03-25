@@ -25,6 +25,7 @@ USAGE:
 
 import os
 import sys
+import glob
 from astropy.io import fits
 import numpy as np
 from astropy.table import Table
