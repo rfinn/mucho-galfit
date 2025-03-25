@@ -212,7 +212,7 @@ if __name__ == '__main__':
     
     #load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4
     #and save to path_to_image_dir
-    sys.path.append(main_dir+'/github/wisesize/unwise_PSFs/')
+    sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')
     from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
         
     #read in tiles. the rest will follow at the bottom of the forthcoming loop
