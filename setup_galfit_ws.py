@@ -150,10 +150,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
             invvar_image = f'{im_name_grz.replace('.fits','')}-invvar-{bandpass}.fits'
 
-        # check if noise image exists in output_dir, if not make it from invvar 
-        sigma_image = invvar_image.replace('invvar','std')
-        if not os.path.exists(output_dir+sigma_image):
-            convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
+    # check if noise image exists in output_dir, if not make it from invvar 
+    sigma_image = invvar_image.replace('invvar','std')
+    if not os.path.exists(output_dir+sigma_image):
+        convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
         
 
     ###############################################################################
