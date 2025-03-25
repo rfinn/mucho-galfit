@@ -9,13 +9,17 @@ PROCEDURE:
 
 * for every galaxy, create a directory
 
+* unpack and move band images to this directory
+
+* generate unWISE psfs, move to this directory
+
 USAGE:
-* on draco, move to /mnt/astrophysics/mg-output-wisesize
+* on draco, move to /mnt/astrophysics/mg-output-wisesize/
 
 * call as:
     python /mnt/astrophysics/kconger_wisesize/github/wisesize/mucho-galfit/setup_galfit.py
 
-    * will create directories of galaxies. each directory will contain the image, noise
+    * will create directories of galaxies. each directory will contain the image, noise, unWISE psfs
 
 '''
 
@@ -24,7 +28,6 @@ import sys
 from astropy.io import fits
 import numpy as np
 from astropy.table import Table
-
 
 ##########################################################################     
 ### FUNCTIONS
@@ -170,11 +173,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 ##########################################################################     
 
 if __name__ == '__main__':
-
-    from astropy.table import Table
-
-    # define environment variable so funpack can find the correct variables
-    #os.environ["LD_LIBRARY_PATH"]="/opt/ohpc/pub/compiler/gcc/9.4.0/lib64:/home/siena.edu/rfinn/software/cfitsio-4.2.0/"
     
     param_file = '/mnt/astrophysics/kconger_wisesize/github/mucho-galfit/paramfile.txt'
         
@@ -211,40 +209,68 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print("ERROR: problem locating catalogs - exiting")
         sys.exit()
-
+    
+    #load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4
+    #and save to path_to_image_dir
+    sys.path.append(main_dir+'/github/wisesize/unwise_PSFs/')
+    from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
+        
+    #read in tiles. the rest will follow at the bottom of the forthcoming loop
+    tile_path = main_dir+param_dict['tile_path']   #contains COADD IDs and the RA+DEC of tile centers
+    tile_table = read_tiles(tile_path)    
+        
     os.chdir(outdir)
     
-    # for each galaxy, create a directory and write sourcelist
+    # for each galaxy, create a directory (and write sourcelist?)
     for i in range(len(maintab)):
+        
+        obj_id = maintab[objid_col][i]
+        ra = maintab['RA'][i]
+        dec = maintab['DEC'][i]
+        objname = maintab[objname_col][i]
+        #group_name = etab[group_name_col][i] # this is either the objname, or objname_GROUP for groups
+        
         #if etab[primary_group_col][i] & (etab[group_mult_col][i] > 0): # make directory for primary targets
-            #galpath = outdir+etab[objid_col][i]
-        galpath = outdir+maintab[objid_col][i]
+        #galpath = outdir+etab[objid_col][i]
+        path_to_image_dir = outdir+obj_id+'/'
         # make directory if it doesn't already exist
-        if not os.path.exists(galpath):
-            os.mkdir(galpath)
-        os.chdir(galpath)
+        if not os.path.exists(path_to_image_dir):
+            os.mkdir(path_to_image_dir)
+        os.chdir(path_to_image_dir)
 
-            #sourcefile = galpath+'/{}sourcelist'.format(maintab['VFID'][i])
-            #sourcelist = open(sourcefile,'w')
-            ## write out one line with VFID, objname, RA, DEC, wavelength
-            #output_string = maintab['VFID'][i] + ' ' + maintab['objname'][i] + ' ' + str(maintab['RA'][i]) + ' ' + str(maintab['DEC'][i]) + ' ' + str(wavelength) + ' \n'.format()
-            #sourcelist.write(output_string)
-            #sourcelist.close()
+        #sourcefile = path_to_image_dir+'/{}sourcelist'.format(maintab['VFID'][i])
+        #sourcelist = open(sourcefile,'w')
+        ## write out one line with OBJID, objname, RA, DEC, wavelength
+        #output_string = maintab['OBJID'][i] + ' ' + maintab['objname'][i] + ' ' + str(maintab['RA'][i]) + ' ' + str(maintab['DEC'][i]) + ' ' + str(wavelength) + ' \n'.format()
+        #sourcelist.write(output_string)
+        #sourcelist.close()
 
-            # copy images
-            obj_id = maintab[objid_col][i]
-            ra = maintab['RA'][i]
-            dec = maintab['DEC'][i]
-            objname = maintab[objname_col][i]
-            #group_name = etab[group_name_col][i] # this is either the objname, or objname_GROUP for groups
-
-            get_images(obj_id,ra,dec,outdir,data_root_dir)
-            os.chdir(path_to_pyscripts'/unwise_PSFs')
-            os.system('python pull_unwise_psfs.py')    #runs code to pull unwise psf images and save to outdir/objid
-            
-            
-            os.chdir(outdir)
-
-            # for testing
-            #if i > 1:
-            #    sys.exit()
+        #copy images
+        get_images(obj_id,ra,dec,outdir,data_root_dir)
+        
+        ############
+        ### PSFs ###
+        ############
+        
+        #directory of (primary) galaxy
+        path+to_image_dir = outdir+obj_id+'/'
+        
+        #get coadd id of (primary) galaxy image
+        coadd_id = get_coadd_id(tile_path, path_to_image_dir, tile_table=tile_table)
+        
+        #pulls psf for W1-4 bands
+        for band in range(1,5):
+            pull_unwise_psf(path_to_image_dir, coadd_id, band)
+        
+        #try:
+        #    #runs code to pull unwise psf images and save to outdir/objid   
+        #    os.system(f'python3 pull_unwise_psfs.py -objid {objid}')    
+        #except:
+        #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
+       
+        # for testing
+        #if i > 1:
+        #    os.chdir(outdir)
+        #    sys.exit()
+        
+    os.chdir(outdir)
