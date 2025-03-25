@@ -126,6 +126,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_root_dir - exiting")
         sys.exit()
     
+    ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
+    dec_val = str(int(dec)) if len(str(int(dec)))==2 else '0'+str(int(dec)) 
+    
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog
         data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
     if dec<32.:
@@ -135,9 +138,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
-
-    ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
-    dec_val = str(int(dec)) if len(str(int(dec)))==2 else '0'+str(int(dec)) 
     
     #np.modf()[0] isolates the decimals
     #str() converts to string
