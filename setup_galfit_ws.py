@@ -30,6 +30,8 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
+from decimal import Decimal, ROUND_DOWN
+
 ##########################################################################     
 ### FUNCTIONS
 ##########################################################################     
@@ -115,7 +117,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     print(objid)
     
     #output_loc is the directory holding the individual galaxy output directories (which GALFIT will be pulling from!)
-    #e.g., /mnt/astrophysics/kconger_wisesize/mg_output_wisesize/OBJ1000/
+    #e.g., /mnt/astrophysics/kconger_wisesize/mg_output_wisesize/OBJ10000/
     output_dir = os.path.join(output_loc,objid+'/')
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
@@ -126,9 +128,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_root_dir - exiting")
         sys.exit()
     
+    #just pulling the RA directory name...fine for my purposes, since RA is never smaller than 10
     ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
     
-    if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog
+    if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog. else, south catalog.
         data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
     if dec<32.:
         data_dir = f'{data_root_dir}dr9-south/native/{ra_val}/'
@@ -137,9 +140,16 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
-
-    ra_string = f"{ra:07.4f}"
-    dec_string = f"{abs(dec):06.4f}"
+    
+    #create RA string using truncation
+    #(create Decimal class obj, round DOWN to 4 decimal places...)
+    truncated_ra = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    #pad with 0s if needed
+    ra_string = f"{truncated_ra:07.4f}"
+    
+    #create DEC string using truncation
+    truncated_dec = Decimal(str(abs(dec))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    dec_string = f"{truncated_dec:06.4f}"
     
     if dec > 0.:
         im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
