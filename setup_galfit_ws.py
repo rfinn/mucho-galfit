@@ -145,11 +145,11 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     #(create Decimal class obj, round DOWN to 4 decimal places...)
     truncated_ra = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
     #pad with 0s if needed
-    ra_string = f"{truncated_ra:07.4f}"
+    ra_string = f"{truncated_ra:08.4f}"
     
     #create DEC string using truncation
     truncated_dec = Decimal(str(abs(dec))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
-    dec_string = f"{truncated_dec:06.4f}"
+    dec_string = f"{truncated_dec:07.4f}"
     
     if dec > 0.:
         im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
