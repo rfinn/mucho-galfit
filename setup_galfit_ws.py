@@ -143,15 +143,45 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
     
+    '''
     #create RA string using truncation
     #(create Decimal class obj, round DOWN to 4 decimal places...)
-    truncated_ra = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    #truncated_ra = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
     #pad with 0s if needed
-    ra_string = f"{truncated_ra:08.4f}"
+    #ra_string = f"{truncated_ra:08.4f}"
     
     #create DEC string using truncation
-    truncated_dec = Decimal(str(abs(dec))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
-    dec_string = f"{truncated_dec:07.4f}"
+    #truncated_dec = Decimal(str(abs(dec))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    #dec_string = f"{truncated_dec:07.4f}"
+    
+    #if dec > 0.:
+    #    im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
+    #else:
+    #    #if dec < 0., then the 'string' will have a negative in front that must be accounted for
+    #    im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
+    
+    #if can't find filename, try rounding up RA instead...a few instance where this is the case. I don't understand.
+    #if not os.path.exists(data_dir+im_name_grz):    
+    #    truncated_ra_new = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+    #    #pad with 0s if needed
+    #    ra_string_new = f"{truncated_ra_new:08.4f}"
+    #    im_name_grz = im_name_grz.replace(ra_string,ra_string_new)
+    '''
+    
+    #np.trunc only works with integers...the "truncated" will convert ra and dec to their integers and 4 decimal places,
+    #all formatted as an integer. 131.200847 becoes 1312008, etc.
+    #adapted from John Moustakas' code.
+    precision=4
+    ratrunc = np.trunc((10.**precision) * ra).astype(int).astype(str)
+    dectrunc = np.trunc((10.**precision) * abs(dec)).astype(int).astype(str)
+    
+    #the following pads the left size with zeros, if needed
+    zra = ratrunc.zfill(7)
+    zdec = dectrunc.zfill(6)
+    
+    #convert to xxx.xxxx (RA) or xx.xxxx (DEC)
+    ra_string = zra[:-precision]+'.'+zra[-precision:]
+    dec_string = zdec[:-precision]+'.'+zdec[-precision:]
     
     if dec > 0.:
         im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
@@ -159,13 +189,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         #if dec < 0., then the 'string' will have a negative in front that must be accounted for
         im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
     
-    #if can't find filename, try rounding up RA instead...a few instance where this is the case. I don't understand.
-    if not os.path.exists(data_dir+im_name_grz):    
-        truncated_ra_new = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
-        #pad with 0s if needed
-        ra_string_new = f"{truncated_ra_new:08.4f}"
-        im_name_grz = im_name_grz.replace(ra_string,ra_string_new)
-
     extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
     
     im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
