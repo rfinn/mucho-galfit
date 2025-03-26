@@ -30,7 +30,7 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
 
 ##########################################################################     
 ### FUNCTIONS
@@ -128,8 +128,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_root_dir - exiting")
         sys.exit()
     
-    #just pulling the RA directory name...fine for my purposes, since RA is never smaller than 10
-    ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
+    #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
+    ra_val = f'{np.trunc(ra):03.0f}'
+    
+    #ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
     
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog. else, south catalog.
         data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
@@ -156,6 +158,13 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     else:
         #if dec < 0., then the 'string' will have a negative in front that must be accounted for
         im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
+    
+    #if can't find filename, try rounding up RA instead...a few instance where this is the case. I don't understand.
+    if not os.path.exists(data_dir+im_name_grz):    
+        truncated_ra_new = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+        #pad with 0s if needed
+        ra_string_new = f"{truncated_ra_new:08.4f}"
+        im_name_grz.replace(ra_string,ra_string_new)
 
     extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
     
