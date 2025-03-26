@@ -164,7 +164,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         truncated_ra_new = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
         #pad with 0s if needed
         ra_string_new = f"{truncated_ra_new:08.4f}"
-        im_name_grz.replace(ra_string,ra_string_new)
+        im_name_grz = im_name_grz.replace(ra_string,ra_string_new)
 
     extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
     
