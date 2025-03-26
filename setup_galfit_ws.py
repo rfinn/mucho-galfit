@@ -128,9 +128,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
     
-    abs_dec = abs(dec)   #need abs() of DEC for string formatting
-    dec_val = str(int(abs_dec)) if len(str(int(abs_dec)))==2 else '0'+str(int(abs_dec)) 
-    
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog
         data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
     if dec<32.:
@@ -140,13 +137,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
-    
-    #np.modf()[0] isolates the decimals
-    #str() converts to string
-    #+'000' ensures that there are at least 4 decimal places (including the required 1 from np.modf()
-    #[1:6] isolates '.xxxx', where xxxx are the 4 decimal places 
-    ra_string = ra_val + (str(np.modf(ra)[0])+'000')[1:6]    
-    dec_string = dec_val + (str(np.modf(abs_dec)[0])+'000')[1:6]   #abs_dec is needed to preserve formatting
+
+    ra_string = f"{ra:07.4f}"
+    dec_string = f"{abs(dec):06.4f}"
     
     if dec > 0.:
         im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
