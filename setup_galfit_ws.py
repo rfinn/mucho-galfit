@@ -30,8 +30,6 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
-from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
-
 ##########################################################################     
 ### FUNCTIONS
 ##########################################################################     
@@ -142,34 +140,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
-    
-    '''
-    #create RA string using truncation
-    #(create Decimal class obj, round DOWN to 4 decimal places...)
-    #truncated_ra = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
-    #pad with 0s if needed
-    #ra_string = f"{truncated_ra:08.4f}"
-    
-    #create DEC string using truncation
-    #truncated_dec = Decimal(str(abs(dec))).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
-    #dec_string = f"{truncated_dec:07.4f}"
-    
-    #if dec > 0.:
-    #    im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
-    #else:
-    #    #if dec < 0., then the 'string' will have a negative in front that must be accounted for
-    #    im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
-    
-    #if can't find filename, try rounding up RA instead...a few instance where this is the case. I don't understand.
-    #if not os.path.exists(data_dir+im_name_grz):    
-    #    truncated_ra_new = Decimal(str(abs(ra))).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
-    #    #pad with 0s if needed
-    #    ra_string_new = f"{truncated_ra_new:08.4f}"
-    #    im_name_grz = im_name_grz.replace(ra_string,ra_string_new)
-    '''
-    
+
     #np.trunc only works with integers...the "truncated" will convert ra and dec to their integers and 4 decimal places,
-    #all formatted as an integer. 131.200847 becoes 1312008, etc.
+    #all formatted as an integer. 131.200847 becomes 1312008, etc.
     #adapted from John Moustakas' code.
     precision=4
     ratrunc = np.trunc((10.**precision) * ra).astype(int).astype(str)
@@ -243,14 +216,19 @@ if __name__ == '__main__':
     group_name_col = param_dict['group_name_col']
     objname_col = param_dict['objname_col']
 
+    #etab = Table.read(phot_catalog)
+    maintab = read_table(param_dict['main_catalog'])
+
+    primary_group_col = param_dict['primary_group_col']
+
+    #trim to only include primary galaxies; if no such flag exists, assume all galaxies are primary.
     try:
-        #etab = Table.read(phot_catalog)
-        maintab = Table.read(main_catalog)        
-    
-    except FileNotFoundError:
-        print("ERROR: problem locating catalogs - exiting")
-        sys.exit()
-    
+        primary_flag = maintab[primary_group_col]
+    except:
+        primary_flag = np.ones(len(maintab),dtype=bool)   #all true
+
+    maintab = maintab[primary_flag]
+
     #load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4
     #and save to path_to_image_dir
     sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')

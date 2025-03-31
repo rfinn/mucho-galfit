@@ -1,6 +1,3 @@
-
-
-
 '''
 GOAL:
 - generate galfit input scripts for sample galaxies
