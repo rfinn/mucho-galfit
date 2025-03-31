@@ -53,7 +53,7 @@ homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
 sys.path.append(homedir+'/github/mucho-galfit/parallel/')
-from maskwrapper import buildmask
+#from maskwrapper import buildmask
 #from run1galfit import get_maskname
 #import run1maskgroup as mg
 
