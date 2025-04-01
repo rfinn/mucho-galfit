@@ -12,12 +12,12 @@ south_cat_name    wisesize-parent-dr9-south.fits            #south galaxies cata
 main_catalog   /mnt/astrophysics/lsdr9-wisesize/wisesize_main.fits      #full path (including filename) to main catalog
                                                                         #this will also be to where merge_ns_catalogs.py 
                                                                         #writes the output
-phot_catalog   //.fits                                                  #full path (including filename) to phot catalog
+phot_catalog   /mnt/astrophysics/lsdr9-wisesize/wisesize_ephot.fits     #full path (including filename) to phot catalog
 
 
 objid_col            OBJID                                  #name of the objid column in the above catalogs
-primary_group_col                                           #name of primary group flag column
-group_mult_col                                              #name of group mult column (num galaxies in group?)
-group_name_col                                              #name of group name column
+primary_group_col    PRIMARY_GROUP_FLAG                     #name of primary group flag column
+group_mult_col       GROUP_MULT                             #name of group mult column (num galaxies in group?)
+group_name_col       GROUP_NAME                             #name of group name column
 objname_col          OBJNAME                                #name of objname column
 

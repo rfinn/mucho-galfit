@@ -25,13 +25,35 @@ def create_OBJIDs(unique_cat):
 def save_table(unique_cat,main_catalog_name,overwrite_flag=True):
     unique_cat.write(main_catalog_name,overwrite=overwrite_flag)
     
-def make_ephot_mockcat():
+#GALFIT requires an ephot tab. in cases where ephot tab does not exist, create a mock version
+#where all group flags are true.
+def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group_mult_col,
+                       group_name_col,overwrite_flag=True):
+    
+    #read main catalog; extract objid, RA, DEC columns
+    maintab = Table.read(main_catalog)
+    objid = maintab[objid_col]
+    RA = maintab['RA']
+    DEC = maintab['DEC']
+    
+    #define placeholder group columns
+    primary_group = np.ones(len(maintab),dtype=bool)
+    group_mult = np.ones(len(maintab),dtype=int)
+    group_name = objid
+    
+    #make ephot mock catalog
+    ephot_tab = Table([objid,RA,DEC,primary_group,group_mult,group_name],
+                      names=[objid_col,'RA','DEC',primary_group_col,group_mult_col,group_name_col])
+    
+    #save to ephot_name path
+    ephot_tab.write(ephot_name,overwrite=overwrite_flag)
     
 
 if __name__ == '__main__':
 
     from astropy.table import Table, vstack, unique
     import numpy as np
+    import os
     
     param_file = '/mnt/astrophysics/kconger_wisesize/github/wisesize/mucho-galfit/paramfile.txt'
         
@@ -53,6 +75,15 @@ if __name__ == '__main__':
     
     ephot_tab = param_dict['phot_catalog']
     
+    objid_col = param_dict['objid_col']
+    primary_group_col = param_dict['primary_group_col']
+    group_mult_col = param_dict['group_mult_col']
+    group_name_col = param_dict['group_name_col']
+    
     stacked_catalog = stack_cats(north_cat, south_cat, data_root_dir)
     unique_catalog = unique_cats(stacked_catalog)
     save_table(unique_catalog, main_catalog, overwrite_flag=True)   
+    
+    #if no ephot tab, make one (or rather, a "placeholder" for when running GALFIT)
+    if not os.path.exists(ephot_tab):
+        make_ephot_mockcat(main_catalog,ephot_tab,objid_col,primary_group_col,group_mult_col,group_name_col)
