@@ -24,6 +24,9 @@ def create_OBJIDs(unique_cat):
     
 def save_table(unique_cat,main_catalog_name,overwrite_flag=True):
     unique_cat.write(main_catalog_name,overwrite=overwrite_flag)
+    
+def make_ephot_mockcat():
+    
 
 if __name__ == '__main__':
 
@@ -47,6 +50,8 @@ if __name__ == '__main__':
     main_catalog = param_dict['main_catalog']    #where result will be saved
     north_cat = param_dict['north_cat_name']
     south_cat = param_dict['south_cat_name']
+    
+    ephot_tab = param_dict['phot_catalog']
     
     stacked_catalog = stack_cats(north_cat, south_cat, data_root_dir)
     unique_catalog = unique_cats(stacked_catalog)
