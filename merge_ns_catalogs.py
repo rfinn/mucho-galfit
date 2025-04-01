@@ -55,7 +55,7 @@ if __name__ == '__main__':
     import numpy as np
     import os
     
-    param_file = '/mnt/astrophysics/kconger_wisesize/github/wisesize/mucho-galfit/paramfile.txt'
+    param_file = '/mnt/astrophysics/kconger_wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
     param_dict={}
