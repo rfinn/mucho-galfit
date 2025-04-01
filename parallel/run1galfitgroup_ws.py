@@ -132,7 +132,7 @@ def get_maskname(image):
     llist = ['im-g','im-r','im-z']
     for l in llist:
         if l in image:
-            maskname = image.replace(f"im-{l}.fits","r-mask.fits")
+            maskname = image.replace(f"{l}.fits","r-mask.fits")
             return maskname
     
 
