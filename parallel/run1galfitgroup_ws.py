@@ -572,7 +572,7 @@ if __name__ == '__main__':
 
 
     # get galaxies in the FOV
-    x,y,objids = get_galaxies_in_fov(image, catalog, objid_col, bandpass=bandpass)
+    x,y,objids = get_galaxies_in_fov(image, maintab, objid_col, bandpass=bandpass)
     ngal = len(objids)
     matchflag = np.zeros(len(etab),'bool')   #bool flag for which galaxies are in the "pointing"/image
 
