@@ -39,6 +39,8 @@ def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group
     primary_group = np.ones(len(maintab),dtype=bool)
     group_mult = np.ones(len(maintab),dtype=int)
     
+    print(objid_col,'RA', 'DEC', primary_group_col, group_mult_col)
+    
     #make ephot mock catalog
     ephot_tab = Table([objid, RA, DEC, primary_group, group_mult],
                       names=[objid_col, 'RA', 'DEC', primary_group_col, group_mult_col])
