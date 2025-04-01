@@ -27,8 +27,7 @@ def save_table(unique_cat,main_catalog_name,overwrite_flag=True):
     
 #GALFIT requires an ephot tab. in cases where ephot tab does not exist, create a mock version
 #where all group flags are true.
-def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group_mult_col,
-                       group_name_col,overwrite_flag=True):
+def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group_mult_col,overwrite_flag=True):
     
     #read main catalog; extract objid, RA, DEC columns
     maintab = Table.read(main_catalog)
