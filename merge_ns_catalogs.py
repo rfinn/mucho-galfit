@@ -86,4 +86,5 @@ if __name__ == '__main__':
     
     #if no ephot tab, make one (or rather, a "placeholder" for when running GALFIT)
     if not os.path.exists(ephot_tab):
+        print(f'ephot catalog not found. writing placeholder to {ephot_tab}')
         make_ephot_mockcat(main_catalog,ephot_tab,objid_col,primary_group_col,group_mult_col,group_name_col)
