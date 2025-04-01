@@ -41,7 +41,7 @@ This is called by mksbatchgroups.py for running in parallel.
 '''
 import os
 import sys
-#import glob
+import glob
 import numpy as np
 
 from astropy.io import fits

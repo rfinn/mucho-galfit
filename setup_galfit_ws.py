@@ -284,12 +284,6 @@ if __name__ == '__main__':
         #pulls psf for W1-4 bands
         for band in range(1,5):
             pull_unwise_psf(path_to_image_dir, coadd_id, band)
-        
-        #try:
-        #    #runs code to pull unwise psf images and save to outdir/objid   
-        #    os.system(f'python3 pull_unwise_psfs.py -objid {objid}')    
-        #except:
-        #    os.system(f'python pull_unwise_psfs.py -objid {objid}')
        
         # for testing
         #if i == 1:
