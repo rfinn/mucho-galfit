@@ -39,11 +39,10 @@ def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group
     #define placeholder group columns
     primary_group = np.ones(len(maintab),dtype=bool)
     group_mult = np.ones(len(maintab),dtype=int)
-    group_name = objid
     
     #make ephot mock catalog
     ephot_tab = Table([objid,RA,DEC,primary_group,group_mult,group_name],
-                      names=[objid_col,'RA','DEC',primary_group_col,group_mult_col,group_name_col])
+                      names=[objid_col,'RA','DEC',primary_group_col,group_mult_col])
     
     #save to ephot_name path
     ephot_tab.write(ephot_name,overwrite=overwrite_flag)
@@ -78,7 +77,6 @@ if __name__ == '__main__':
     objid_col = param_dict['objid_col']
     primary_group_col = param_dict['primary_group_col']
     group_mult_col = param_dict['group_mult_col']
-    group_name_col = param_dict['group_name_col']
     
     stacked_catalog = stack_cats(north_cat, south_cat, data_root_dir)
     unique_catalog = unique_cats(stacked_catalog)
