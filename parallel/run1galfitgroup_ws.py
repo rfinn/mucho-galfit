@@ -377,7 +377,7 @@ def write_galfit_input(output_dir,image,sigma_image,psf_image,bandpass,xgal=None
         for i in range(len(all_lines)):
             
             line = all_lines[i]
-            if '0) ser=sic' in line:
+            if '0) sersic' in line:
                 objnum += 1
                 if nsersic_flag is None:
                     fixn = False
@@ -426,6 +426,7 @@ def write_galfit_input(output_dir,image,sigma_image,psf_image,bandpass,xgal=None
                     holdfixed=False
                     outlines.append(line)
                 #print(f"checking magnitude {float(t[1])} compared to {minmag}",holdfixed)                
+            
             elif line.startswith(' 4)'):
                 print("result from round 1 = ",line)
                 if holdfixed and not skyobject:
@@ -689,6 +690,7 @@ if __name__ == '__main__':
         nsersic, high_nsersic_flag = get_galfit_nsersic(output_image,ngal=ngal)
 
         if np.sum(high_nsersic_flag) > 0:
+            
             print("running again and holding the sersic index fixed for {np.sum(high_nsersic_flag)}")
             write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, 
                                mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA,
