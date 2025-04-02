@@ -686,17 +686,21 @@ if __name__ == '__main__':
             output_image = f'{t[0]}-{bandpass}-fixBA-out2.fits'
         else:
             output_image = f'{t[0]}-{bandpass}-out2.fits'
+    
+    else:
+        t = image.split('-')   #isolating galaxy name
+        output_image = f'{t[0]}-{bandpass}-out1.fits'
+    
+    nsersic, high_nsersic_flag = get_galfit_nsersic(output_image,ngal=ngal)
 
-        nsersic, high_nsersic_flag = get_galfit_nsersic(output_image,ngal=ngal)
+    if np.sum(high_nsersic_flag) > 0:
 
-        if np.sum(high_nsersic_flag) > 0:
-            
-            print("running again and holding the sersic index fixed for {np.sum(high_nsersic_flag)}")
-            write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, 
-                               mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA,
-                               nsersic_flag=high_nsersic_flag)
+        print("running again and holding the sersic index fixed for {np.sum(high_nsersic_flag)}")
+        write_galfit_input(output_dir, image, std_image, psf_image, bandpass, xgal=x, ygal=y, 
+                           mask_image=mask_image,firstpass=False,rPA=rCPA,fixPA=fixCPA,rBA=rCBA,fixBA=fixCBA,
+                           nsersic_flag=high_nsersic_flag)
 
-            print('running galfit third time to hold fixed n=6')
-            os.system(f"galfit galfit.input2")
+        print('running galfit third time to hold fixed n=6')
+        os.system(f"galfit galfit.input2")
 
     os.chdir(outdir)
