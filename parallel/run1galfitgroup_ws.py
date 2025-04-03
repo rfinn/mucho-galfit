@@ -688,6 +688,7 @@ if __name__ == '__main__':
             output_image = f'{t[0]}-{bandpass}-out2.fits'
     
     else:
+        #if just r-band, then use the noconv run (not running r-band with conv so *out2.fits does not exist)
         t = image.split('-')   #isolating galaxy name
         output_image = f'{t[0]}-{bandpass}-out1.fits'
     
