@@ -691,7 +691,7 @@ if __name__ == '__main__':
         #if just r-band, then use the noconv run (not running r-band with conv so *out2.fits does not exist)
         t = image.split('-')   #isolating galaxy name
         output_image = f'{t[0]}-{bandpass}-out1.fits'
-    '''
+    
     nsersic, high_nsersic_flag = get_galfit_nsersic(output_image,ngal=ngal)
     
     if np.sum(high_nsersic_flag) > 0:
@@ -703,5 +703,5 @@ if __name__ == '__main__':
 
         print('running galfit third time to hold fixed n=6')
         os.system(f"galfit galfit.input2")
-    '''
+    
     os.chdir(outdir)
