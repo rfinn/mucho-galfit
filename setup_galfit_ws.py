@@ -47,18 +47,20 @@ def funpack_image(input,output,nhdu=1):
     #print('finished unpacking image')
 
 #unpack composite images into their constituent wavelength bands
-def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
+def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
+    
+    ims=fits.open(path_to_im+im_name)
+    header_im = ims[0].header
+    header_invvar = ims[1].header
+
     if grz:
-        ims=fits.open(path_to_im+im_name)
-        header_im = ims[0].header
-        header_invvar = ims[1].header
         g_im, r_im, z_im = ims[0].data[0], ims[0].data[1], ims[0].data[2]
         g_inv, r_inv, z_inv = ims[1].data[0], ims[1].data[1], ims[1].data[2]
         ims.close()
         
-        grz_im_names = [im_name.replace('.fits','-im-g.fits'),im_name.replace('.fits','-im-r.fits'),
-                        im_name.replace('.fits','-im-z.fits'),im_name.replace('.fits','-invvar-g.fits'),
-                        im_name.replace('.fits','-invvar-r.fits'),im_name.replace('.fits','-invvar-z.fits')]
+        grz_im_names = [f'{objid}-im-g.fits', f'{objid}-im-r.fits', f'{objid}-im-z.fits',
+                        f'{objid}-invvar-g.fits', f'{objid}-invvar-r.fits', f'{objid}-invvar-z.fits'
+                        im_name.replace('.fits','-invvar-g.fits')]
         grz_ims = [g_im,r_im,z_im,g_inv,r_inv,z_inv]
         
         for i,filename in enumerate(grz_im_names):
@@ -66,17 +68,16 @@ def extract_bands(path_to_im,output_dir,im_name=None,grz=False,WISE=False):
             fits.writeto(output_dir+filename,grz_ims[i],header=header,overwrite=True)
         
     if WISE:
-        ims=fits.open(path_to_im+im_name)
-        header_im = ims[0].header
-        header_invvar = ims[1].header
         w1_im, w2_im, w3_im, w4_im = ims[0].data[0], ims[0].data[1], ims[0].data[2], ims[0].data[3]
         w1_inv, w2_inv, w3_inv, w4_inv = ims[1].data[0], ims[1].data[1], ims[1].data[2], ims[1].data[3]
         ims.close()
         
-        wise_im_names = [im_name.replace('-unwise.fits','-im-W1.fits'),im_name.replace('-unwise.fits','-im-W2.fits'),
-                        im_name.replace('-unwise.fits','-im-W3.fits'),im_name.replace('-unwise.fits','-im-W4.fits'),
-                        im_name.replace('-unwise.fits','-invvar-W1.fits'),im_name.replace('-unwise.fits','-invvar-W2.fits'),
-                        im_name.replace('-unwise.fits','-invvar-W3.fits'),im_name.replace('-unwise.fits','-invvar-W4.fits')]
+        wise_im_names = [f'{objid}-im-W1.fits', f'{objid}-im-W2.fits', f'{objid}-im-W3.fits', f'{objid}-im-W4.fits',
+                        f'{objid}-invvar-W1.fits', f'{objid}-invvar-W2.fits', f'{objid}-invvar-W3.fits', f'{objid}-invvar-W4.fits']
+        #wise_im_names = [im_name.replace('-unwise.fits','-im-W1.fits'),im_name.replace('-unwise.fits','-im-W2.fits'),
+        #                im_name.replace('-unwise.fits','-im-W3.fits'),im_name.replace('-unwise.fits','-im-W4.fits'),
+        #                im_name.replace('-unwise.fits','-invvar-W1.fits'),im_name.replace('-unwise.fits','-invvar-W2.fits'),
+        #                im_name.replace('-unwise.fits','-invvar-W3.fits'),im_name.replace('-unwise.fits','-invvar-W4.fits')]
         wise_ims = [w1_im,w2_im,w3_im,w4_im,w1_inv,w2_inv,w3_inv,w4_inv]
         
         for i,filename in enumerate(wise_im_names):
@@ -162,10 +163,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         #if dec < 0., then the 'string' will have a negative in front that must be accounted for
         im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
     
-    extract_bands(data_dir,output_dir,im_name=im_name_grz,grz=True)
+    extract_bands(data_dir,output_dir,objid,im_name=im_name_grz,grz=True)
     
     im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
-    extract_bands(data_dir,output_dir,im_name=im_name_wise,WISE=True)
+    extract_bands(data_dir,output_dir,objid,im_name=im_name_wise,WISE=True)
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
@@ -244,7 +245,7 @@ if __name__ == '__main__':
     else:
         os.system(f'mkdir {outdir}')
     
-    # for each galaxy, create a directory (and write sourcelist?)
+    # for each galaxy, create a directory
     for i in range(len(maintab)):
         
         obj_id = maintab[objid_col][i]
@@ -260,13 +261,6 @@ if __name__ == '__main__':
         if not os.path.exists(path_to_image_dir):
             os.mkdir(path_to_image_dir)
         os.chdir(path_to_image_dir)
-
-        #sourcefile = path_to_image_dir+'/{}sourcelist'.format(maintab['VFID'][i])
-        #sourcelist = open(sourcefile,'w')
-        ## write out one line with OBJID, objname, RA, DEC, wavelength
-        #output_string = maintab['OBJID'][i] + ' ' + maintab['objname'][i] + ' ' + str(maintab['RA'][i]) + ' ' + str(maintab['DEC'][i]) + ' ' + str(wavelength) + ' \n'.format()
-        #sourcelist.write(output_string)
-        #sourcelist.close()
 
         #copy images
         get_images(obj_id,ra,dec,outdir,data_root_dir)
