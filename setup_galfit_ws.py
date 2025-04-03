@@ -218,7 +218,7 @@ if __name__ == '__main__':
     objname_col = param_dict['objname_col']
 
     #etab = Table.read(phot_catalog)
-    maintab = read_table(param_dict['main_catalog'])
+    maintab = Table.read(param_dict['main_catalog'])
 
     primary_group_col = param_dict['primary_group_col']
 
