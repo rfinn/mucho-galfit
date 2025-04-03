@@ -59,8 +59,7 @@ def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
         ims.close()
         
         grz_im_names = [f'{objid}-im-g.fits', f'{objid}-im-r.fits', f'{objid}-im-z.fits',
-                        f'{objid}-invvar-g.fits', f'{objid}-invvar-r.fits', f'{objid}-invvar-z.fits'
-                        im_name.replace('.fits','-invvar-g.fits')]
+                        f'{objid}-invvar-g.fits', f'{objid}-invvar-r.fits', f'{objid}-invvar-z.fits']
         grz_ims = [g_im,r_im,z_im,g_inv,r_inv,z_inv]
         
         for i,filename in enumerate(grz_im_names):
