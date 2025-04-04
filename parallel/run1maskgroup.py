@@ -335,6 +335,7 @@ class buildgroupmask(buildmask):
         for x,y in zip(self.xgals,self.ygals):
             # get mask value at location of galaxy
             # this is SE objid
+            print("value of mask at position of galaxy = ",self.maskdat[int(y),int(x)])
             se_objid.append(self.maskdat[int(y),int(x)])
 
         se_gal_flag = np.zeros(len(self.se_number),'bool')
