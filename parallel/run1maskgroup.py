@@ -534,7 +534,7 @@ if __name__ == '__main__':
     galid = sys.argv[1]
     bandpass = 'r'
     # move to muchogalfit-output directory
-    output_dir = topdir+galid+'/'
+    output_dir = os.path.join(topdir,galid)
     if not os.path.exists(output_dir):
         print(f'WARNING: {galid} does not exist\n Be sure to run setup_galfit.py first')
         print(f"Could not find directory: {output_dir}")
