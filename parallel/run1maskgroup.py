@@ -57,6 +57,8 @@ from astropy.wcs import WCS
 from reproject import reproject_interp
 from scipy.stats import scoreatpercentile
 
+# adding this for testing
+from matplotlib import pyplot as plt
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
@@ -331,7 +333,10 @@ class buildgroupmask(buildmask):
 
         se_objid = []
         print("xgals = ",self.xgals)
-        print("ygals = ",self.ygals)        
+        print("ygals = ",self.ygals)
+        plt.figure()
+        plt.imshow(self.maskdat)
+        plt.savefig("check_mask.png")
         for x,y in zip(self.xgals,self.ygals):
             # get mask value at location of galaxy
             # this is SE objid
