@@ -27,7 +27,7 @@ def save_table(unique_cat,main_catalog_name,overwrite_flag=True):
     
 #GALFIT requires an ephot tab. in cases where ephot tab does not exist, create a mock version
 #where all group flags are true.
-def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group_mult_col,overwrite_flag=True):
+def make_ephot_mockcat(main_catalog,mock_ephot_name,objid_col,primary_group_col,group_mult_col,overwrite_flag=True):
     
     #read main catalog; extract objid, RA, DEC columns
     maintab = Table.read(main_catalog)
@@ -44,7 +44,7 @@ def make_ephot_mockcat(main_catalog,ephot_name,objid_col,primary_group_col,group
                       names=[objid_col, 'RA', 'DEC', primary_group_col, group_mult_col])
     
     #save to ephot_name path
-    ephot_tab.write(ephot_name,overwrite=overwrite_flag)
+    ephot_tab.write(mock_ephot_name,overwrite=overwrite_flag)
     
 
 if __name__ == '__main__':
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     import numpy as np
     import os
     
-    param_file = '/mnt/astrophysics/kconger_wisesize/github/mucho-galfit/paramfile.txt'
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
     param_dict={}
@@ -83,5 +83,6 @@ if __name__ == '__main__':
     
     #if no ephot tab, make one (or rather, a "placeholder" for when running GALFIT)
     if not os.path.exists(ephot_tab):
+        ephot_tab=param_dict['mock_ephot_name']
         print(f'ephot catalog not found. writing placeholder to {ephot_tab}')
         make_ephot_mockcat(main_catalog, ephot_tab, objid_col, primary_group_col, group_mult_col)

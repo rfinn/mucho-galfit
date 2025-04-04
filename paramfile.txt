@@ -14,6 +14,10 @@ main_catalog   /mnt/astrophysics/lsdr9-wisesize/wisesize_main.fits      #full pa
                                                                         #writes the output
 phot_catalog   /mnt/astrophysics/lsdr9-wisesize/wisesize_ephot.fits     #full path (including filename) to phot catalog
 
+create_mock_ephot     True             #if phot_catalog does not exist, create a "placeholder" version
+mock_ephot_name       /mnt/astrophysics/lsdr9-wisesize/wisesize_ephot_mock.fits   #placeholder loc+name
+
+
 
 objid_col            OBJID                                  #name of the objid column in the above catalogs
 primary_group_col    PRIMARY_GROUP_FLAG                     #name of primary group flag column

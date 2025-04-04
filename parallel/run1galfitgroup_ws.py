@@ -533,11 +533,16 @@ if __name__ == '__main__':
     group_mult_col = param_dict['group_mult_col']
     group_name_col = param_dict['group_name_col']
     objname_col = param_dict['objname_col']
+    
+    
 
-    #etab = Table.read(phot_catalog)
+    mock_ephot_flag = param_dict['create_mock_ephot']
     maintab = Table.read(param_dict['main_catalog'])
     try:
-        etab = Table.read(param_dict['phot_catalog'])
+        if mock_ephot_flag:
+            etab = Table.read(param_dict['mock_ephot_name'])
+        else:
+            etab = Table.read(param_dict['phot_catalog'])
     except:
         print('etab not found. exiting.')
         sys.exit()

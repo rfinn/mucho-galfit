@@ -8,14 +8,14 @@ USAGE:
 
 from /mnt/astrophysics/rfinn/muchogalfit-output/
 
-python3 ~/github/mucho-galfit/gather_output_params_all.py W3
+python3 ~/github/mucho-galfit/gather_all_output_params.py W3
 
 where W3 is the bandpass and can  be [g,r,z,W1,W2,W3,W4]
 
 OUTPUT:
 creates a table in the current directory called
 
-vf_v2_galfit_{band}.fits
+wisesize_galfit_{band}.fits
 
 or should we combine all wavelengths into one table?
 
