@@ -61,6 +61,7 @@ from scipy.stats import scoreatpercentile
 homedir = os.getenv("HOME")
 # add in masking from halphagui
 sys.path.append(homedir+'/github/halphagui/')
+#sys.path.append('/github/halphagui/')
 from maskwrapper import buildmask
 import imutils
 from mask1galaxy import get_galaxy_params
@@ -342,7 +343,7 @@ class buildgroupmask(buildmask):
 
 
         self.objsma_pixels = self.A_IMAGE[se_gal_flag]
-        self.objsma = self.objsma_pixels * self.pscalex
+        self.objsma = self.objsma_pixels * self.pscalex * 3600
 
         self.objBA = self.BA[se_gal_flag]
         self.objPA = self.THETA_IMAGE[se_gal_flag]
