@@ -507,6 +507,12 @@ def get_maskname(image):
         if l in image:
             maskname = image.replace(l+".fits","image-r-mask.fits")
             return maskname
+    # naming convention for WISEsize images
+    llist = ['im-g','im-r','im-z']
+    for l in llist:
+        if l in image:
+            maskname = image.replace(l+".fits","im-r-mask.fits")
+            return maskname
         
 
                                                                                                   
