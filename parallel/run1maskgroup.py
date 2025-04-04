@@ -520,13 +520,17 @@ if __name__ == '__main__':
     # TODO : change to run from current directory which should be path_to_images, don't assume or change to a directory
 
     # TODO : remove any other path dependencies to virgo and fix with statements at the beginning
-    topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
-    try:
-        os.chdir(topdir)
-    except FileNotFoundError: # assuming that we are running on virgo vms or draco
-        topdir = '/mnt/astrophysics/muchogalfit-output/'
-        os.chdir(topdir)
+
+    # reorganizing to run from the root image directory, where each galaxy/group has its own subdir
+    # topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+    #try:
+    #    os.chdir(topdir)
+    #except FileNotFoundError: # assuming that we are running on virgo vms or draco
+    #    topdir = '/mnt/astrophysics/muchogalfit-output/'
+    #    os.chdir(topdir)
     # take as input the galaxy name
+    topdir = os.getcwd()
+
     galid = sys.argv[1]
     bandpass = 'r'
     # move to muchogalfit-output directory
