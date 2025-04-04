@@ -289,7 +289,7 @@ class buildgroupmask(buildmask):
 
         call after get_galaxies_in_fov()
 
-        this create lists of ellipse parameters to use with maskwrapper
+        this create lists of ellipse parameters from JM ellip phot file to use with maskwrapper
 
         """
         # get ellipse params as well
@@ -313,9 +313,40 @@ class buildgroupmask(buildmask):
         self.objPA = gPA
         self.objsma = gRAD
         self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
-        
-                
 
+    def get_ellipse_params_se(self):
+        """
+
+        call after get_galaxies_in_fov()
+
+        this create lists of ellipse parameters from the SE catalog to use with maskwrapper
+
+        """
+ 
+
+        ## TODO - should use ellipse for each galaxy like I do in the regular masking routine
+
+        se_objid = []
+        
+        for x,y in zip(self.xgals,self.ygals):
+            # get mask value at location of galaxy
+            # this is SE objid
+            se_objid.append(self.maskdat[int(y),int(x)])
+
+        se_gal_flag = np.zeros(len(self.se_number),'bool')
+        for objid in se_objid:
+            flag = self.se_number == objid
+            se_gal_flag[flag] = True
+
+
+        self.objsma_pixels = self.A_IMAGE[se_gal_flag]
+        self.objsma = self.objsma_pixels * self.pscalex
+
+        self.objBA = self.BA[se_gal_flag]
+        self.objPA = self.THETA_IMAGE[se_gal_flag]
+
+        #xc=self.xpixel,yc=self.ypixel
+            
     def remove_gals(self):
         '''
         method to remove SE segmentation id that corresponds to each galaxy position
