@@ -279,6 +279,9 @@ class buildgroupmask(buildmask):
         self.xpixel = x
         self.ypixel = y
 
+        self.xgals = x
+        self.ygals = y
+
         
     
     def get_ellipse_params(self):
@@ -313,7 +316,7 @@ class buildgroupmask(buildmask):
         
                 
 
-    def remove_gals(self,xgals,ygals):
+    def remove_gals(self):
         '''
         method to remove SE segmentation id that corresponds to each galaxy position
 
@@ -321,7 +324,7 @@ class buildgroupmask(buildmask):
 
         ## TODO - should use ellipse for each galaxy like I do in the regular masking routine
         
-        for x,y in zip(xgals,ygals):
+        for x,y in zip(self.xgals,self.ygals):
             # get mask value at location of galaxy
             maskval = self.maskdat[int(y),int(x)]
             
