@@ -332,17 +332,19 @@ class buildgroupmask(buildmask):
 
         ## TODO - should use ellipse for each galaxy like I do in the regular masking routine
 
+        # TODO - use galaxy RA and DEC and find closest object in SE catalog
         se_objid = []
         print("xgals = ",self.xgals)
         print("ygals = ",self.ygals)
-        plt.figure()
-        plt.imshow(self.maskdat)
-        plt.savefig("check_mask.png")
+
+        # read in segmentation image
+        segdata = fits.getdata(self.segmentation)
         for x,y in zip(self.xgals,self.ygals):
             # get mask value at location of galaxy
             # this is SE objid
-            print("value of mask at position of galaxy = ",self.maskdat[int(y),int(x)])
-            se_objid.append(self.maskdat[int(y),int(x)])
+            print("value of mask at position of galaxy = ",segdata[int(y),int(x)])
+            #se_objid.append(self.maskdat[int(y),int(x)])
+            se_objid.append(segdata[int(y),int(x)])
 
         se_gal_flag = np.zeros(len(self.se_number),'bool')
         for objid in se_objid:
