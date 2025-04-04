@@ -527,12 +527,12 @@ if __name__ == '__main__':
         topdir = '/mnt/astrophysics/muchogalfit-output/'
         os.chdir(topdir)
     # take as input the galaxy name
-    vfid = sys.argv[1]
+    galid = sys.argv[1]
     bandpass = 'r'
     # move to muchogalfit-output directory
-    output_dir = topdir+vfid+'/'
+    output_dir = topdir+galid+'/'
     if not os.path.exists(output_dir):
-        print('WARNING: {} does not exist\n Be sure to run setup_galfit.py first')
+        print(f'WARNING: {galid} does not exist\n Be sure to run setup_galfit.py first')
         os.chdir(topdir)
         sys.exit()
     
