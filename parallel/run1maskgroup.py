@@ -4,19 +4,27 @@
 GOAL: 
 - this creates a mask for a group image
 - the mask is built from the r-band image
+- the r-band mask is then reprojected for use with the unWISE images
 
 INPUT:
 - directory of the primary group number comes in as sys.argv[1]
 
 PROCEDURE:
-- load virgo catalog (vf_v2_main.fits)
-- get virgo galaxies in FOV
+- load galaxy catalog, which must have RA and DEC columns 
+  - vf_v2_main.fits for Virgo
+  - wisesize_main.fits for WISEsize
+- get galaxies in FOV
 - create a mask
 - remove mask for galaxies in FOV
+  - for virgo, we use JM's ephot catalog to remove any masked pixels within galaxy's
+    ellipse, but we keep the masks for gaia stars.
+  - for WISEsize, as of april 04, 2025, we don't have photometry from JM.  
+    So we can just remove the SExtractor sources that are at each galaxy position.  
+    This won't be perfect, but it will allow us to move forward until SGA2025 is 
+    released.
 
 USAGE:
 This should be run from a directory that contains
-- galfit input file
 - image
 - noise image
 
@@ -25,12 +33,17 @@ Run on r-band first!!!
 
 python ~/github/virgowise/run1galfitgroup.py galname 
 
-- galname should be the VFID and should correspond to the subdirectories in 
-/mnt/astrophysics/rfinn/muchogalfit-output (grawp directory)
-
-/mnt/astrophysics/muchogalfit-output (how directory is mounted on virgo vms)
-
-- each subdirectory has an input file that is created by setup_galfit.py
+- galname (should be the VFID for Virgo and) should correspond to the 
+  subdirectories in 
+  - Virgo: /mnt/astrophysics/rfinn/muchogalfit-output (grawp directory)
+    - each subdirectory has an input file that is created by setup_galfit.py
+  - WISEsize: 
+    - /mnt/astrophysics/wisesize/mg_output_wisesize (draco directory)
+    - /mnt/astrophysics/rfinn/wisesize/mg_output_wisesize (grawp directory)
+    - each directory has grz, W1-W4 images; all invvar images; all std images; 
+      wise psfs
+    - Kim has script setup_galfit_ws.py that creates these directories.  
+      in wisesize branch of mucho-galfit
 
 '''
 import os
@@ -67,6 +80,46 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 
 # set up a dictionary for the radius to use for the first guess of the sersic profile
 # a better way is to use a constant angular size, and then we can translate that into pixels using the pixel scale
+
+
+###########################################
+## SET UP CATALOGS
+###########################################
+
+# setting up to look for Kim's param file
+# get current directory
+cdir = os.getcwd()
+
+# first option is for running with wiseSize
+if 'mg_output_wisesize' in cdir:
+    # open paramfile.txt
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
+    #create dictionary with keyword and values from param textfile
+    param_dict={}
+    with open(param_file) as f:
+        for line in f:
+            try:
+                key = line.split()[0]
+                val = line.split()[1]
+                param_dict[key] = val
+            except:
+                continue
+            
+    MAIN_CATALOG = main_catalog
+    ELLIPSE_CATALOG = None
+    OBJID_COLNAME = 'OBJID'
+
+else:
+    catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
+    # read in virgo catalog
+    etablename = 'vf_v2_legacy_ephot.fits'
+    maintablename = 'vf_v2_main.fits'
+
+    MAIN_CATALOG = catalogdir+maintablename
+    ELLIPSE_CATALOG = catalogdir+etablename
+    OBJID_COLNAME = 'VFID'
+
+# directory structure on grawp
 
 
 
@@ -120,7 +173,7 @@ class buildgroupmask(buildmask):
         self.minarea = 5
         
 
-        # read in image and define center coords
+        # get the pixel scale in the image
         self.pscalex,self.pscaley = self.image_wcs.proj_plane_pixel_scales() # appears to be degrees/pixel
         
         # get image dimensions in deg,deg
@@ -141,43 +194,60 @@ class buildgroupmask(buildmask):
         self.figure_size = (10,5)
         self.cmap = 'gist_heat_r'
     def build_mask(self):
-        # SET UP AND RUN SOURCE EXTRACTOR
-        self.link_files()
-        self.runse()
-        self.get_gaia_stars()
-        self.add_gaia_masks()
-        self.grow_mask()
-        self.grow_mask()
-        self.grow_mask()
-        self.grow_mask()        
-        
 
-        self.get_galaxies_in_fov()
-        self.get_ellipse_params()
-        self.remove_center_object()
+        ##################################
+        ### METHODS FROM MASKWRAPPER.PY
+        ##################################
+        # SET UP AND RUN SOURCE EXTRACTOR
+        # link source extractor files
+        self.link_files() # maskwrapper method
+        self.runse() # maskwrapper method
+        self.get_gaia_stars() # maskwrapper method
+        self.add_gaia_masks() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+
+        ##################################
+        ### METHODS FROM THIS CLASS
+        ##################################
+        self.get_galaxies_in_fov() # this class, updated to work with any gal catalog with RA and DEC columns
+
+        # the ellipse params are used to clear and SE detection on galaxy
+        # while leaving gaia stars
+        if ELLIPSE_CATALOG is not None:
+            self.get_ellipse_params() # this class, using JM ephot table to get ellipse params for each galaxy
+
+        ##################################
+        ### METHODS FROM MASKWRAPPER.PY
+        ##################################
+        self.remove_center_object() # remove center object flag is false in the init function
         #m.remove_gals(xgals,ygals)
         #self.write_mask()        
         self.show_mask_mpl()
         
     def get_galaxies_in_fov(self):
-        """get virgo catalog galaxies in FOV """
+        """get catalog galaxies in FOV.  updated to work with Virgo or WISEsize """
         from astropy.wcs import WCS
         from astropy.coordinates import SkyCoord
         from astropy.table import Table
 
-        # read in virgo catalog
-        catalog='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/vf_v2_main.fits'
+        # read in galaxy catalog, where MAIN_CATALOG is defined at the start of this program
+        catalog=MAIN_CATALOG
         if os.path.exists(catalog):
-            vtab = Table.read(catalog)
+            gtab = Table.read(catalog)
         else:
-            try:
-                # test to see if running on Virgo VMS
-                catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
-                vtab = Table.read(catalog)
-            except FileNotFoundError: # adding case for testing on laptop
-                catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
-                vtab = Table.read(catalog)
-            
+            #try:
+            #    # test to see if running on Virgo VMS
+            #    catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+            #    vtab = Table.read(catalog)
+            #except FileNotFoundError: # adding case for testing on laptop
+            #    catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
+            #    vtab = Table.read(catalog)
+            print(f"WARNING: could not find {MAIN_CATALOG}")
+            print("Terminating program...")
+            sys.exit()
 
         # create a SkyCoord object from RA and DEC of virgo galaxies
         galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
@@ -192,16 +262,16 @@ class buildgroupmask(buildmask):
 
         # create flag to save galaxies on the image
         flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
-        vfids = vtab['VFID'][flag]
+        galids = gtab[OBJ][flag]
         x,y = x[flag],y[flag]
         # write out file containing VFID, x, y
         ofilename = f'galsFOV.txt'
         outfile = open(ofilename,'w')
-        for i in range(len(vfids)):
+        for i in range(len(galids)):
             outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
         outfile.close()
         self.keepflag = flag
-        self.vfids = vfids
+        self.galids = galids
         self.xpixel = x
         self.ypixel = y
 
@@ -223,7 +293,7 @@ class buildgroupmask(buildmask):
         gRAD = []
         gBA = []
         gPA = []
-        for vf in self.vfids:
+        for vf in self.galids:
             t = get_galaxy_params(vf)
             gRA.append(t[0])
             gDEC.append(t[1])
@@ -240,6 +310,10 @@ class buildgroupmask(buildmask):
                 
 
     def remove_gals(self,xgals,ygals):
+        '''
+        method to remove SE segmentation id that corresponds to each galaxy position
+
+        '''
 
         ## TODO - should use ellipse for each galaxy like I do in the regular masking routine
         
@@ -320,17 +394,20 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     from astropy.table import Table
 
     # read in virgo catalog
-    catalog='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/vf_v2_main.fits'
+    catalog=MAIN_CATALOG
     if os.path.exists(catalog):
         vtab = Table.read(catalog)
     else:
-        try:
-            # test to see if running on Virgo VMS
-            catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
-            vtab = Table.read(catalog)
-        except FileNotFoundError: # adding case for testing on laptop
-            catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
-            vtab = Table.read(catalog)
+        #try:
+        #    # test to see if running on Virgo VMS
+        #    catalog='/mnt/astrophysics/catalogs/Virgo/v2/vf_v2_main.fits'
+        #    vtab = Table.read(catalog)
+        #except FileNotFoundError: # adding case for testing on laptop
+        #    catalog=os.getenv("HOME")+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
+        #    vtab = Table.read(catalog)
+        print(f"WARNING: could not find {MAIN_CATALOG}")
+        print("Terminating program...")
+        sys.exit()
         
     # create a SkyCoord object from RA and DEC of virgo galaxies
     galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
@@ -346,7 +423,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
     # create flag to save galaxies on the image
     flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
-    vfids = vtab['VFID'][flag]
+    vfids = vtab[OBJID_COLNAME][flag]
     x,y = x[flag],y[flag]
     # write out file containing VFID, x, y
     ofilename = f'galsFOV-{bandpass}.txt'
@@ -432,11 +509,17 @@ def get_maskname(image):
 
                                                                                                   
 if __name__ == '__main__':
+
+    # TODO : if ellip phot file is NONE, remove the SE objects that are at each galaxy position
     
     # run this from /mnt/astrophysics
 
     # DONE: move galfit output to a new destination
     # /mnt/astrophysics/rfinn/muchogalfit-output
+
+    # TODO : change to run from current directory which should be path_to_images, don't assume or change to a directory
+
+    # TODO : remove any other path dependencies to virgo and fix with statements at the beginning
     topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
     try:
         os.chdir(topdir)
@@ -455,29 +538,27 @@ if __name__ == '__main__':
     
     os.chdir(output_dir)
 
-    # read in virgo catalog
-    tablename = 'vf_v2_legacy_ephot.fits'
-    maintablename = 'vf_v2_main.fits'
-    # directory structure on grawp
-    catalogdir='/mnt/astrophysics/rfinn/catalogs/Virgo/v2/'
     try:
         
-        etab = Table.read(catalogdir+tablename)
+        etab = Table.read(catalogdir+etablename)
         maintab = Table.read(catalogdir+maintablename)        
         
         aphys = '/mnt/astrophysics/rfinn/'
     except FileNotFoundError:
-        try:
-            # test to see if running on Virgo VMS or draco
-            catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
-            etab = Table.read(catalogdir+tablename)
-            maintab = Table.read(catalogdir+maintablename)        
-            aphys = '/mnt/astrophysics/'        
-        except FileNotFoundError: # 
-            print("ERROR: problem locating astrophysics drive - exiting")
-            sys.exit()
+        #try:
+        #    # test to see if running on Virgo VMS or draco
+        #    catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
+        #    etab = Table.read(catalogdir+tablename)
+        #    maintab = Table.read(catalogdir+maintablename)        
+        #    aphys = '/mnt/astrophysics/'        
+        #except FileNotFoundError: # 
+        #    print("ERROR: problem locating astrophysics drive - exiting")
+        #    sys.exit()
+        print(f"WARNING: could not find {MAIN_CATALOG}")
+        print("Exiting program...")
+        sys.exit
 
-    matchflag = etab['VFID'] == vfid
+    matchflag = etab[OBJID_COLNAME] == vfid
     
     if np.sum(matchflag) < 1:
         print("ERROR: did not find a matching VFID for ",vfid)
