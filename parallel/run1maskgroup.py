@@ -220,6 +220,8 @@ class buildgroupmask(buildmask):
         # while leaving gaia stars
         if ELLIPSE_CATALOG is not None:
             self.get_ellipse_params() # this class, using JM ephot table to get ellipse params for each galaxy
+        else:
+            self.remove_gals()
 
         ##################################
         ### METHODS FROM MASKWRAPPER.PY
