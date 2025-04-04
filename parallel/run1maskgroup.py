@@ -307,7 +307,7 @@ class buildgroupmask(buildmask):
             t = get_galaxy_params(vf)
             gRA.append(t[0])
             gDEC.append(t[1])
-            gRAD.append(t[2])
+            gRAD.append(t[2]) # radius in arcsec
             gBA.append(t[3])
             gPA.append(float(t[4])+90)
         # convert radius to pixels
@@ -341,7 +341,7 @@ class buildgroupmask(buildmask):
             flag = self.se_number == objid
             se_gal_flag[flag] = True
 
-
+        print("SE objids for galaxies in FOV = ",se_objid)
         self.objsma_pixels = self.A_IMAGE[se_gal_flag]
         self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
