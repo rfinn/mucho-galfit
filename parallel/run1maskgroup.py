@@ -207,7 +207,8 @@ class buildgroupmask(buildmask):
         # link source extractor files
         self.link_files() # maskwrapper method
         self.runse() # maskwrapper method
-        self.read_se_cat()
+        objnumber = self.read_se_cat()
+        print("object number returned from read_se_cat = ", objnumber)
         self.get_gaia_stars() # maskwrapper method
         self.add_gaia_masks() # maskwrapper method
         self.grow_mask() # maskwrapper method
