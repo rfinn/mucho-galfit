@@ -221,7 +221,8 @@ class buildgroupmask(buildmask):
         if ELLIPSE_CATALOG is not None:
             self.get_ellipse_params() # this class, using JM ephot table to get ellipse params for each galaxy
         else:
-            self.remove_gals()
+            #self.remove_gals()
+            self.get_ellipse_params_se()
 
         ##################################
         ### METHODS FROM MASKWRAPPER.PY
