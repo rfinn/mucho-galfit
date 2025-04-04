@@ -105,7 +105,7 @@ if 'mg_output_wisesize' in cdir:
             except:
                 continue
             
-    MAIN_CATALOG = main_catalog
+    MAIN_CATALOG = param_dict['main_catalog']
     ELLIPSE_CATALOG = None
     OBJID_COLNAME = 'OBJID'
 
