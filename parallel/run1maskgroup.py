@@ -330,8 +330,8 @@ class buildgroupmask(buildmask):
         ## TODO - should use ellipse for each galaxy like I do in the regular masking routine
 
         se_objid = []
-        print("xgals = ",xgals)
-        print("ygals = ",ygals)        
+        print("xgals = ",self.xgals)
+        print("ygals = ",self.ygals)        
         for x,y in zip(self.xgals,self.ygals):
             # get mask value at location of galaxy
             # this is SE objid
