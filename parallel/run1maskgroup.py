@@ -270,7 +270,7 @@ class buildgroupmask(buildmask):
         ofilename = f'galsFOV.txt'
         outfile = open(ofilename,'w')
         for i in range(len(galids)):
-            outfile.write(f'{vfids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
+            outfile.write(f'{galids[i]}, {x[i]:.2f}, {y[i]:.2f} \n')
         outfile.close()
         self.keepflag = flag
         self.galids = galids
