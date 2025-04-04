@@ -352,7 +352,7 @@ class buildgroupmask(buildmask):
             se_gal_flag[flag] = True
 
         print("SE objids for galaxies in FOV = ",se_objid)
-        self.objsma_pixels = self.A_IMAGE[se_gal_flag]
+        self.objsma_pixels = self.A_IMAGE[se_gal_flag] * 3 # factor of three from SE user manual
         self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
         self.objBA = self.BA[se_gal_flag]
