@@ -597,6 +597,7 @@ if __name__ == '__main__':
                 psf_image = f'{galid}-PSF-{bandpass}.fits'
             
         # get mask
+        print("working in ",os.getcwd())
         print("image = ",image)        
         mask_image = get_group_mask(image,bandpass=bandpass,overwrite=True)
 
