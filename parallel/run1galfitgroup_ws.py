@@ -29,10 +29,10 @@ This should be run from a directory that contains
 To run:
 Run on r-band first!!!
 
-python /mnt/astrophysics/kconger_wisesize/github/mucho-galfit/run1galfitgroup.py galname r
+python /mnt/astrophysics/wisesize/github/mucho-galfit/run1galfitgroup.py galname r
 
 - galname should be the OBJIDxxxx and should correspond to the subdirectories in 
-/mnt/astrophysics/kconger_wisesize/mg_output_wisesize/ (draco directory)
+/mnt/astrophysics/wisesize/mg_output_wisesize/ (draco directory)
 
 - each subdirectory has an input file that is created by setup_galfit.py
 
@@ -510,7 +510,7 @@ def write_galfit_input(output_dir,image,sigma_image,psf_image,bandpass,xgal=None
 if __name__ == '__main__':
 
 
-    param_file = '/mnt/astrophysics/kconger_wisesize/github/mucho-galfit/paramfile.txt'
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
     param_dict={}
@@ -598,7 +598,12 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 3:
         # open the galfit output table from rband
-        rgalfit = Table.read(outdir+'/wisesize_galfit_r.fits')
+        try:
+            rgalfit = Table.read(outdir+'wisesize_galfit_r.fits')
+        except:
+            print(f'need to make output table {outdir}wisesize_galfit_r.fits before running with fixed r-band BA and PA')
+            sys.exit()
+            
         # check numerical error flag
         print(rgalfit['Numerical_Error'][matchindex_primary])
         if rgalfit['Numerical_Error'][matchindex_primary][0]:

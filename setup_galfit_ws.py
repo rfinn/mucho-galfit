@@ -17,7 +17,7 @@ USAGE:
 * on draco, move to /mnt/astrophysics/mg-output-wisesize/
 
 * call as:
-    python /mnt/astrophysics/kconger_wisesize/github/wisesize/mucho-galfit/setup_galfit.py
+    python /mnt/astrophysics/wisesize/github/wisesize/mucho-galfit/setup_galfit.py
 
     * will create directories of galaxies. each directory will contain the image, noise, unWISE psfs
 
@@ -106,7 +106,7 @@ def convert_invvar_noise(invvar_image, noise_image):
     # write out as noise image
     fits.writeto(noise_image,noise_data,header=header,overwrite=True)
     
-#path_to_repos e.g., /mnt/astrophysics/kconger_wisesize/
+#path_to_repos e.g., /mnt/astrophysics/wisesize/
 def get_images(objid,ra,dec,output_loc,data_root_dir):
     ###############################################################################
     ### GET IMAGES
@@ -115,7 +115,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     print(objid)
     
     #output_loc is the directory holding the individual galaxy output directories (which GALFIT will be pulling from!)
-    #e.g., /mnt/astrophysics/kconger_wisesize/mg_output_wisesize/OBJ10000/
+    #e.g., /mnt/astrophysics/wisesize/mg_output_wisesize/OBJ10000/
     output_dir = os.path.join(output_loc,objid+'/')
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
@@ -188,7 +188,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 
 if __name__ == '__main__':
     
-    param_file = '/mnt/astrophysics/kconger_wisesize/github/mucho-galfit/paramfile.txt'
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
     param_dict={}

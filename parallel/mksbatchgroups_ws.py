@@ -15,7 +15,7 @@ USAGE:
 * If it looks good, run again using the --submit flag to submit the script to slurm.
 
 
-This runs `run1galfitgroup.py` on all the targets in "groupPrimaryVFID.txt".
+This runs `run1galfitgroup_ws.py` on all the targets in "groupPrimaryWS.txt".
 
 
 '''
@@ -82,11 +82,11 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += s
     output += "#\n"
 
-    output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup.py $LINE {wavelength}\n"
+    output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup_ws.py $LINE {wavelength}\n"
 
     if wavelength.startswith('W'):
         # run galfit again, fixing BA and PA to r-band values
-        output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup.py  $LINE {wavelength} 1\n"
+        output += f"python3 {HOME}/github/mucho-galfit/parallel/run1galfitgroup_ws.py $LINE {wavelength} 1\n"
 
     outfname = f"JOB_{script_id}.sh"
 
@@ -135,11 +135,11 @@ cwd = os.getcwd()
 data_dir = f"{HOME}/research/wisesize/"
 # this is the directory that has a subdirectory for each galaxy
 # the following is the directory that grawp sees (remove rfinn if running on virgo)
-data_dir = "/mnt/astrophysics/rfinn/muchogalfit-output/"
+data_dir = "/mnt/astrophysics/wisesize/mg_output_wisesize/"
 
 
 # this is the name of the shell script that will be created
-script_id = f"VFIDgroup-{args.wavelength}"
+script_id = f"WISESize-{args.wavelength}"
 
 print('data_dir = ', data_dir)
 print()
@@ -161,9 +161,9 @@ print(f"\nthe number of lines in PrimaryDirs.txt = {nfiles}\n")
 # write out files and submit jobs
 # for d in dirlist:
 
-#input_file = "groupPrimaryVFID.txt"
+#input_file = "groupPrimaryWS.txt"
 
-# set sample size to 10 galaxies for testing
+# set sample size to 2 galaxies for testing
 
 if args.testsample:
     nfiles=2
