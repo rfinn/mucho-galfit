@@ -252,7 +252,7 @@ class buildgroupmask(buildmask):
             sys.exit()
 
         # create a SkyCoord object from RA and DEC of virgo galaxies
-        galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
+        galcoord = SkyCoord(gtab['RA'],gtab['DEC'],frame='icrs',unit='deg')
 
         # set up image wcs
 
@@ -398,7 +398,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
     # read in virgo catalog
     catalog=MAIN_CATALOG
     if os.path.exists(catalog):
-        vtab = Table.read(catalog)
+        gtab = Table.read(catalog)
     else:
         #try:
         #    # test to see if running on Virgo VMS
@@ -412,7 +412,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
         sys.exit()
         
     # create a SkyCoord object from RA and DEC of virgo galaxies
-    galcoord = SkyCoord(vtab['RA'],vtab['DEC'],frame='icrs',unit='deg')
+    galcoord = SkyCoord(gtab['RA'],gtab['DEC'],frame='icrs',unit='deg')
 
     # set up image wcs
     image_wcs = WCS(image)
@@ -425,7 +425,7 @@ def get_galaxies_in_fov(image,bandpass='W3'):
 
     # create flag to save galaxies on the image
     flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
-    vfids = vtab[OBJID_COLNAME][flag]
+    vfids = gtab[OBJID_COLNAME][flag]
     x,y = x[flag],y[flag]
     # write out file containing VFID, x, y
     ofilename = f'galsFOV-{bandpass}.txt'
