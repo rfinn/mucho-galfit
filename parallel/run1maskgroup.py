@@ -204,6 +204,7 @@ class buildgroupmask(buildmask):
         # link source extractor files
         self.link_files() # maskwrapper method
         self.runse() # maskwrapper method
+        self.read_se_cat()
         self.get_gaia_stars() # maskwrapper method
         self.add_gaia_masks() # maskwrapper method
         self.grow_mask() # maskwrapper method
