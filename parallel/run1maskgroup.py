@@ -551,7 +551,7 @@ if __name__ == '__main__':
         print("ERROR: did not find a matching GALID for ",vfid)
     matchindex = np.arange(len(maintab))[matchflag][0]
     
-    if ELLIP_CATALOG is not None:
+    if ELLIPSE_CATALOG is not None:
         try:
             etab = Table.read(catalogdir+etablename)
         except FileNotFoundError:
