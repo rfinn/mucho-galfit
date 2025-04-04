@@ -90,8 +90,10 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 # get current directory
 cdir = os.getcwd()
 
+VirgoFlag = True
 # first option is for running with wiseSize
 if 'mg_output_wisesize' in cdir:
+    VirgoFlag = False
     # open paramfile.txt
     param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
     #create dictionary with keyword and values from param textfile
@@ -543,46 +545,56 @@ if __name__ == '__main__':
     
     os.chdir(output_dir)
 
-    try:
-        
-        etab = Table.read(catalogdir+etablename)
-        maintab = Table.read(catalogdir+maintablename)        
-        
-        aphys = '/mnt/astrophysics/rfinn/'
-    except FileNotFoundError:
-        #try:
-        #    # test to see if running on Virgo VMS or draco
-        #    catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
-        #    etab = Table.read(catalogdir+tablename)
-        #    maintab = Table.read(catalogdir+maintablename)        
-        #    aphys = '/mnt/astrophysics/'        
-        #except FileNotFoundError: # 
-        #    print("ERROR: problem locating astrophysics drive - exiting")
-        #    sys.exit()
-        print(f"WARNING: could not find {MAIN_CATALOG}")
-        print("Exiting program...")
-        sys.exit
-
-    matchflag = etab[OBJID_COLNAME] == vfid
-    
+    maintab = Table.read(MAIN_CATALOG)
+    matchflag = maintab[OBJID_COLNAME] == galid
     if np.sum(matchflag) < 1:
-        print("ERROR: did not find a matching VFID for ",vfid)
-    matchindex = np.arange(len(etab))[matchflag][0]
+        print("ERROR: did not find a matching GALID for ",vfid)
+    matchindex = np.arange(len(maintab))[matchflag][0]
+    
+    if ELLIP_CATALOG is not None:
+        try:
+            etab = Table.read(catalogdir+etablename)
+        except FileNotFoundError:
+            #try:
+            #    # test to see if running on Virgo VMS or draco
+            #    catalogdir='/mnt/astrophysics/catalogs/Virgo/v2/'
+            #    etab = Table.read(catalogdir+tablename)
+            #    maintab = Table.read(catalogdir+maintablename)        
+            #    aphys = '/mnt/astrophysics/'        
+            #except FileNotFoundError: # 
+            #    print("ERROR: problem locating astrophysics drive - exiting")
+            #    sys.exit()
+            print(f"WARNING: could not find {MAIN_CATALOG}")
+            print("Exiting program...")
+            sys.exit()
+
+
+    
+
     
         
     for bandpass in ['r','W1']:
-        objname = etab['GALAXY'][matchindex]
-        # look in vf tables to find if file is group or not
-        if etab['GROUP_MULT'][matchindex] > 1:
-            image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
-            invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
-            psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
-        else:
-            image = f'{objname}-custom-image-{bandpass}.fits'
-            invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
-            psf_image = f'{objname}-custom-psf-{bandpass}.fits'
+        if VirgoFlag:
+            objname = etab['GALAXY'][matchindex]
+            # look in vf tables to find if file is group or not
+            if etab['GROUP_MULT'][matchindex] > 1:
+                image = f'{objname}_GROUP-custom-image-{bandpass}.fits'
+                invvar_image = f'{objname}_GROUP-custom-invvar-{bandpass}.fits'    
+                psf_image = f'{objname}_GROUP-custom-psf-{bandpass}.fits'
+            else:
+                image = f'{objname}-custom-image-{bandpass}.fits'
+                invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
+                psf_image = f'{objname}-custom-psf-{bandpass}.fits'
             
-        print("image = ",image)
+                print("image = ",image)
+        else:
+            # get image names for wisesize
+            image = f'{galid}-im-{bandpass}.fits'
+            invvar_image = f'{galid}-invvar-{bandpass}.fits'
+            if bandpass == 'r':
+                psf_image = None
+            elif bandpass == 'W1':
+                psf_image = f'{galid}-PSF-{bandpass}.fits'
             
         # get mask
         mask_image = get_group_mask(image,bandpass=bandpass,overwrite=True)
