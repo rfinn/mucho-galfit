@@ -343,7 +343,7 @@ class buildgroupmask(buildmask):
 
 
         self.objsma_pixels = self.A_IMAGE[se_gal_flag]
-        self.objsma = self.objsma_pixels * self.pscalex * 3600
+        self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
         self.objBA = self.BA[se_gal_flag]
         self.objPA = self.THETA_IMAGE[se_gal_flag]
