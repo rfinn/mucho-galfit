@@ -586,7 +586,7 @@ if __name__ == '__main__':
                 invvar_image = f'{objname}-custom-invvar-{bandpass}.fits'    
                 psf_image = f'{objname}-custom-psf-{bandpass}.fits'
             
-                print("image = ",image)
+                
         else:
             # get image names for wisesize
             image = f'{galid}-im-{bandpass}.fits'
@@ -597,6 +597,7 @@ if __name__ == '__main__':
                 psf_image = f'{galid}-PSF-{bandpass}.fits'
             
         # get mask
+        print("image = ",image)        
         mask_image = get_group_mask(image,bandpass=bandpass,overwrite=True)
 
     os.chdir(topdir)
