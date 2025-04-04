@@ -348,6 +348,11 @@ class buildgroupmask(buildmask):
         self.objBA = self.BA[se_gal_flag]
         self.objPA = self.THETA_IMAGE[se_gal_flag]
 
+        print("objsma_pixels = ",self.objsma_pixels)
+        print("objsma = ",self.objsma)
+        print("objBA = ",self.objBA)
+        print("objPA = ",self.objPA)        
+
         #xc=self.xpixel,yc=self.ypixel
             
     def remove_gals(self):
