@@ -264,7 +264,7 @@ class buildgroupmask(buildmask):
 
         # create flag to save galaxies on the image
         flag = (x > 0) & (x < xmax) & (y>0) & (y < ymax)        
-        galids = gtab[OBJ][flag]
+        galids = gtab[OBJID_COLNAME][flag]
         x,y = x[flag],y[flag]
         # write out file containing VFID, x, y
         ofilename = f'galsFOV.txt'
