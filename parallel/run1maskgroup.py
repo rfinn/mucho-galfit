@@ -320,7 +320,7 @@ class buildgroupmask(buildmask):
         self.objsma = gRAD
         self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
 
-    def get_ellipse_params_se(self,BAscale=1.4):
+    def get_ellipse_params_se(self,BAscale=1.33):
         """
 
         call after get_galaxies_in_fov()
