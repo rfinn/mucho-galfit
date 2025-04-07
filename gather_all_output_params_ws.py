@@ -6,7 +6,7 @@ to gather all results from galfit fitting
 
 USAGE: 
 
-from /mnt/astrophysics/rfinn/muchogalfit-output/
+from /mnt/astrophysics/wisesize/mg_output_wisesize/
 
 python3 ~/github/mucho-galfit/gather_all_output_params.py W3
 
@@ -17,9 +17,8 @@ creates a table in the current directory called
 
 wisesize_galfit_{band}.fits
 
-or should we combine all wavelengths into one table?
-
 """
+
 import os
 import sys
 from astropy.table import Table
@@ -102,7 +101,7 @@ for i in range(nvirgo):
 topdir = os.getcwd()
 os.chdir(topdir)
 # TODONE get list of directories
-dirlist = glob.glob('VFID????')
+dirlist = glob.glob('OBJID?????')
 dirlist.sort()
 #print(dirlist)
 # go in each directory
@@ -113,14 +112,14 @@ for d in dirlist:
 
     gfile = f"galsFOV-{band}.txt"
     if os.path.exists(gfile):
-        vfids = []
+        objids = []
         xgal = []
         ygal = []
 
-        vgals = open(gfile,'r')
-        for line in vgals:
+        gals = open(gfile,'r')
+        for line in gals:
             t = line.strip().split(',')
-            vfids.append(t[0])
+            objids.append(t[0])
             xgal.append(t[1])
             ygal.append(t[2])
 
@@ -183,6 +182,6 @@ for d in dirlist:
     os.chdir(topdir)
 # write output table
 os.chdir(topdir)
-outfilename = f"vf_v2_galfit_{band}{fixBA}.fits"
+outfilename = f"wisesize_galfit_{band}{fixBA}.fits"
 
 outtab.write(outfilename,format='fits',overwrite=True)

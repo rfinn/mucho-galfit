@@ -556,7 +556,7 @@ if __name__ == '__main__':
     # move to muchogalfit-output directory
     output_dir = outdir+objid+'/'
     if not os.path.exists(output_dir):
-        print('WARNING: {} does not exist.\n Be sure to run setup_galfit.py first.')
+        print(f'WARNING: {output_dir} does not exist.\n Be sure to run setup_galfit.py first.')
         os.chdir(outdir)
         sys.exit()
     
