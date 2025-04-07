@@ -82,7 +82,7 @@ colnames.append('Numerical_Error')
 colnames.append('CNumerical_Error')
 
 
-dtype=['S9',\
+dtype=['S10',\
            float,float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,\
            float,float,float,float,float,float,float,float,float,\
