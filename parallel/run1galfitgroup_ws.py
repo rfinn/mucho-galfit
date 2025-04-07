@@ -525,7 +525,7 @@ if __name__ == '__main__':
     
     main_dir = param_dict['main_dir']
     
-    outdir = os.getcwd()
+    outdir = os.getcwd()+'/'
     #outdir = main_dir+param_dict['path_to_images']
     
     data_root_dir = param_dict['data_root_dir']
