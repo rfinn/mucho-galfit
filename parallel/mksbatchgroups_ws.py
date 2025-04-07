@@ -15,7 +15,7 @@ USAGE:
 * If it looks good, run again using the --submit flag to submit the script to slurm.
 
 
-This runs `run1galfitgroup_ws.py` on all the targets in "groupPrimaryWS.txt".
+This runs `run1galfitgroup_ws.py` on all the targets in "PrimaryDirs.txt".
 
 
 '''
@@ -135,7 +135,7 @@ cwd = os.getcwd()
 data_dir = f"{HOME}/research/wisesize/"
 # this is the directory that has a subdirectory for each galaxy
 # the following is the directory that grawp sees (remove rfinn if running on virgo)
-data_dir = "/mnt/astrophysics/wisesize/mg_output_wisesize/"
+data_dir = "/mnt/astrophysics/wisesize/mg_output_wisesize_testsample/"
 
 
 # this is the name of the shell script that will be created
@@ -153,7 +153,7 @@ os.chdir(data_dir)
 #
 
 input_file = "PrimaryDirs.txt"
-infile = open(input_file, 'r')
+infile = open(data_dir+input_file, 'r')
 nfiles = (len(infile.readlines()))
 infile.close()
 
