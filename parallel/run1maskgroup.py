@@ -354,7 +354,7 @@ class buildgroupmask(buildmask):
         print("SE objids for galaxies in FOV = ",se_objid)
         # TODO - on monday, play with scale factor - probably needs to be 3.1 or 3.2
         # TODO - also check if we need to scale B/A because factor of 3 seems to be ok along semi-major axis but not semi-minor
-        self.objsma_pixels = self.A_IMAGE[se_gal_flag] * 3.15 # factor of three from SE user manual
+        self.objsma_pixels = self.A_IMAGE[se_gal_flag] * 3.2 # factor of three from SE user manual
         self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
         # trying to increase B/A b/c ellipses seem a bit too narrow
