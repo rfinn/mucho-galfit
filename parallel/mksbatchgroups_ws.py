@@ -121,6 +121,7 @@ parser.add_argument('--testsample',
                     default=False,
                     action='store_true',
                     help='Set this option to submit a script with a test sample of 10 galaxies to slurm. Default is false. You can check output JOB_{scriptid}.sh.  If everything looks good, then add submit flag.')
+
 parser.add_argument('--submit',
                     dest='submit',
                     default=False,
@@ -132,7 +133,7 @@ args = parser.parse_args()
 cwd = os.getcwd()
 
 # what is this directory???
-data_dir = f"{HOME}/research/wisesize/"
+#data_dir = f"{HOME}/research/wisesize/"
 # this is the directory that has a subdirectory for each galaxy
 # the following is the directory that grawp sees (remove rfinn if running on virgo)
 data_dir = "/mnt/astrophysics/wisesize/mg_output_wisesize_testsample/"

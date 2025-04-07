@@ -51,7 +51,7 @@ from astropy.table import Table
 
 homedir = os.getenv("HOME")
 # add in masking from halphagui
-sys.path.append(homedir+'/github/halphagui/')
+#sys.path.append(homedir+'/github/halphagui/')
 sys.path.append(homedir+'/github/mucho-galfit/parallel/')
 #from maskwrapper import buildmask
 #from run1galfit import get_maskname
@@ -126,10 +126,10 @@ def get_maskname(image):
     
     for e in elist:
         if e in image:
-            maskname = image.replace(f"im-{e}.fits","wise-mask.fits")
+            maskname = image.replace(f"{e}.fits","wise-mask.fits")
             return maskname
     # check for legacy
-    llist = ['im-g','im-r','im-z']
+    llist = ['g','r','z']
     for l in llist:
         if l in image:
             maskname = image.replace(f"{l}.fits","r-mask.fits")

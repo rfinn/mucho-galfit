@@ -1,8 +1,8 @@
 #---------------------------------- File paths ----------------------------------
 
-main_dir          /mnt/astrophysics/wisesize/       #mounted dir for input/output images
+main_dir          /mnt/astrophysics/wisesize/               #mounted dir for input/output images
 path_to_scripts   github/wisesize/mucho-galfit/             #draco path for galfit code, starting from main_dir
-path_to_images    mg_output_wisesize/                       #output path to image dirs for each galaxy, starting from main_dir
+path_to_images    mg_output_wisesize_testsample/            #output path to image dirs for each galaxy, starting from main_dir
 data_root_dir     /mnt/astrophysics/lsdr9-wisesize/         #where JM images are stored (RA directories)
 tile_path         github/wisesize/unwise_PSFs/tiles.fits    #location of tiles.fits, needed for pulling unWISE PSF images
 
