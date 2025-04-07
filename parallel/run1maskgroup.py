@@ -320,7 +320,7 @@ class buildgroupmask(buildmask):
         self.objsma = gRAD
         self.objsma_pixels = self.objsma/(self.pscalex.value*3600)
 
-    def get_ellipse_params_se(self):
+    def get_ellipse_params_se(self,BAscale=1.1):
         """
 
         call after get_galaxies_in_fov()
@@ -357,7 +357,8 @@ class buildgroupmask(buildmask):
         self.objsma_pixels = self.A_IMAGE[se_gal_flag] * 3 # factor of three from SE user manual
         self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
-        self.objBA = self.BA[se_gal_flag]
+        # trying to increase B/A b/c ellipses seem a bit too narrow
+        self.objBA = self.BA[se_gal_flag] * BAscale
         self.objPA = self.THETA_IMAGE[se_gal_flag]
 
         print("objsma_pixels = ",self.objsma_pixels)
