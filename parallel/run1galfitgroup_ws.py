@@ -525,7 +525,10 @@ if __name__ == '__main__':
     
     main_dir = param_dict['main_dir']
     
-    outdir = main_dir+param_dict['path_to_images']
+    outdir = os.getcwd()
+    #outdir = main_dir+param_dict['path_to_images']    #ALSO I need to type full path to .py in the lines!
+                                                       #then complete test run again...THEN gather output params, 
+                                                       #try run with fixBA after saving r-band params, etc.
     data_root_dir = param_dict['data_root_dir']
     
     objid_col = param_dict['objid_col']
@@ -553,7 +556,7 @@ if __name__ == '__main__':
     # set bandpass to the wavelength that is passed in from the command line
     bandpass = sys.argv[2]
     
-    # move to muchogalfit-output directory
+    # move to muchogalfit-output directory    
     output_dir = outdir+objid+'/'
     if not os.path.exists(output_dir):
         print(f'WARNING: {output_dir} does not exist.\n Be sure to run setup_galfit.py first.')
