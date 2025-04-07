@@ -526,9 +526,8 @@ if __name__ == '__main__':
     main_dir = param_dict['main_dir']
     
     outdir = os.getcwd()
-    #outdir = main_dir+param_dict['path_to_images']    #ALSO I need to type full path to .py in the lines!
-                                                       #then complete test run again...THEN gather output params, 
-                                                       #try run with fixBA after saving r-band params, etc.
+    #outdir = main_dir+param_dict['path_to_images']
+    
     data_root_dir = param_dict['data_root_dir']
     
     objid_col = param_dict['objid_col']

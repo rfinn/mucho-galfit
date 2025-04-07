@@ -13,7 +13,7 @@ python3 ~/github/mucho-galfit/gather_all_output_params.py W3
 where W3 is the bandpass and can  be [g,r,z,W1,W2,W3,W4]
 
 OUTPUT:
-creates a table in the current directory called
+creates a table in the current directory [/mnt/astrophysics/wisesize/mg_output_wisesize/] called
 
 wisesize_galfit_{band}.fits
 
@@ -41,21 +41,25 @@ except:
     fixBA = ''
 
 print("fixBA = ",fixBA)
-# read in VFID catalog
-#tabledir = "/mnt/astrophysics/rfinn/catalogs/Virgo/v2/"
 
-#vmain = Table.read(tabledir+"vf_v2_main.fits")
+param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
+        
+#create dictionary with keyword and values from param textfile
+param_dict={}
+with open(param_file) as f:
+    for line in f:
+        try:
+            key = line.split()[0]
+            val = line.split()[1]
+            param_dict[key] = val
+        except:
+            continue
 
-# don't actually need to read in the main table just to get the VFIDs
-# they just run from 1 - 6780
-#
-# or from 0 - 6779
+nobj = len(Table.read(param_dict['main_catalog']))
 
-nvirgo = 6780
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','AR','PA','SKY','CHI2NU']
 header_err = [f"{h}_ERR" for h in header[:-1]]
-# TODO - make an empty table
 # for convolution - second pass of galfit
 cheader = ["C"+i for i in header]
 cheader_err = [f"{h}_ERR" for h in cheader[:-1]]
@@ -70,7 +74,7 @@ for i in range(len(cheader)):
     cheader_with_err.append(cheader[i])
     if i < len(cheader) -1:
         cheader_with_err.append(cheader_err[i])
-col1 = ['VFID']
+col1 = ['OBJID']
 
 
 colnames = col1 + hheader_with_err + cheader_with_err
@@ -87,27 +91,21 @@ dtype=['S8',\
 #print('length of dtype = ',len(dtype))
 
 #print('length of colnames = ',len(colnames))
-outtab = Table(np.zeros((nvirgo,len(dtype))),dtype=dtype,names=colnames)
+outtab = Table(np.zeros((nobj,len(dtype))),dtype=dtype,names=colnames)
 
+for i in range(nobj):
+    objid = f"OBJID{i:05d}"
+    outtab['OBJID'][i] = objid
 
-
-
-for i in range(nvirgo):
-    vfid = f"VFID{i:04d}"
-    outtab['VFID'][i] = vfid
-    #outtab['VFID'][i] = vfid
-
-# create a dictionary to link the VFID and row in table?
+# create a dictionary to link the OBJID and row in table?
 topdir = os.getcwd()
 os.chdir(topdir)
-# TODONE get list of directories
+
 dirlist = glob.glob('OBJID?????')
-dirlist.sort()
-#print(dirlist)
-# go in each directory
+dirlist.sort()  #numerical order :-)
+
 for d in dirlist:
-    #if os.path.isdir(d):
-    #    print(d)
+
     os.chdir(d)
 
     gfile = f"galsFOV-{band}.txt"
@@ -125,7 +123,7 @@ for d in dirlist:
 
     #print("number of galaxies = ",len(xgal))
 
-    
+    #for no convolution and convolution cases...
     for k in range(2):
         if k == 0:
             #output from galfit is NAME-g-out1.fits = output from no convolution
@@ -138,8 +136,6 @@ for d in dirlist:
             print(f"no out{k+1} file for ",d)
             continue
 
-        # TODONE : figure out how to extract results for groups, and how to match with the corresponding VFID!!!
-
         # read in image header
         hdu = fits.open(infile1[0])
         # extension 2 has the model info
@@ -149,7 +145,7 @@ for d in dirlist:
         
         #print(infile1[0])
         for i in range(len(xgal)):
-            table_index = int(vfids[i].replace('VFID',''))
+            table_index = int(objids[i].replace('OBJID',''))
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
 
@@ -173,13 +169,13 @@ for d in dirlist:
                 outtab[prefix+h][table_index] = float(a)
                 outtab[prefix+h+"_ERR"][table_index] = float(b)
             nsky = len(xgal) + 1
-            #print("HEYYYY: nsky = ",nsky)
             t = imheader[f"{nsky}_SKY"]
             a,b = t.split(' +/- ')
             outtab[prefix+'SKY'][table_index] = float(a)
             outtab[prefix+'SKY_ERR'][table_index] = float(b)
 
     os.chdir(topdir)
+
 # write output table
 os.chdir(topdir)
 outfilename = f"wisesize_galfit_{band}{fixBA}.fits"
