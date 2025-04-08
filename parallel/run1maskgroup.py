@@ -94,11 +94,11 @@ guess_mag = {'FUV':17.5,'NUV':17.5,'g':15.5,'r':15.5,'z':15.5,'W1':15,'W2':15,'W
 cdir = os.getcwd()
 
 VirgoFlag = True
-# first option is for running with wiseSize
+# first option is for running with WISESize
 if 'mg_output_wisesize' in cdir:
     VirgoFlag = False
     # open paramfile.txt
-    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
+    param_file = homedir+'/github/mucho-galfit/paramfile.txt'
     #create dictionary with keyword and values from param textfile
     param_dict={}
     with open(param_file) as f:
@@ -574,25 +574,7 @@ def get_maskname(image):
                                                                                                   
 if __name__ == '__main__':
 
-    # TODO : if ellip phot file is NONE, remove the SE objects that are at each galaxy position
-    
-    # run this from /mnt/astrophysics
 
-    # DONE: move galfit output to a new destination
-    # /mnt/astrophysics/rfinn/muchogalfit-output
-
-    # TODO : change to run from current directory which should be path_to_images, don't assume or change to a directory
-
-    # TODO : remove any other path dependencies to virgo and fix with statements at the beginning
-
-    # reorganizing to run from the root image directory, where each galaxy/group has its own subdir
-    # topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
-    #try:
-    #    os.chdir(topdir)
-    #except FileNotFoundError: # assuming that we are running on virgo vms or draco
-    #    topdir = '/mnt/astrophysics/muchogalfit-output/'
-    #    os.chdir(topdir)
-    # take as input the galaxy name
     topdir = os.getcwd()
 
     galid = sys.argv[1]

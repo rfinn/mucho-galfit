@@ -2,7 +2,6 @@
 '''
 GOAL:
 * create web page to inspect the galfit results
-* adapting code from build_web_cutouts2.py
 * create one page per galaxy, and show results for
   * g, r, z
   * W1, w/conv, fixedBA
@@ -17,7 +16,7 @@ NOTES:
 * using John Moustakas's code as a reference (https://github.com/moustakas/legacyhalos/blob/main/py/legacyhalos/virgofilaments.py#L1131-L1202)
 * https://docs.astropy.org/en/stable/visualization/normalization.html#:~:text=The%20astropy.visualization%20module%20provides%20a%20framework%20for%20transforming,x%20represents%20the%20values%20in%20the%20original%20image%3A
 
-* on draco, the results are in /mnt/astrophysics/muchogalfit-output/
+* on draco, the results are in /mnt/astrophysics/wisesize/wisesize_html/
 
 
 
@@ -43,51 +42,16 @@ from astropy import units as u
 from astropy.nddata import Cutout2D
 from astropy.stats import sigma_clip
 
-import multiprocessing as mp
-
 from PIL import Image
 
 homedir = os.getenv("HOME")
 
-os.sys.path.append(homedir+'/github/virgowise/')
-import rungalfit as rg #This code has galfit defined functions 
-
-#from build_web_coadds import get_galaxies_fov, plot_vf_gals
 from build_web_common import *
 
 
 ###########################################################
-####  GLOBAL VARIABLES
-###########################################################
-
-
-VFMAIN_PATH = homedir+'/research/Virgo/tables-north/v1/vf_north_v1_main.fits'
-VFMAIN_PATH = homedir+'/research/Virgo/tables-north/v2/vf_v2_main.fits'
-VFEPHOT_PATH = homedir+'/research/Virgo/tables-north/v2/vf_v2_legacy_ephot.fits'
-haimaging_path = os.path.join(homedir,'github/HalphaImaging/python3/')
-#sys.path.append(haimaging_path)
-
-#vfmain = fits.getdata(VFMAIN_PATH)
-residual_stretch = LinearStretch(slope=0.5, intercept=0.5) + SinhStretch() + \
-    LinearStretch(slope=2, intercept=-1)
-###########################################################
 ####  FUNCTIONS
 ###########################################################
-def get_params_from_name(image_name):
-    #print(t)
-    tels = ['BOK','HDI','INT','MOS']
-    for t in tels:
-        if t in image_name:
-            telescope = t
-            break
-    t = os.path.basename(image_name).split('-')
-    for item in t:
-        if item.startswith('20'):
-            dateobs = item
-            break
-    pointing = t[-1]
-
-    return telescope,dateobs,pointing
 
 def get_galfit_results(galfit_output_image,ngal=1):
 
@@ -146,7 +110,6 @@ def get_galfit_results(galfit_output_image,ngal=1):
 def buildone(subdir,outdir,flist):
     print(subdir)
 
-    #telescope,dateobs,pointing = get_params_from_name(subdir)
     #run = dateobs+'-'+pointing
     #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
     if os.path.isdir(subdir):
@@ -299,105 +262,99 @@ def plot_ellipse(ax,ellipseparams):
 
     
 def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2residual=99,cmap='viridis',zoom=None,outdir=None,mask=None,ellipseparams=None,suffix=''):
-      '''
-      ARGS:
-      galfile = galfit output image (with image, model, residual)
-      percentile1 = min percentile for stretch of image and model
-      percentile2 = max percentile for stretch of image and model
-      p1residual = min percentile for stretch of residual
-      p2residual = max percentile for stretch of residual
-      cmap = colormap, default is viridis
-      mask = bad pixel mask, with bad values set to True
-      '''
-      # model name
 
-      #print("inside display_galfit_model, mask = ",mask)
-      image,h = fits.getdata(galfile,1,header=True)
-      model = fits.getdata(galfile,2)
-      residual = fits.getdata(galfile,3)
+    # model name
 
-      if zoom is not None:
-         print("who's zoomin' who?")
-         # display central region of image
+    #print("inside display_galfit_model, mask = ",mask)
+    image,h = fits.getdata(galfile,1,header=True)
+    model = fits.getdata(galfile,2)
+    residual = fits.getdata(galfile,3)
 
-         # get image dimensions and center
-         ymax,xmax = image.shape
-         xcenter = int(xmax/2)
-         ycenter = int(ymax/2)
+    if zoom is not None:
+        print("who's zoomin' who?")
+        # display central region of image
 
-         # calculate new size to display based on zoom factor
-         new_xradius = int(xmax/2/(float(zoom)))
-         new_yradius = int(ymax/2/(float(zoom)))
+        # get image dimensions and center
+        ymax,xmax = image.shape
+        xcenter = int(xmax/2)
+        ycenter = int(ymax/2)
 
-         # calculate pixels to keep based on zoom factor
-         x1 = xcenter - new_xradius
-         x2 = xcenter + new_xradius
-         y1 = ycenter - new_yradius
-         y2 = ycenter + new_yradius
-         
-         # check to make sure limits are not outsize image dimensions
-         if (x1 < 1):
+        # calculate new size to display based on zoom factor
+        new_xradius = int(xmax/2/(float(zoom)))
+        new_yradius = int(ymax/2/(float(zoom)))
+
+        # calculate pixels to keep based on zoom factor
+        x1 = xcenter - new_xradius
+        x2 = xcenter + new_xradius
+        y1 = ycenter - new_yradius
+        y2 = ycenter + new_yradius
+
+        # check to make sure limits are not outside image dimensions
+        if (x1 < 1):
             x1 = 1
-         if (y1 < 1):
+        if (y1 < 1):
             y1 = 1
-         if (x2 > xmax):
+        if (x2 > xmax):
             x2 = xmax
-         if (y2 > ymax):
+        if (y2 > ymax):
             y2 = ymax
 
-         # cut images to new size
-         # python is data[row,col]
-         image = image[y1:y2,x1:x2]
-         model = model[y1:y2,x1:x2]
-         residual = residual[y1:y2,x1:x2]         
-         pass
-      imwcs = wcs.WCS(h)
-      images = [image,model,residual]
-      titles = ['image','model','residual']
-      if mask is not None:
-          print("\nshape of image = ",image.shape)
-          print("shape of mask = ",mask.shape)
-          print()
-          try:
-              im = image[~mask]
-              res = residual[~mask]
-          except IndexError:
-              im = image
-              res = residual
-              
-              print("no mask for galfit ",galfile)
-          norms = [simple_norm(im,'asinh',max_percent=percentile2),
-                   simple_norm(im,'asinh',max_percent=percentile2),
-                   simple_norm(res,'asinh',max_percent=percentile2,min_percent=20)]
+        # cut images to new size
+        # python is data[row,col]
+        image = image[y1:y2,x1:x2]
+        model = model[y1:y2,x1:x2]
+        residual = residual[y1:y2,x1:x2]         
+        pass
+    
+    imwcs = wcs.WCS(h)
+    images = [image,model,residual]
+    titles = ['image','model','residual']
+    if mask is not None:
+        print("\nshape of image = ",image.shape)
+        print("shape of mask = ",mask.shape)
+        print()
+        try:
+            im = image[~mask]
+            res = residual[~mask]
+        except IndexError:
+            im = image
+            res = residual
 
-      else:
-          norms = [simple_norm(image,'asinh',max_percent=percentile2),
-                   simple_norm(image,'asinh',max_percent=percentile2),
-                   simple_norm(residual,'asinh',max_percent=percentile2)]
+            print("no mask for galfit ",galfile)
+        
+        norms = [simple_norm(im,'asinh',max_percent=percentile2),
+               simple_norm(im,'asinh',max_percent=percentile2),
+               simple_norm(res,'asinh',max_percent=percentile2,min_percent=20)]
 
-      outim = [f'galfit_image{suffix}.png',\
-               f'galfit_model{suffix}.png',\
-               f'galfit_residual{suffix}.png']
-      
-      if outdir is not None:
-          outim = [os.path.join(outdir,f) for f in outim]
-      for i,im in enumerate(images):
-          fig = plt.figure(figsize=(6,6))          
-          plt.subplot(1,1,1,projection=imwcs)
-          plt.subplots_adjust(top=.95,right=.95,left=.2,bottom=.15)
-          plt.imshow(im,origin='lower',cmap=cmap,norm=norms[i])
-          #plt.colorbar(fraction=.08)
-          plt.xlabel('RA (deg)',fontsize=16)
-          plt.ylabel('DEC (deg)',fontsize=16)
-          #plt.title(titles[i],fontsize=16)
-          
-          # TODO add ellipse to the residual image
-          if (i == 2) and (ellipseparams is not None):
-              # plot the ellipse
-              plot_ellipse(plt.gca(),ellipseparams)
-          plt.savefig(outim[i])
+    else:
+        norms = [simple_norm(image,'asinh',max_percent=percentile2),
+               simple_norm(image,'asinh',max_percent=percentile2),
+               simple_norm(residual,'asinh',max_percent=percentile2)]
 
-      plt.close(fig)
+    outim = [f'galfit_image{suffix}.png',\
+           f'galfit_model{suffix}.png',\
+           f'galfit_residual{suffix}.png']
+
+    if outdir is not None:
+        outim = [os.path.join(outdir,f) for f in outim]
+    
+    for i,im in enumerate(images):
+        fig = plt.figure(figsize=(6,6))          
+        plt.subplot(1,1,1,projection=imwcs)
+        plt.subplots_adjust(top=.95,right=.95,left=.2,bottom=.15)
+        plt.imshow(im,origin='lower',cmap=cmap,norm=norms[i])
+        #plt.colorbar(fraction=.08)
+        plt.xlabel('RA (deg)',fontsize=16)
+        plt.ylabel('DEC (deg)',fontsize=16)
+        #plt.title(titles[i],fontsize=16)
+
+        # TODO add ellipse to the residual image
+        if (i == 2) and (ellipseparams is not None):
+            # plot the ellipse
+            plot_ellipse(plt.gca(),ellipseparams)
+        plt.savefig(outim[i])
+
+    plt.close(fig)
 
 ###########################################################
 ####  CLASSES
@@ -415,12 +372,12 @@ class galfit_dir():
 
         This creates the png images for different cutouts
         '''
-        # this returns the VFID
+        # this returns the OBJID
         # the galname should be the NED name that JM uses
-        self.vfid = cutoutdir
+        self.objid = cutoutdir
 
         if args.verbose:
-            print('inside galfit_dir, vfid = ',self.vfid)
+            print('inside galfit_dir, objid = ',self.objid)
         #print('cutoutdir = ',cutoutdir)
         #print('outdir = ',outdir)
         
@@ -435,7 +392,8 @@ class galfit_dir():
         
     def runall(self):
         self.get_ngal()        
-        self.get_ned_name()
+        #self.get_ned_name()
+        self.gname = maincat['OBJNAME_NED']   #galaxy's NED name
         self.get_file_names()
         self.get_ellipse_params()
         self.make_png_mask()
@@ -460,17 +418,14 @@ class galfit_dir():
         
                 
     def get_file_names(self):
-        search_string = '*custom-image-r.fits'
-        #print(search_string)
+        search_string = '*-im-r.fits'
         t = glob.glob(search_string)
-        #print(t)
         
-        
-        self.maskimage = self.gname+'-custom-image-r-mask.fits'
+        self.maskimage = self.gname+'-im-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
 
         if not os.path.exists(self.maskimage):
-            print(f"WARNING: can not find mask image {self.maskimage}!!!")
+            print(f"WARNING: cannot find mask image {self.maskimage}!")
             
     def get_ellipse_params(self):
         """ get ellipse parameters from the header of the mask image  """
@@ -511,9 +466,9 @@ class galfit_dir():
             except TypeError:
                 continue
             try:
-                if i < 4:
-                    make_png(self.fitsimages[f],pngfile,mask=None)
-                elif i == (len(self.fitsimages)-2): # add ellipse to mask image
+                if (i < 4) & ~(i == (len(self.fitsimages)-2)):
+                    make_png(self.fitsimages[f],pngfile,mask=None)  #just save mask as .png
+                elif i == (len(self.fitsimages)-2): #add ellipse to mask image, then save
                     if self.ellipseparams is not None:
                         make_png(self.fitsimages[f],pngfile,ellipseparams=self.ellipseparams)
                     else:
@@ -530,8 +485,15 @@ class galfit_dir():
 
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
-        self.galfit = f"{self.gname}-{band}-out2.fits"
+        
+        #we are only running GALFIT on r-band without convolution!
+        if band=='r':
+            self.galfit = f"{self.objid}-{band}-out1.fits"
+        else:
+            self.galfit = f"{self.objid}-{band}-out2.fits"
+        
         print(f"looking for galfit file {self.galfit}")
+        
         if os.path.exists(self.galfit):
             # store fit results
             if args.verbose:
@@ -543,8 +505,8 @@ class galfit_dir():
                 mask = fits.getdata(self.maskimage)
             mask = mask > 0
 
-
-            display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,ellipseparams=self.ellipseparams,suffix=f"_{band}")
+            display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,
+                                 ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
             outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png']
         
@@ -557,19 +519,6 @@ class galfit_dir():
             self.results = get_galfit_results(self.galfit,ngal=self.ngal)
             # make png of mask
 
-            #t = rg.parse_galfit_1comp(self.galfit)
-        
-            #header_keywords=['1_XC','1_YC','1_MAG','1_RE','1_N','1_AR','1_PA','2_SKY','ERROR','CHI2NU']
-            #self.xc, self.xc_err = t[0]
-            #self.yc, self.yc_err = t[1]
-            #self.mag, self.mag_err = t[2]
-            #self.re, self.re_err = t[3]
-            #self.nsersic, self.nsersic_err = t[4]
-            #self.BA, self.BA_err = t[5]
-            #self.PA, self.PA_err = t[6]
-            #self.sky, self.sky_err = t[7]
-            #self.error = t[8]
-            #self.chi2nu = t[9]
         else:
             self.galimage = None
         
@@ -580,17 +529,17 @@ class galfit_dir():
 class build_html_cutout():
 
     def __init__(self,cutoutdir,outdir,previous=None,next=None,tel=None,run=None):
-        ''' pass in instance of cutout_dir class and output directory '''
+        ''' pass in instance of galfit_dir class and output directory '''
         #print("in build_html_cutout!")
         
-        # instance of class cutout_dir
+        # instance of class galfit_dir
         self.cutout = cutoutdir
 
-        outfile = os.path.join(outdir,self.cutout.vfid+'.html')
+        outfile = os.path.join(outdir,self.cutout.objid+'.html')
         if args.verbose:
             print("outfile = ",outfile)
-        vfindices = np.arange(len(vfmain))
-        self.vfindex = vfindices[vfmain['VFID'] == self.cutout.vfid]
+        vfindices = np.arange(len(maincat))
+        self.objindex = vfindices[maincat['OBJID'] == self.cutout.objid]
         #print('inside build html')
         #print('coutdir = ',coutdir)
         #print('outfile = ',outfile)        
@@ -607,15 +556,17 @@ class build_html_cutout():
 
         
         #self.build_html()
+        
     def build_html(self):
         self.write_header()
         self.write_navigation_links()
         # adding this here so we can inspect the masks quickly
         # can remove once we are done with masks
 
-        bands = ['r','g','W1','W2','W3','W4']
-        bands = ['g','r','W1','W1-fixBA','W2','W3','W3-fixBA','W4']
+        #bands = ['r','g','W1','W2','W3','W4']
+        #bands = ['g','r','W1','W1-fixBA','W2','W3','W3-fixBA','W4']
         bands = ['r','W1','W1-fixBA','W3','W3-fixBA']                
+        
         for b in bands:
             self.cutout.get_galfit_model(band=b)
         
@@ -652,7 +603,7 @@ class build_html_cutout():
 
     def write_navigation_links(self):
         # Top navigation menu--
-        self.html.write(f'<h1>{self.cutout.vfid}-{self.cutout.gname}</h1>\n')
+        self.html.write(f'<h1>{self.cutout.objid}-{self.cutout.gname}</h1>\n')
 
         self.html.write('<a href="../{}">Home</a>\n'.format(self.htmlhome))
         self.html.write('<br />\n')
@@ -688,9 +639,9 @@ class build_html_cutout():
         if self.cutout.galimage is not None:
             self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')
             if 'W' in band:
-                maskpng = self.cutout.gname+'-custom-image-wise-mask.png'
+                maskpng = self.cutout.objid+'-im-wise-mask.png'
             else:
-                maskpng = self.cutout.gname+'-custom-image-r-mask.png'
+                maskpng = self.cutout.objid+'-im-r-mask.png'
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
                       self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
@@ -735,26 +686,50 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description ='create psf image from image that contains stars')
 
-    #parser.add_argument('--table-path', dest = 'tablepath', default = '/Users/rfinn/github/Virgo/tables/', help = 'path to github/Virgo/tables')
+
     parser.add_argument('--cutoutdir',dest = 'cutoutdir', default=None, help='set to cutout directory. default is the current directory, like you are running from the cutouts/ directory')
     parser.add_argument('--verbose',dest = 'verbose',default=False, action='store_true', help='set for additional print statements')    
     parser.add_argument('--oneimage',dest = 'oneimage',default=None, help='give directory for one image')
-    parser.add_argument('--outdir',dest = 'outdir',default='/data-pool/Halpha/html_dev/galfit/', help='output directory.  default is /data-pool/Halpha/html_dev/galfit/')    
+    parser.add_argument('--outdir',dest = 'outdir',default='/mnt/astrophysics/wisesize/wisesize_html/', help='output directory.  default is /mnt/astrophysics/wisesize/wisesize_html/')    
      
     args = parser.parse_args()
 
-    # get tables, define as a global variable
-    vfmain = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_main.fits')
-    ephot = fits.getdata(homedir+'/research/Virgo/tables-north/v2/vf_v2_legacy_ephot.fits')
+    
+    param_file = homedir+'/github/mucho-galfit/paramfile.txt'
+        
+    #create dictionary with keyword and values from param textfile
+    param_dict={}
+    with open(param_file) as f:
+        for line in f:
+            try:
+                key = line.split()[0]
+                val = line.split()[1]
+                param_dict[key] = val
+            except:
+                continue
 
+    
+    # get tables, define as a global variable
+    maincat = fits.getdata(param_dict['main_catalog'])
+    
+    mock_ephot_flag = param_dict['create_mock_ephot']
+    try:
+        if mock_ephot_flag:
+            ephot = fits.getdata(param_dict['mock_ephot_name'])
+        else:
+            ephot = fits.getdata(param_dict['phot_catalog'])
+    except:
+        print('etab not found. exiting.')
+        sys.exit()
+    
+    #directory which contains the subdirectories...
     topdir = os.getcwd()
 
     # get directory list to use with Previous and Next links
     rfiles = os.listdir()
     rfiles.sort()
 
-
-    
+    #where to save the html outputs
     outdir = args.outdir
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -764,7 +739,8 @@ if __name__ == '__main__':
     if not os.path.exists(args.oneimage):
         print(f"Could not find {args.oneimage} - please check the cutout directory name you provided")
         sys.exit()
-    # find index in rfiles that corresponds to image
+    # find index in rfiles (list of all subdirectories) that corresponds to image subdirectory given
+    # also a global variable..?
     coadd_index = rfiles.index(args.oneimage)
     indices = [np.arange(len(rfiles))[coadd_index]]
 
