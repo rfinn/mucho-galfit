@@ -495,10 +495,10 @@ class galfit_dir():
         pixscale=1
         
         #grab transformation matrix of unWISE image
-        pscale=np.abs(float(self.wise_header['CD1_1']))
+        pscale=np.abs(float(header['CD1_1']))
         
         #grab length of unWISE image
-        xsize=np.abs(int(self.wise_header['NAXIS1']))
+        xsize=np.abs(int(header['NAXIS1']))
         
         #convert length to arcseconds
         xsize_arcsec=pscale*3600*xsize/pixscale
