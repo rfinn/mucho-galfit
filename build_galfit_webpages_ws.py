@@ -508,8 +508,11 @@ class galfit_dir():
         
         #create filename for Legacy Survey image
         LS_name = imname.replace('-im-r.fits','-im-LS.jpg')
+        print(LS_name)
         
         image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
+        
+        print(image_url)
         
         #only pull image if it does not already exist!
         if not os.path.exists(LS_name):
