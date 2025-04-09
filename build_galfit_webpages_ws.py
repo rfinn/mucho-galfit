@@ -393,7 +393,7 @@ class galfit_dir():
         
         #get RA and DEC from maincat for the objid
         objindices = np.arange(len(maincat))
-        self.objindex = objindices[maincat['OBJID'] == self.cutout.objid]
+        self.objindex = objindices[maincat['OBJID'] == self.objid]
         self.RA = maincat['RA'][self.objindex]
         self.DEC = maincat['DEC'][self.objindex]
         
