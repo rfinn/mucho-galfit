@@ -112,11 +112,13 @@ class build_html_coadd():
             print(g)
             self.html.write('<tr>')
             self.html.write('<td>{}</td>'.format(galindex))  
-            jpg_path = os.path.join(self.outdir,f'{g}-im-LS.jpg')
+            jpg_path = os.path.join(f'{g}/{g}-im-LS.jpg')
+            
             self.html.write(f'<a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
             
             htmlpage = "{}/{}.html".format(g,g)
-            #do not think this is necessary...but I will keep it in case it is.
+            
+            #do not think the 'replace' is necessary...but I will keep it in case.
             self.html.write('<td><a href="{}">{}</td>'.format(htmlpage,g.replace('-noback-coadd','')))
 
             self.html.write('</tr>\n')
