@@ -394,8 +394,9 @@ class galfit_dir():
         #get RA and DEC from maincat for the objid
         objindices = np.arange(len(maincat))
         self.objindex = objindices[maincat['OBJID'] == self.objid]
-        self.RA = maincat['RA'][self.objindex].data
-        self.DEC = maincat['DEC'][self.objindex].data
+        self.RA = maincat['RA'][self.objindex]
+        self.DEC = maincat['DEC'][self.objindex]
+        print(self.RA)
         
     def runall(self):
         self.get_ngal()        
