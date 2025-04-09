@@ -513,16 +513,19 @@ class galfit_dir():
         imsize=str(int(xsize_arcsec))
         
         #create filename for Legacy Survey image
-        LS_name = imname.replace('-im-r.fits','-im-LS.jpg')
-        
+        LS_name = imname.replace('im-W1.fits','im-LS.jpg')
         
         image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
                 
         #only pull image if it does not already exist!
-        if not os.path.exists(LS_name):
+        if not os.path.exists(self.outdir+LS_name):
             print('LS image not found. Pulling from Legacy Survey Viewer...')
             print(f'Saving to {self.outdir+LS_name}')
-            self.LS_image = wget.download(image_url,out=self.outdir+LS_name)
+            self.LS_image = wget.download(image_url,out=LS_name)
+        else:
+            os.system(f'rm {LS_name}')
+            self.LS_image = wget.download(image_url,out=LS_name)
+            
     
 
     def get_galfit_model(self,band='r'):
