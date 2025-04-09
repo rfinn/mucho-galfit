@@ -421,7 +421,7 @@ class galfit_dir():
         search_string = '*-im-r.fits'
         t = glob.glob(search_string)
         
-        self.maskimage = self.gname+'-im-r-mask.fits'
+        self.maskimage = self.objid+'-im-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
         
         print(self.maskimage)
