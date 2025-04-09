@@ -396,7 +396,13 @@ class galfit_dir():
         self.objindex = objindices[maincat['OBJID'] == self.objid]
         self.RA = maincat['RA'][self.objindex]
         self.DEC = maincat['DEC'][self.objindex]
-        print(self.RA)
+        try:
+            #if RA and DEC in a list (for some reason), isolate the value
+            self.RA = self.RA[0]
+            self.DEC = self.DEC[0]
+        except:
+            self.RA = self.RA
+            self.DEC = self.DEC
         
     def runall(self):
         self.get_ngal()        
