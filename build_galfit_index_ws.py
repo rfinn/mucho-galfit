@@ -63,6 +63,8 @@ def write_text_table(html,labels,data):
 
 def legacy_link(ra,dec):
     return "https://www.legacysurvey.org/viewer?ra={:.4f}&dec={:.4f}&layer=ls-dr9&zoom=13".format(ra,dec)    
+
+
 ###########################################################
 ####  CLASSES
 ###########################################################
@@ -88,12 +90,14 @@ class build_html_coadd():
         self.write_coadd_list()
         #self.write_navigation_links()
         self.close_html()
+    
     def write_header(self):
         self.html.write('<html><body>\n')
         self.html.write('<style type="text/css">\n')
         self.html.write('table, td, th {padding: 5px; text-align: center; border: 1px solid black}\n')
         self.html.write('</style>\n')
-        self.html.write('<h1>VF Galfit Analysis</h1>\n')        
+        self.html.write('<h1>WISESize Galfit Analysis</h1>\n')        
+    
     def write_coadd_list(self):
         self.html.write('<table width="50%">\n')
         self.html.write('<tr>')
@@ -126,30 +130,39 @@ class build_html_coadd():
     
     def close_html(self):
         self.html.close()
+
 # wrap
 if __name__ == '__main__':
     # work through coadd directory
-    #global vmain
-
     
-    #outdir = homedir+'/research/Virgo-dev/html-dev/coadds/'
-    outdir = '/data-pool/Halpha/html_dev/galfit/'    
-    #outdir = '/home/rfinn/Virgo-dev/html-dev/coadds/'    
-
+    param_file = homedir+'/github/mucho-galfit/paramfile.txt'
+        
+    #create dictionary with keyword and values from param textfile
+    param_dict={}
+    with open(param_file) as f:
+        for line in f:
+            try:
+                key = line.split()[0]
+                val = line.split()[1]
+                param_dict[key] = val
+            except:
+                continue
+    
+    outdir = param_dict['html_outdir']
+    
     # this should contain a list of all the galaxy folders
     temp = os.listdir(outdir)
     temp.sort()
     flist1 = []
     for t in temp:
-        if 'VFID' in t:
+        if 'OBJID' in t:
             flist1.append(t)
     #print(flist1)
     galnames=[]
     for i,subdir in enumerate(flist1): # loop through list
         
 
-        #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
-        if (os.path.isdir(subdir)):# & (subdir.startswith('VF')):
+        if (os.path.isdir(subdir)):
             #print('adding ',subdir)
             galnames.append(subdir)
     #print('galnames = ',galnames)

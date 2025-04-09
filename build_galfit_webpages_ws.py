@@ -680,20 +680,7 @@ class build_html_cutout():
 # wrap
 
 if __name__ == '__main__':
-
-
-    import argparse
-
-    parser = argparse.ArgumentParser(description ='create psf image from image that contains stars')
-
-
-    parser.add_argument('--cutoutdir',dest = 'cutoutdir', default=None, help='set to cutout directory. default is the current directory, like you are running from the cutouts/ directory')
-    parser.add_argument('--verbose',dest = 'verbose',default=False, action='store_true', help='set for additional print statements')    
-    parser.add_argument('--oneimage',dest = 'oneimage',default=None, help='give directory for one image')
-    parser.add_argument('--outdir',dest = 'outdir',default='/mnt/astrophysics/wisesize/wisesize_html/', help='output directory.  default is /mnt/astrophysics/wisesize/wisesize_html/')    
-     
-    args = parser.parse_args()
-
+    
     
     param_file = homedir+'/github/mucho-galfit/paramfile.txt'
         
@@ -707,6 +694,19 @@ if __name__ == '__main__':
                 param_dict[key] = val
             except:
                 continue
+    
+    html_outdir = param_dict['html_outdir']
+    
+    import argparse
+
+    parser = argparse.ArgumentParser(description ='create psf image from image that contains stars')
+
+    parser.add_argument('--cutoutdir', dest = 'cutoutdir', default=None, help='set to cutout directory. default is the current directory, like you are running from the cutouts/ directory')
+    parser.add_argument('--verbose', dest = 'verbose', default=False, action='store_true', help='set for additional print statements')    
+    parser.add_argument('--oneimage', dest = 'oneimage', default=None, help='give directory for one image')
+    parser.add_argument('--outdir', dest = 'outdir', default=html_outdir, help=f'output directory.  default is {html_outdir}')    
+     
+    args = parser.parse_args()
 
     
     # get tables, define as a global variable
