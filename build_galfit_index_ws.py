@@ -114,7 +114,7 @@ class build_html_coadd():
             self.html.write('<td>{}</td>'.format(galindex))  
             jpg_path = os.path.join(f'{g}/{g}-im-LS.jpg')
             
-            self.html.write(f'<a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
+            self.html.write(f'<td><a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
             
             htmlpage = "{}/{}.html".format(g,g)
             
