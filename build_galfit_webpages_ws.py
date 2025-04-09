@@ -423,7 +423,9 @@ class galfit_dir():
         
         self.maskimage = self.gname+'-im-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
-
+        
+        print(self.maskname)
+        
         if not os.path.exists(self.maskimage):
             print(f"WARNING: cannot find mask image {self.maskimage}!")
             
