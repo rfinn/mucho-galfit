@@ -26,6 +26,7 @@ import os
 import sys
 import numpy as np
 import glob
+import wget
 
 from matplotlib import pyplot as plt
 from matplotlib.patches import Ellipse
@@ -390,13 +391,18 @@ class galfit_dir():
         if args.verbose:
             print("self.cutoutdir = ",self.cutoutdir)
         
+        #get RA and DEC from maincat for the objid
+        self.objindex = objindices[maincat['OBJID'] == self.cutout.objid]
+        self.RA = maincat['RA'][self.objindex]
+        self.DEC = maincat['DEC'][self.objindex]
+        
     def runall(self):
         self.get_ngal()        
-        #self.get_ned_name()
         self.gname = maincat['OBJNAME_NED'][maincat['OBJID']==self.objid]   #galaxy's NED name
         self.get_file_names()
         self.get_ellipse_params()
         self.make_png_mask()
+        self.get_legacy_image()
 
         
     def get_ngal(self):
@@ -406,16 +412,7 @@ class galfit_dir():
         self.ngal = len(mylines)
 
         if args.verbose:
-            print(f"number of galaxies = {self.ngal}")
-            
-    def get_ned_name(self):
-        """ get galaxy NED name by grabbing an image """
-
-        # running from within galfit output directory
-        t = glob.glob('*-custom-image-r.fits')[0]
-        self.gname = os.path.basename(t).split('-custom')[0]
-        print("galaxy nedname = ",self.gname)
-        
+            print(f"number of galaxies = {self.ngal}")        
                 
     def get_file_names(self):
         search_string = '*-im-r.fits'
@@ -483,7 +480,40 @@ class galfit_dir():
 
             except TypeError:
                 print('WARNING: problem making png for ',self.fitsimages[f])
-                
+    
+    
+    #pull and download scaled RGB .jpg of OBJID????? galaxy; place in galaxy's subdirectory
+    def get_legacy_image(self):
+        
+        #we have self.objid, self.RA, self.DEC (init) and can pull the OBJID image name
+        #I am (hopefully) still in the OBJID????? subdirectory!
+        imname = f"{self.objid}-im-W1.fits"   #use W1 image header as referece
+        im,header=fits.getdata(imname,header=True)
+        
+        #define pixscale for url (1 is standard)
+        pixscale=1
+        
+        #grab transformation matrix of unWISE image
+        pscale=np.abs(float(self.wise_header['CD1_1']))
+        
+        #grab length of unWISE image
+        xsize=np.abs(int(self.wise_header['NAXIS1']))
+        
+        #convert length to arcseconds
+        xsize_arcsec=pscale*3600*xsize/pixscale
+        
+        #convert length to an integer, then to a string
+        imsize=str(int(xsize_arcsec))
+        
+        #create filename for Legacy Survey image
+        LS_name = imname.replace('-im-r.fits','-im-LS.jpg')
+        
+        image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
+        
+        #only pull image if it does not already exist!
+        if not os.path.exists(LS_name):
+            image = wget.download(image_url,out=LS_name)
+    
 
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
@@ -540,8 +570,8 @@ class build_html_cutout():
         outfile = os.path.join(outdir,self.cutout.objid+'.html')
         if args.verbose:
             print("outfile = ",outfile)
-        vfindices = np.arange(len(maincat))
-        self.objindex = vfindices[maincat['OBJID'] == self.cutout.objid]
+        objindices = np.arange(len(maincat))
+        self.objindex = objindices[maincat['OBJID'] == self.cutout.objid]
         #print('inside build html')
         #print('coutdir = ',coutdir)
         #print('outfile = ',outfile)        
@@ -593,6 +623,7 @@ class build_html_cutout():
         #self.write_morph_table()        
         self.write_navigation_links()
         self.close_html()
+    
     def write_header(self):
         # title
         # home link
