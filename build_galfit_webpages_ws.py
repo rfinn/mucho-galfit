@@ -681,7 +681,14 @@ class build_html_cutout():
     def write_galfit_images(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
         if self.cutout.galimage is not None:
-            self.html.write(f'<h2>GALFIT {band} Modeling </h2>\n')
+            
+            #aesthetics. :-)
+            if band in 'grz':
+                band_header=f'{band}-band'
+            else:
+                band_header=band
+            
+            self.html.write(f'<h2>GALFIT {band_header} Modeling </h2>\n')
             if 'W' in band:
                 maskpng = self.cutout.objid+'-im-wise-mask.png'
             else:
@@ -695,6 +702,13 @@ class build_html_cutout():
     
     def write_galfit_table(self,band='r'):
         ''' display galfit model and fit parameters for r-band image '''
+        
+        #aesthetics. :-)
+        if band in 'grz':
+            band_header=f'{band}-band'
+        else:
+            band_header=band
+
         self.html.write(f'<h4>GALFIT Sersic Parameters for {band}</h4>\n')                
         labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
 

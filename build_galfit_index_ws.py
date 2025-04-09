@@ -77,10 +77,7 @@ class build_html_coadd():
 
         outfile = os.path.join(outdir,'index.html')
         self.outdir = outdir
-
-        #print('inside build html')
-        #print('coutdir = ',coutdir)
-        #print('outfile = ',outfile)        
+        
         self.html = open(outfile,'w')
         self.galnames = gallist
         self.build_html()
@@ -96,12 +93,12 @@ class build_html_coadd():
         self.html.write('<style type="text/css">\n')
         self.html.write('table, td, th {padding: 5px; text-align: center; border: 1px solid black}\n')
         self.html.write('</style>\n')
-        self.html.write('<h1>WISESize Galfit Analysis</h1>\n')        
+        self.html.write('<h1>WISESize GALFIT Analysis</h1>\n')        
     
     def write_coadd_list(self):
         self.html.write('<table width="50%">\n')
         self.html.write('<tr>')
-        colnames = ['Index','Galaxy']
+        colnames = ['Index','Legacy Image','Galaxy']
         for i,l in enumerate(colnames):
             if i == 1:
                 colspan=2
@@ -110,17 +107,16 @@ class build_html_coadd():
             self.html.write('<th colspan="{}">{}</th>'.format(colspan,l))
         self.html.write('</tr></p>\n')            
 
-        #vfindices = np.arange(len(vfmain))
-        # write one row for each galaxy
-        #print('galnames = ',self.galnames)
         galindex = 1
         for i,g in enumerate(self.galnames):
             print(g)
-            jpg_path = os.path.join(self.outdir,'r-coadd.png')
-            
             self.html.write('<tr>')
-            self.html.write('<td>{}</td>'.format(galindex))            
+            self.html.write('<td>{}</td>'.format(galindex))  
+            jpg_path = os.path.join(self.outdir,f'{g}-im-LS.jpg')
+            self.html.write(f'<a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
+            
             htmlpage = "{}/{}.html".format(g,g)
+            #do not think this is necessary...but I will keep it in case it is.
             self.html.write('<td><a href="{}">{}</td>'.format(htmlpage,g.replace('-noback-coadd','')))
 
             self.html.write('</tr>\n')
