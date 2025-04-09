@@ -394,8 +394,8 @@ class galfit_dir():
         #get RA and DEC from maincat for the objid
         objindices = np.arange(len(maincat))
         self.objindex = objindices[maincat['OBJID'] == self.objid]
-        self.RA = maincat['RA'][self.objindex]
-        self.DEC = maincat['DEC'][self.objindex]
+        self.RA = maincat['RA'][self.objindex].data
+        self.DEC = maincat['DEC'][self.objindex].data
         
     def runall(self):
         self.get_ngal()        
@@ -516,6 +516,7 @@ class galfit_dir():
         
         #only pull image if it does not already exist!
         if not os.path.exists(LS_name):
+            print('LS image not found. pulling from legacy survey viewer)
             image = wget.download(image_url,out=LS_name)
     
 
