@@ -515,7 +515,7 @@ class galfit_dir():
         #create filename for Legacy Survey image
         LS_name = imname.replace('im-W1.fits','im-LS.jpg')
         
-        self.image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
+        image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
                 
         path = os.path.join(self.outdir,LS_name)
         if not os.path.exists(path):
