@@ -373,8 +373,7 @@ class galfit_dir():
 
         This creates the png images for different cutouts
         '''
-        # this returns the OBJID
-        # the galname should be the NED name that JM uses
+
         self.objid = cutoutdir
 
         if args.verbose:
@@ -515,16 +514,15 @@ class galfit_dir():
         
         #create filename for Legacy Survey image
         LS_name = imname.replace('-im-r.fits','-im-LS.jpg')
-        print(LS_name)
+        
         
         image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
-        
-        print(image_url)
-        
+                
         #only pull image if it does not already exist!
         if not os.path.exists(LS_name):
-            print('LS image not found. pulling from legacy survey viewer')
-            image = wget.download(image_url,out=LS_name)
+            print('LS image not found. Pulling from Legacy Survey Viewer...')
+            print(f'Saving to {self.outdir+LS_name}')
+            self.LS_image = wget.download(image_url,out=self.outdir+LS_name)
     
 
     def get_galfit_model(self,band='r'):
