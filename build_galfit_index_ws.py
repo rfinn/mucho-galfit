@@ -98,7 +98,7 @@ class build_html_coadd():
     def write_coadd_list(self):
         self.html.write('<table width="50%">\n')
         self.html.write('<tr>')
-        colnames = ['Index','Legacy Image','Galaxy']
+        colnames = ['Index','Galaxy']
         for i,l in enumerate(colnames):
             if i == 1:
                 colspan=2
