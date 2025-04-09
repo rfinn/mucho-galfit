@@ -393,7 +393,7 @@ class galfit_dir():
     def runall(self):
         self.get_ngal()        
         #self.get_ned_name()
-        self.gname = maincat['OBJNAME_NED']   #galaxy's NED name
+        self.gname = maincat['OBJNAME_NED'][maincat['OBJID']==self.objid]   #galaxy's NED name
         self.get_file_names()
         self.get_ellipse_params()
         self.make_png_mask()
@@ -468,7 +468,7 @@ class galfit_dir():
             except TypeError:
                 continue
             try:
-                if (i < 4) & ~(i == (len(self.fitsimages)-2)):
+                if (i < 4) & not (i == (len(self.fitsimages)-2)):
                     make_png(self.fitsimages[f],pngfile,mask=None)  #just save mask as .png
                 elif i == (len(self.fitsimages)-2): #add ellipse to mask image, then save
                     if self.ellipseparams is not None:
