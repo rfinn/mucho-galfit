@@ -516,7 +516,7 @@ class galfit_dir():
         
         #only pull image if it does not already exist!
         if not os.path.exists(LS_name):
-            print('LS image not found. pulling from legacy survey viewer)
+            print('LS image not found. pulling from legacy survey viewer')
             image = wget.download(image_url,out=LS_name)
     
 
