@@ -320,7 +320,7 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
 
     outim = [f'galfit_image{suffix}.png',\
            f'galfit_model{suffix}.png',\
-           f'galfit_residual{suffix}.png',\
+           f'galfit_residual_imstretch{suffix}.png',\
             f'galfit_residual{suffix}.png']
 
     if outdir is not None:
@@ -538,13 +538,13 @@ class galfit_dir():
             display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,
                                  ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
-            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png',
+            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual{band}.png',
                     f'galfit_residual_imstretch_{band}.png']
         
             self.galimage = os.path.join(self.outdir,outim[0])
             self.galmodel = os.path.join(self.outdir,outim[1])
             self.galresidual = os.path.join(self.outdir,outim[2])
-            self.galresidual_imstretch = os.path.join(self.outdir,outim[2])
+            self.galresidual_imstretch = os.path.join(self.outdir,outim[3])
 
             # store fitted parameters
 
@@ -661,15 +661,15 @@ class build_html_cutout():
                 maskpng = self.cutout.objid+'-im-wise-mask.png'
             else:
                 maskpng = self.cutout.objid+'-im-r-mask.png'
-            images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
-                      self.cutout.galresidual_imstretch, self.cutout.pngimages['mask']]
+            images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual_imstretch,\
+                      self.cutout.galresidual, self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
-            labels = ['Image', 'Model', 'Residual (Hard Stretch)', 'Residual (Image Stretch)', 'Mask']
+            labels = ['Image', 'Model', 'Residual (Image Stretch)', 'Residual (Hard Stretch)', 'Mask']
             write_table(self.html,images=images,labels=labels)
 
     
     def write_galfit_table(self,band='r'):
-        ''' display galfit model and fit parameters for r-band image '''
+        ''' display galfit model and fit parameters for {band} image '''
         
         #aesthetics. :-)
         band_header=f'{band}-band'
