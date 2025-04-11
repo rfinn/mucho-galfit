@@ -291,8 +291,8 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
         pass
     
     imwcs = wcs.WCS(h)
-    images = [image,model,residual,residual]   #want one image-stretch, one hard-stretch residual
-    titles = ['image','model','residual','residual']
+    images = [image,model,residual]
+    titles = ['image','model','residual']
     if mask is not None:
         print("\nshape of image = ",image.shape)
         print("shape of mask = ",mask.shape)
@@ -306,22 +306,18 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
 
             print("no mask for galfit ",galfile)
         
-        #third element in this array ensures one of two residuals is image-stetched
         norms = [simple_norm(im,'asinh',max_percent=percentile2),
-               simple_norm(im,'asinh',max_percent=percentile2),
                simple_norm(im,'asinh',max_percent=percentile2),
                simple_norm(res,'asinh',max_percent=percentile2,min_percent=20)]
 
     else:
         norms = [simple_norm(image,'asinh',max_percent=percentile2),
                simple_norm(image,'asinh',max_percent=percentile2),
-               simple_norm(image,'asinh',max_percent=percentile2),
                simple_norm(residual,'asinh',max_percent=percentile2)]
 
     outim = [f'galfit_image{suffix}.png',\
            f'galfit_model{suffix}.png',\
-           f'galfit_residual{suffix}.png',\
-            f'galfit_residual{suffix}.png']
+           f'galfit_residual{suffix}.png']
 
     if outdir is not None:
         outim = [os.path.join(outdir,f) for f in outim]
@@ -335,9 +331,8 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
         plt.xlabel('RA (deg)',fontsize=16)
         plt.ylabel('DEC (deg)',fontsize=16)
         #plt.title(titles[i],fontsize=16)
-        
-        #give ellipses to BOTH residuals!
-        if ((i == 2)|(i == 3)) and (ellipseparams is not None):
+
+        if (i == 2) and (ellipseparams is not None):
             # plot the ellipse
             plot_ellipse(plt.gca(),ellipseparams)
         plt.savefig(outim[i])
@@ -538,13 +533,11 @@ class galfit_dir():
             display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,
                                  ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
-            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png',
-                    f'galfit_residual_imstretch_{band}.png']
+            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png']
         
             self.galimage = os.path.join(self.outdir,outim[0])
             self.galmodel = os.path.join(self.outdir,outim[1])
-            self.galresidual = os.path.join(self.outdir,outim[2])
-            self.galresidual_imstretch = os.path.join(self.outdir,outim[2])
+            self.galresidual = os.path.join(self.outdir,outim[2])        
 
             # store fitted parameters
 
@@ -586,7 +579,9 @@ class build_html_cutout():
         #              self.legacy_g,self.legacy_r,self.legacy_z,\
         #              self.w1,self.w2,self.w3,self.w4]
 
-                
+        
+        #self.build_html()
+        
     def build_html(self):
         self.write_header()
         self.write_navigation_links()
@@ -602,7 +597,23 @@ class build_html_cutout():
         
             self.write_galfit_images(band=b)
             self.write_galfit_table(band=b)
-     
+        #self.write_image_stats()
+        #if self.cutout.legacy_flag:
+        #    self.write_legacy_images()
+
+        #self.write_sfr_images()
+        #if self.cutout.wise_flag:
+        #    self.write_wise_images()
+        #self.write_halpha_images()
+        #if self.cutout.galimage is not None:
+        #    self.write_galfit_images()
+        #    self.write_galfit_table()
+        #try:
+        #    self.write_phot_profiles()
+        #except AttributeError:
+        #    pass
+        #self.write_mag_table()
+        #self.write_morph_table()        
         self.write_navigation_links()
         self.close_html()
     
@@ -650,7 +661,7 @@ class build_html_cutout():
     
 
     def write_galfit_images(self,band='r'):
-        ''' display galfit model and fit parameters for {band} image '''
+        ''' display galfit model and fit parameters for r-band image '''
         if self.cutout.galimage is not None:
             
             #aesthetics. :-)
@@ -662,9 +673,9 @@ class build_html_cutout():
             else:
                 maskpng = self.cutout.objid+'-im-r-mask.png'
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual,\
-                      self.cutout.galresidual_imstretch, self.cutout.pngimages['mask']]
+                      self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
-            labels = ['Image', 'Model', 'Residual (Hard Stretch)', 'Residual (Image Stretch)', 'Mask']
+            labels = ['Image', 'Model', 'Residual','Mask']
             write_table(self.html,images=images,labels=labels)
 
     
