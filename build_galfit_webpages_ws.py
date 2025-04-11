@@ -538,7 +538,7 @@ class galfit_dir():
             display_galfit_model(self.galfit,outdir=self.outdir,mask=mask,
                                  ellipseparams=self.ellipseparams,suffix=f"_{band}")
 
-            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual{band}.png',
+            outim = [f'galfit_image_{band}.png',f'galfit_model_{band}.png',f'galfit_residual_{band}.png',
                     f'galfit_residual_imstretch_{band}.png']
         
             self.galimage = os.path.join(self.outdir,outim[0])
