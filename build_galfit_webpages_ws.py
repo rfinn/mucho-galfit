@@ -158,13 +158,11 @@ def buildone(subdir,outdir,flist):
         #    print('WARNING: problem building webpage for ',subdir)
     
 
-def display_image(image,percentile1=.5,percentile2=99.5,stretch='asinh',mask=None,sigclip=True,zoom=None):
-    if zoom is not None:
-        print("who's zoomin' who?")
-        # display central region of image
+def zoom_im(image):
+    # display central region of image
         
         # get image dimensions and center
-        xmax,ymax = image.shape
+        xmax,ymax = mask_image.shape
         xcenter = int(xmax/2)
         ycenter = int(ymax/2)
         
@@ -187,11 +185,21 @@ def display_image(image,percentile1=.5,percentile2=99.5,stretch='asinh',mask=Non
             x2 = xmax
         if (y2 > ymax):
             y2 = ymax
+            
+        return x1,x2,y1,y2
+
+
+#ONLY USED FOR MASK??   
+def display_image(image,percentile1=.5,percentile2=99.5,stretch='asinh',mask=None,sigclip=True,zoom=None):
+    if zoom is not None:
+        
+        x1,x2,y1,y2 = zoom_im(mask_image)
 
         # cut images to new size
         image = image[x1:x2,y1:y2]
         if mask is not None:
             mask = mask[x1:x2,y1:y2]
+    
     # use inner 80% of image
     xdim,ydim = image.shape
     xmin = int(.1*xdim)
@@ -221,9 +229,9 @@ def display_image(image,percentile1=.5,percentile2=99.5,stretch='asinh',mask=Non
 
     norm = simple_norm(clipped_data, stretch=stretch,max_percent=percentile2,min_percent=percentile1)
 
-    plt.imshow(image, norm=norm,cmap='gray_r',origin='lower')#,vmin=v1,vmax=v2)
+    plt.imshow(image, vmin=0, vmax=1 ,cmap='gray_r',origin='lower')
     
-
+#also only used for mask..?
 def make_png(fitsimage,outname,mask=None,ellipseparams=None):
     imdata,imheader = fits.getdata(fitsimage,header=True)
     fig = plt.figure(figsize=(6,6))
@@ -272,33 +280,8 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
     residual = fits.getdata(galfile,3)
 
     if zoom is not None:
-        print("who's zoomin' who?")
-        # display central region of image
-
-        # get image dimensions and center
-        ymax,xmax = image.shape
-        xcenter = int(xmax/2)
-        ycenter = int(ymax/2)
-
-        # calculate new size to display based on zoom factor
-        new_xradius = int(xmax/2/(float(zoom)))
-        new_yradius = int(ymax/2/(float(zoom)))
-
-        # calculate pixels to keep based on zoom factor
-        x1 = xcenter - new_xradius
-        x2 = xcenter + new_xradius
-        y1 = ycenter - new_yradius
-        y2 = ycenter + new_yradius
-
-        # check to make sure limits are not outside image dimensions
-        if (x1 < 1):
-            x1 = 1
-        if (y1 < 1):
-            y1 = 1
-        if (x2 > xmax):
-            x2 = xmax
-        if (y2 > ymax):
-            y2 = ymax
+        
+        x1,y1,x2,y2 = zoom_im(image)
 
         # cut images to new size
         # python is data[row,col]
@@ -349,7 +332,6 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
         plt.ylabel('DEC (deg)',fontsize=16)
         #plt.title(titles[i],fontsize=16)
 
-        # TODO add ellipse to the residual image
         if (i == 2) and (ellipseparams is not None):
             # plot the ellipse
             plot_ellipse(plt.gca(),ellipseparams)
@@ -663,7 +645,7 @@ class build_html_cutout():
     
 
     def write_wise_images(self):
-        ''' w1 - w4 images '''
+        ''' W1 - W4 images '''
         self.html.write('<h2>WISE Images</h2>\n')
         pngimages = [self.cutout.pngimages['w1'],self.cutout.pngimages['w2'],\
                      self.cutout.pngimages['w3'],self.cutout.pngimages['w4']]
@@ -683,10 +665,7 @@ class build_html_cutout():
         if self.cutout.galimage is not None:
             
             #aesthetics. :-)
-            if band in 'grz':
-                band_header=f'{band}-band'
-            else:
-                band_header=band
+            band_header='{band}-band'
             
             self.html.write(f'<h2>GALFIT {band_header} Modeling </h2>\n')
             if 'W' in band:
@@ -704,12 +683,9 @@ class build_html_cutout():
         ''' display galfit model and fit parameters for r-band image '''
         
         #aesthetics. :-)
-        if band in 'grz':
-            band_header=f'{band}-band'
-        else:
-            band_header=band
+        band_header=f'{band}-band'
 
-        self.html.write(f'<h4>GALFIT Sersic Parameters for {band}</h4>\n')                
+        self.html.write(f'<h4>GALFIT Sersic Parameters for {band_header}</h4>\n')                
         labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
 
 
