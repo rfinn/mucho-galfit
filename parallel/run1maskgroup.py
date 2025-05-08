@@ -211,10 +211,6 @@ class buildgroupmask(buildmask):
         print("object number returned from read_se_cat = ", objnumber)
         self.get_gaia_stars() # maskwrapper method
         self.add_gaia_masks() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
 
         ##################################
         ### METHODS FROM THIS CLASS
@@ -234,7 +230,17 @@ class buildgroupmask(buildmask):
         ##################################
         self.remove_center_object() # remove center object flag is false in the init function
         #m.remove_gals(xgals,ygals)
-        #self.write_mask()        
+        #self.write_mask()
+
+        ##################################
+        ### GROW MASK
+        ##################################
+
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        
         self.show_mask_mpl()
         
     def get_galaxies_in_fov(self):
