@@ -98,7 +98,7 @@ VirgoFlag = True
 if 'mg_output_wisesize' in cdir:
     VirgoFlag = False
     # open paramfile.txt
-    param_file = homedir+'/github/mucho-galfit/paramfile.txt'
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
     #create dictionary with keyword and values from param textfile
     param_dict={}
     with open(param_file) as f:
@@ -211,10 +211,6 @@ class buildgroupmask(buildmask):
         print("object number returned from read_se_cat = ", objnumber)
         self.get_gaia_stars() # maskwrapper method
         self.add_gaia_masks() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
-        self.grow_mask() # maskwrapper method
 
         ##################################
         ### METHODS FROM THIS CLASS
@@ -234,7 +230,17 @@ class buildgroupmask(buildmask):
         ##################################
         self.remove_center_object() # remove center object flag is false in the init function
         #m.remove_gals(xgals,ygals)
-        #self.write_mask()        
+        #self.write_mask()
+
+        ##################################
+        ### GROW MASK
+        ##################################
+
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        self.grow_mask() # maskwrapper method
+        
         self.show_mask_mpl()
         
     def get_galaxies_in_fov(self):
@@ -352,7 +358,8 @@ class buildgroupmask(buildmask):
             se_gal_flag[flag] = True
 
         print("SE objids for galaxies in FOV = ",se_objid)
-        
+        # TODO - on monday, play with scale factor - probably needs to be 3.1 or 3.2
+        # TODO - also check if we need to scale B/A because factor of 3 seems to be ok along semi-major axis but not semi-minor
         self.objsma_pixels = self.A_IMAGE[se_gal_flag] * 3.2 # factor of three from SE user manual
         self.objsma = self.objsma_pixels * self.pscalex.value * 3600
 
@@ -574,7 +581,25 @@ def get_maskname(image):
                                                                                                   
 if __name__ == '__main__':
 
+    # TODO : if ellip phot file is NONE, remove the SE objects that are at each galaxy position
+    
+    # run this from /mnt/astrophysics
 
+    # DONE: move galfit output to a new destination
+    # /mnt/astrophysics/rfinn/muchogalfit-output
+
+    # TODO : change to run from current directory which should be path_to_images, don't assume or change to a directory
+
+    # TODO : remove any other path dependencies to virgo and fix with statements at the beginning
+
+    # reorganizing to run from the root image directory, where each galaxy/group has its own subdir
+    # topdir = '/mnt/astrophysics/rfinn/muchogalfit-output/'
+    #try:
+    #    os.chdir(topdir)
+    #except FileNotFoundError: # assuming that we are running on virgo vms or draco
+    #    topdir = '/mnt/astrophysics/muchogalfit-output/'
+    #    os.chdir(topdir)
+    # take as input the galaxy name
     topdir = os.getcwd()
 
     galid = sys.argv[1]
@@ -612,11 +637,6 @@ if __name__ == '__main__':
             print("Exiting program...")
             sys.exit()
 
-
-    
-
-    
-        
     for bandpass in ['r','W1']:
         if VirgoFlag:
             objname = etab['GALAXY'][matchindex]
