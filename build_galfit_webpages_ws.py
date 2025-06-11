@@ -392,7 +392,7 @@ class galfit_dir():
         
     def runall(self):
         self.get_ngal()        
-        self.gname = maincat['OBJNAME_NED'][maincat['OBJID']==self.objid]   #galaxy's NED name
+        self.gname = maincat['OBJNAME'][maincat['OBJID']==self.objid]   #galaxy's NED name
         self.get_file_names()
         self.get_ellipse_params()
         self.make_png_mask()

@@ -22,6 +22,10 @@ def create_OBJIDs(unique_cat):
     unique_cat['OBJID'] = formatted_strings  #add the new column
     return unique_cat
     
+def isolate_G_objects(unique_cat):
+    G_flag = (unique_cat['OBJTYPE']=='G')
+    return unique_cat[G_flag]
+    
 def save_table(unique_cat,main_catalog_name,overwrite_flag=True):
     unique_cat.write(main_catalog_name,overwrite=overwrite_flag)
     
@@ -79,6 +83,7 @@ if __name__ == '__main__':
     
     stacked_catalog = stack_cats(north_cat, south_cat, data_root_dir)
     unique_catalog = unique_cats(stacked_catalog)
+    unique_catalog = isolate_G_objects(unique_catalog)
     save_table(unique_catalog, main_catalog, overwrite_flag=True)   
     
     #if no ephot tab, make one (or rather, a "placeholder" for when running GALFIT)
