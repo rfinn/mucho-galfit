@@ -157,16 +157,16 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         data_dir = f'{data_root_dir}dr9-north/{ra_slice}/'
     if dec<32.:
         data_dir = f'{data_root_dir}dr9-south/{ra_slice}/'
-    
-    print(data_dir)
-    
+        
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
 
     group_name = radec_to_groupname(ra, dec, prefix='')
     
-    funpack_all(data_root_dir, output_loc)
+    data_dir = data_dir+group_name
+    
+    funpack_all(data_dir, output_loc)
     
     
         
