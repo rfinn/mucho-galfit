@@ -53,8 +53,9 @@ def funpack_image(input_,output,nhdu=1):
     #print('finished unpacking image')
 
 def funpack_all(start_dir, output_dir):
-    
+    print(start_dir)
     for filename in os.listdir(start_dir):
+        print(filename)
         if '.fz' in filename:
             funpack_image(filename, output_dir+filename.replace('.fz',''), nhdu=1)
     
