@@ -215,7 +215,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 
 if __name__ == '__main__':
     
-    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile-onegaltest.txt'
+    param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
     param_dict={}
