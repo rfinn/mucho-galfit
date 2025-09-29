@@ -54,7 +54,7 @@ def funpack_image(input_,output,nhdu=1):
 
 def funpack_all(start_dir, output_dir):
     
-    for filename in os.listdir():
+    for filename in os.listdir(start_dir):
         if '.fz' in filename:
             funpack_image(filename, output_dir+filename.replace('.fz',''), nhdu=1)
     
@@ -163,7 +163,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
 
-    radec_to_groupname(ra, dec, prefix='')
+    group_name = radec_to_groupname(ra, dec, prefix='')
     
     funpack_all(data_root_dir, output_loc)
     
@@ -197,7 +197,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
-        invvar_image = f'{objid}-invvar-{bandpass}.fits'
+        invvar_image = f'{group_name}-invvar-{bandpass}.fits'
 
         # check if noise image exists in output_dir, if not make it from invvar 
         sigma_image = invvar_image.replace('invvar','std')
