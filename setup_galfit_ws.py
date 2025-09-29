@@ -40,10 +40,6 @@ from SGA import get_galaxy_galaxydir
 ##########################################################################     
 
 #functions to change .fits.fz to .fits
-def funpack_image_cfitsio(input_,output):
-    command = 'funpack -O {} {}'.format(output,input_)
-    print(command)
-    os.system(command)
     
 def funpack_image(input_,output,nhdu=0):
     hdu = fits.open(input_)
@@ -53,9 +49,7 @@ def funpack_image(input_,output,nhdu=0):
     #print('finished unpacking image')
 
 def funpack_all(start_dir, output_dir):
-    print(start_dir)
     for filename in os.listdir(start_dir):
-        print(filename)
         if '.fz' in filename:
             funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''))
     
@@ -166,7 +160,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     data_dir = data_dir+group_name+'/'
     
-    funpack_all(data_dir, output_loc)
+    funpack_all(data_dir, output_dir)
     
     
         
