@@ -45,7 +45,7 @@ def funpack_image_cfitsio(input_,output):
     print(command)
     os.system(command)
     
-def funpack_image(input_,output,nhdu=1):
+def funpack_image(input_,output,nhdu=0):
     hdu = fits.open(input_)
     print('input_ file = ',input_)
     fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
@@ -57,7 +57,7 @@ def funpack_all(start_dir, output_dir):
     for filename in os.listdir(start_dir):
         print(filename)
         if '.fz' in filename:
-            funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''), nhdu=1)
+            funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''))
     
 #unpack composite images into their constituent wavelength bands
 def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
