@@ -41,12 +41,16 @@ from SGA import get_galaxy_galaxydir
 
 #functions to change .fits.fz to .fits
     
-def funpack_image(input_,output,nhdu=0):
-    hdu = fits.open(input_)
-    print('input_ file = ',input_)
-    fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
-    hdu.close()
-    #print('finished unpacking image')
+def funpack_image(input_, output):
+    hdu_list = fits.open(input_)
+    #find first HDU with data
+    for h in hdu_list:
+        if h.data is not None:
+            fits.writeto(output, h.data, header=h.header, overwrite=True)
+            hdu_list.close()
+            return
+    print(f"Warning: no data found in {input_}")
+    hdu_list.close()
 
 def funpack_all(start_dir, output_dir):
     for filename in os.listdir(start_dir):
