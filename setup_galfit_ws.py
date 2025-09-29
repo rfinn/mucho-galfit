@@ -157,6 +157,8 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     if dec<32.:
         data_dir = f'{data_root_dir}dr9-south/{ra_slice}/'
     
+    print(data_dir)
+    
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
