@@ -57,7 +57,7 @@ def funpack_all(start_dir, output_dir):
     for filename in os.listdir(start_dir):
         print(filename)
         if '.fz' in filename:
-            funpack_image(filename, output_dir+filename.replace('.fz',''), nhdu=1)
+            funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''), nhdu=1)
     
 #unpack composite images into their constituent wavelength bands
 def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
