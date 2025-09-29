@@ -192,7 +192,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
-        invvar_image = f'{group_name}-invvar-{bandpass}.fits'
+        invvar_image = f'SGA2025_{group_name}-invvar-{bandpass}.fits'
 
         # check if noise image exists in output_dir, if not make it from invvar 
         sigma_image = invvar_image.replace('invvar','std')
