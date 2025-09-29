@@ -30,29 +30,41 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
+#importing JM's code
+sys.path.insert(0,'../SGA/py/SGA')
+from SGA import get_galaxy_galaxydir
+
+
 ##########################################################################     
 ### FUNCTIONS
 ##########################################################################     
 
 #functions to change .fits.fz to .fits
-def funpack_image_cfitsio(input,output):
-    command = 'funpack -O {} {}'.format(output,input)
+def funpack_image_cfitsio(input_,output):
+    command = 'funpack -O {} {}'.format(output,input_)
     print(command)
     os.system(command)
-def funpack_image(input,output,nhdu=1):
-    hdu = fits.open(input)
-    print('input file = ',input)
+    
+def funpack_image(input_,output,nhdu=1):
+    hdu = fits.open(input_)
+    print('input_ file = ',input_)
     fits.writeto(output,data=hdu[nhdu].data, header=hdu[nhdu].header, overwrite=True)
     hdu.close()
     #print('finished unpacking image')
 
+def funpack_all(start_dir, output_dir):
+    
+    for filename in os.listdir():
+        if '.fz' in filename:
+            funpack_image(filename, output_dir+filename.replace('.fz',''), nhdu=1)
+    
 #unpack composite images into their constituent wavelength bands
 def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
     
     ims=fits.open(path_to_im+im_name)
     header_im = ims[0].header
-    header_invvar = ims[1].header
-
+    header_invvar = ims[1].header    
+    
     if grz:
         g_im, r_im, z_im = ims[0].data[0], ims[0].data[1], ims[0].data[2]
         g_inv, r_inv, z_inv = ims[1].data[0], ims[1].data[1], ims[1].data[2]
@@ -73,10 +85,7 @@ def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
         
         wise_im_names = [f'{objid}-im-W1.fits', f'{objid}-im-W2.fits', f'{objid}-im-W3.fits', f'{objid}-im-W4.fits',
                         f'{objid}-invvar-W1.fits', f'{objid}-invvar-W2.fits', f'{objid}-invvar-W3.fits', f'{objid}-invvar-W4.fits']
-        #wise_im_names = [im_name.replace('-unwise.fits','-im-W1.fits'),im_name.replace('-unwise.fits','-im-W2.fits'),
-        #                im_name.replace('-unwise.fits','-im-W3.fits'),im_name.replace('-unwise.fits','-im-W4.fits'),
-        #                im_name.replace('-unwise.fits','-invvar-W1.fits'),im_name.replace('-unwise.fits','-invvar-W2.fits'),
-        #                im_name.replace('-unwise.fits','-invvar-W3.fits'),im_name.replace('-unwise.fits','-invvar-W4.fits')]
+
         wise_ims = [w1_im,w2_im,w3_im,w4_im,w1_inv,w2_inv,w3_inv,w4_inv]
         
         for i,filename in enumerate(wise_im_names):
@@ -105,6 +114,19 @@ def convert_invvar_noise(invvar_image, noise_image):
 
     # write out as noise image
     fits.writeto(noise_image,noise_data,header=header,overwrite=True)
+
+    
+def radec_to_groupname(ra, dec, prefix=''):
+    
+    #36-arcsec precision (0.01 degrees)
+    ra1, dec1 = np.atleast_1d(ra), np.atleast_1d(dec)
+    
+    group_name = '{}{:05d}{}{:04d}'.format(
+            prefix, int(100*ra1), 'm' if dec1 < 0 else 'p',
+            int(100*np.abs(dec1))))
+
+    return group_name  
+    
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
 def get_images(objid,ra,dec,output_loc,data_root_dir):
@@ -121,51 +143,55 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
 
-    #data_root_dir is where JM's input images are initially stored
+    #data_root_dir is where JM's input_ images are initially stored
     if not os.path.exists(data_root_dir):
         print(f"could not find data_root_dir - exiting")
         sys.exit()
     
     #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
-    ra_val = f'{np.trunc(ra):03.0f}'
-    
-    #ra_val = str(int(ra)) if len(str(int(ra)))==3 else '0'+str(int(ra))
-    
+    #ra_slice = f'{np.trunc(ra):03.0f}'
+    ra_slice = f'{int(ra):03d}'
+        
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog. else, south catalog.
-        data_dir = f'{data_root_dir}dr9-north/native/{ra_val}/'
+        data_dir = f'{data_root_dir}dr9-north/{ra_slice}/'
     if dec<32.:
-        data_dir = f'{data_root_dir}dr9-south/native/{ra_val}/'
-    
+        data_dir = f'{data_root_dir}dr9-south/{ra_slice}/'
     
     if not os.path.exists(data_dir):
         print(f"could not find data_dir - exiting")
         sys.exit()
 
-    #np.trunc only works with integers...the "truncated" will convert ra and dec to their integers and 4 decimal places,
+    radec_to_groupname(ra, dec, prefix='')
+    
+    funpack_all(data_root_dir, output_loc)
+    
+    
+        
+    #np.trunc only works with integers...the "truncated" will convert ra and dec to their integers and 3 decimal places,
     #all formatted as an integer. 131.200847 becomes 1312008, etc.
     #adapted from John Moustakas' code.
-    precision=4
-    ratrunc = np.trunc((10.**precision) * ra).astype(int).astype(str)
-    dectrunc = np.trunc((10.**precision) * abs(dec)).astype(int).astype(str)
+    #precision=3   #36" precision, or 0.01 degrees
+    #ratrunc = np.trunc((10.**precision) * ra).astype(int).astype(str)
+    #dectrunc = np.trunc((10.**precision) * abs(dec)).astype(int).astype(str)
     
     #the following pads the left size with zeros, if needed
-    zra = ratrunc.zfill(7)
-    zdec = dectrunc.zfill(6)
+    #zra = ratrunc.zfill(7)
+    #zdec = dectrunc.zfill(6)
     
     #convert to xxx.xxxx (RA) or xx.xxxx (DEC)
-    ra_string = zra[:-precision]+'.'+zra[-precision:]
-    dec_string = zdec[:-precision]+'.'+zdec[-precision:]
+    #ra_string = zra[:-precision]+'.'+zra[-precision:]
+    #dec_string = zdec[:-precision]+'.'+zdec[-precision:]
     
-    if dec > 0.:
-        im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
-    else:
-        #if dec < 0., then the 'string' will have a negative in front that must be accounted for
-        im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
+    #if dec > 0.:
+    #    im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
+    #else:
+    #    #if dec < 0., then the 'string' will have a negative in front that must be accounted for
+    #    im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
     
-    extract_bands(data_dir,output_dir,objid,im_name=im_name_grz,grz=True)
+    #extract_bands(data_dir,output_dir,objid,im_name=im_name_grz,grz=True)
     
-    im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
-    extract_bands(data_dir,output_dir,objid,im_name=im_name_wise,WISE=True)
+    #im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
+    #extract_bands(data_dir,output_dir,objid,im_name=im_name_wise,WISE=True)
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
@@ -277,7 +303,7 @@ if __name__ == '__main__':
         #pulls psf for W1-4 bands
         for band in range(1,5):
             pull_unwise_psf(path_to_image_dir, coadd_id, band)
-       
+        
         # for testing
         #if i == 1:
         #    os.chdir(outdir)
