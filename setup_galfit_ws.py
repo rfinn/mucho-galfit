@@ -123,7 +123,7 @@ def radec_to_groupname(ra, dec, prefix=''):
     
     group_name = '{}{:05d}{}{:04d}'.format(
             prefix, int(100*ra1), 'm' if dec1 < 0 else 'p',
-            int(100*np.abs(dec1))))
+            int(100*np.abs(dec1)))
 
     return group_name  
     
