@@ -164,7 +164,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 
     group_name = radec_to_groupname(ra, dec, prefix='')
     
-    data_dir = data_dir+group_name
+    data_dir = data_dir+group_name+'/'
     
     funpack_all(data_dir, output_loc)
     
