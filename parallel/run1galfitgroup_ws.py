@@ -571,6 +571,8 @@ if __name__ == '__main__':
     #objname = etab[objname_col][matchindex_primary][0]
     #print(f"objname = {objname}")
     
+    print(f'{output_dir}*im-{bandpass}.fits')
+    
     image = os.path.basename(glob.glob(f'{output_dir}*im-{bandpass}.fits')[0])
     invvar_image = image.replace('im-','invvar-')
     std_image = image.replace('im-','std-')
