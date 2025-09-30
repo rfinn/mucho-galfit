@@ -573,10 +573,10 @@ if __name__ == '__main__':
     
     print(f'{output_dir}*im-{bandpass}.fits')
     
-    image = os.path.basename(glob.glob(f'{output_dir}*im-{bandpass}.fits')[0])
-    invvar_image = image.replace('im-','invvar-')
-    std_image = image.replace('im-','std-')
-    psf_image = image.replace('im-','PSF-')
+    image = os.path.basename(glob.glob(f'{output_dir}*image-{bandpass}.fits')[0])
+    invvar_image = image.replace('image-','invvar-')
+    std_image = image.replace('image-','std-')
+    psf_image = image.replace('image-','PSF-')
     
     print("image = ",image)
 
