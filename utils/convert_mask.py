@@ -60,8 +60,12 @@ def reproject_mask(maskfile, reffile):
 
         #reproject using HDU
         wisemask, footprint = reproject_interp(hmask[0], href[0].header)
-
+        
+        from matplotlib import pyplot as plt
+        plt.imshow(wisemask)
+        
         outname = maskfile.replace('r-mask', 'wise-mask')
+        
         fits.writeto(outname, wisemask, href[0].header, overwrite=True)
     
     return outname      
