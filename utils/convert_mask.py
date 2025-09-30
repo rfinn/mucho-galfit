@@ -54,12 +54,12 @@ def reproject_mask(maskfile, reffile):
     
     with fits.open(maskfile) as hmask, fits.open(reffile) as href:
         #remove galaxy pixels from mask
-        hmask[0].data = remove_galaxy(hmask[0].data)
+        hmask[1].data = remove_galaxy(hmask[1].data)
 
         #reproject using HDU
-        wisemask, footprint = reproject_interp(hmask[0], href[0].header)
+        wisemask, footprint = reproject_interp(hmask[1], href[1].header)
 
         outname = maskfile.replace('r-mask', 'wise-mask')
-        fits.writeto(outname, wisemask, href[0].header, overwrite=True)
+        fits.writeto(outname, wisemask, href[1].header, overwrite=True)
     
     return outname      

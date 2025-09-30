@@ -74,6 +74,9 @@ def move_masks(start_dir, output_dir, wise_image_file):
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
             #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
+            
+            print(rmask_file)
+            
             reproject_mask(rmask_file, wise_image_file)
             
             return
