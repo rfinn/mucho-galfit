@@ -62,6 +62,6 @@ def reproject_mask(maskfile, reffile):
         wisemask, footprint = reproject_interp(hmask[0], href[0].header)
 
         outname = maskfile.replace('r-mask', 'wise-mask')
-        fits.writeto(outname, wisemask, href[1].header, overwrite=True)
+        fits.writeto(outname, wisemask, href[0].header, overwrite=True)
     
     return outname      
