@@ -109,8 +109,8 @@ def radec_to_groupname(ra, dec, prefix=''):
     ra1, dec1 = np.atleast_1d(ra), np.atleast_1d(dec)
     
     group_name = '{}{:05d}{}{:04d}'.format(
-            prefix, int(100*ra1), 'm' if dec1 < 0 else 'p',
-            int(100*np.abs(dec1).item))
+            prefix, int(100*ra1.item()), 'm' if dec1 < 0 else 'p',
+            int(100*np.abs(dec1).item()))
 
     return group_name  
     
