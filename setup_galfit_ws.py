@@ -32,7 +32,8 @@ from astropy.table import Table
 
 #importing mask util functions...
 sys.path.insert(0,'../utils')
-from convert_mask import get_maskname, reproject_mask
+sys.path.insert(0,'utils')
+from convert_mask import reproject_mask
 
 
 ##########################################################################     
