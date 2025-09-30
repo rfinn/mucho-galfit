@@ -68,7 +68,7 @@ def move_masks(start_dir, output_dir, wise_image_file):
     for filename in os.listdir(output_dir):
         
         if 'maskbits' in filename:
-            rmask_file = filename.replace('maskbits','r-mask')   #replace 'maskbits' with 'r-mask' in mask filename
+            rmask_file = output_dir+filename.replace('maskbits','r-mask')   #replace 'maskbits' with 'r-mask' in mask filename
     
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
             #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
