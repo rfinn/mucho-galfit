@@ -32,7 +32,7 @@ from astropy.table import Table
 
 #importing mask util functions...
 sys.path.insert(0,'../utils')
-from convert_mask import get_maskname, reproject_mask
+from convert_mask import get_maskname, remove_galaxy, reproject_mask
 
 
 ##########################################################################     
@@ -56,25 +56,40 @@ def funpack_all(start_dir, output_dir):
     for filename in os.listdir(start_dir):
         if '.fz' in filename:
             funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''))
-
-
-#prepare the masks!
-def move_masks(start_dir, output_dir, wise_image_file):
-    '''
-    Run AFTER the *maskbits.fits.fz is converted to .fits and relocated to the OBJIDxxxxx directory
-    '''
     
-    for filename in os.listdir(start_dir):
+#unpack composite images into their constituent wavelength bands
+def extract_bands(path_to_im,output_dir,objid,im_name,grz=False,WISE=False):
+    
+    ims=fits.open(path_to_im+im_name)
+    header_im = ims[0].header
+    header_invvar = ims[1].header    
+    
+    if grz:
+        g_im, r_im, z_im = ims[0].data[0], ims[0].data[1], ims[0].data[2]
+        g_inv, r_inv, z_inv = ims[1].data[0], ims[1].data[1], ims[1].data[2]
+        ims.close()
         
-        if 'maskbits' in filename:
-            rmask_file = filename.replace('maskbits','r-mask')   #replace 'maskbits' with 'r-mask' in mask filename
-    
-            #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
-            #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
-            reproject_mask(rmask_file, wise_image_file)
-            
-            return
-    
+        grz_im_names = [f'{objid}-im-g.fits', f'{objid}-im-r.fits', f'{objid}-im-z.fits',
+                        f'{objid}-invvar-g.fits', f'{objid}-invvar-r.fits', f'{objid}-invvar-z.fits']
+        grz_ims = [g_im,r_im,z_im,g_inv,r_inv,z_inv]
+        
+        for i,filename in enumerate(grz_im_names):
+            header = header_im if i<=2 else header_invvar
+            fits.writeto(output_dir+filename,grz_ims[i],header=header,overwrite=True)
+        
+    if WISE:
+        w1_im, w2_im, w3_im, w4_im = ims[0].data[0], ims[0].data[1], ims[0].data[2], ims[0].data[3]
+        w1_inv, w2_inv, w3_inv, w4_inv = ims[1].data[0], ims[1].data[1], ims[1].data[2], ims[1].data[3]
+        ims.close()
+        
+        wise_im_names = [f'{objid}-im-W1.fits', f'{objid}-im-W2.fits', f'{objid}-im-W3.fits', f'{objid}-im-W4.fits',
+                        f'{objid}-invvar-W1.fits', f'{objid}-invvar-W2.fits', f'{objid}-invvar-W3.fits', f'{objid}-invvar-W4.fits']
+
+        wise_ims = [w1_im,w2_im,w3_im,w4_im,w1_inv,w2_inv,w3_inv,w4_inv]
+        
+        for i,filename in enumerate(wise_im_names):
+            header = header_im if i<=2 else header_invvar
+            fits.writeto(output_dir+filename,wise_ims[i],header=header,overwrite=True)
     
 #convert invvar image to noise
 def convert_invvar_noise(invvar_image, noise_image):
@@ -151,10 +166,34 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     
     funpack_all(data_dir, output_dir)
     
-    #masks! rename maskbits to rband mask, remove 4096 (SGA galaxy) mask; create WISE mask
-    wise_image = glob.glob(f'{output_dir}*-image-W3.fits')[0]   #will output the image path+filename
-    move_masks(data_dir, output_dir, wise_image) 
-
+    
+        
+    #np.trunc only works with integers...the "truncated" will convert ra and dec to their integers and 3 decimal places,
+    #all formatted as an integer. 131.200847 becomes 1312008, etc.
+    #adapted from John Moustakas' code.
+    #precision=3   #36" precision, or 0.01 degrees
+    #ratrunc = np.trunc((10.**precision) * ra).astype(int).astype(str)
+    #dectrunc = np.trunc((10.**precision) * abs(dec)).astype(int).astype(str)
+    
+    #the following pads the left size with zeros, if needed
+    #zra = ratrunc.zfill(7)
+    #zdec = dectrunc.zfill(6)
+    
+    #convert to xxx.xxxx (RA) or xx.xxxx (DEC)
+    #ra_string = zra[:-precision]+'.'+zra[-precision:]
+    #dec_string = zdec[:-precision]+'.'+zdec[-precision:]
+    
+    #if dec > 0.:
+    #    im_name_grz = f'SGA2025_J{ra_string}+{dec_string}.fits'
+    #else:
+    #    #if dec < 0., then the 'string' will have a negative in front that must be accounted for
+    #    im_name_grz = f'SGA2025_J{ra_string}-{dec_string}.fits'
+    
+    #extract_bands(data_dir,output_dir,objid,im_name=im_name_grz,grz=True)
+    
+    #im_name_wise = im_name_grz.replace('.fits','-unwise.fits')   #just use grz formatting :-)
+    #extract_bands(data_dir,output_dir,objid,im_name=im_name_wise,WISE=True)
+    
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
         invvar_image = f'SGA2025_{group_name}-invvar-{bandpass}.fits'

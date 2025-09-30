@@ -57,8 +57,6 @@ sys.path.append(homedir+'/github/mucho-galfit/parallel/')
 #from run1galfit import get_maskname
 #import run1maskgroup as mg
 
-#import reproject_mask
-
 ### DICTIONARIES
 
 pixel_scale = {'FUV':1.5,'NUV':1.5,'g':0.262,'r':0.262,'z':0.262,'W1':2.75,'W2':2.75,'W3':2.75,'W4':2.75}
@@ -124,12 +122,12 @@ def get_maskname(image):
     # check for wise extenstion
     elist = ['W1','W2','W3','W4']
     
-    for e in elist:
+    for e in elist:    #WISE list
         if e in image:
             maskname = image.replace(f"{e}.fits","wise-mask.fits")
             return maskname
     # check for legacy
-    llist = ['g','r','z']
+    llist = ['g','r','z']   #'legacy' grz list
     for l in llist:
         if l in image:
             maskname = image.replace(f"{l}.fits","r-mask.fits")
