@@ -27,16 +27,19 @@ image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W
 minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4':10}
 
 
-def remove_galaxy(mask_data):
+def remove_galaxy(maskfile):
+    
+    hdu = fits.open(maskfile)
     
     #remove 4096 (2**12, corresponds to pixel touching SGA galaxy (https://www.legacysurvey.org/dr10/bitmasks/)
-    mask_mask = (mask_data==4096)  #the "mask mask," i.e. the mask for the mask
+    hdu[0].data[hdu[0].data == 4096] = 0
     
     #change 4096 pixels to 0 so that they are ignored.
     mask_data[mask_mask]=0
-    
-    return mask_data
-    
+
+    # write out updated mask
+    hdu.writeto(maskfile,overwrite=True)
+
 
 def reproject_mask(maskfile, reffile):
     '''
@@ -52,12 +55,13 @@ def reproject_mask(maskfile, reffile):
     Output: output filename for the reprojected mask
     '''
     
+    #remove galaxy pixels from mask...will save.
+    remove_galaxy(maskfile)
+    
     with fits.open(maskfile) as hmask, fits.open(reffile) as href:
-        #remove galaxy pixels from mask
-        hmask[1].data = remove_galaxy(hmask[1].data)
 
         #reproject using HDU
-        wisemask, footprint = reproject_interp(hmask[1], href[1].header)
+        wisemask, footprint = reproject_interp(hmask[0], href[0].header)
 
         outname = maskfile.replace('r-mask', 'wise-mask')
         fits.writeto(outname, wisemask, href[1].header, overwrite=True)
