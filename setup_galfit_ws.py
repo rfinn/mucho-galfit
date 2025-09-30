@@ -69,7 +69,7 @@ def move_masks(start_dir, output_dir, wise_image_file):
         
         if 'maskbits' in filename:
 
-            rmask_file = output_dir+filename.replace('maskbits','r-mask') #replace 'maskbits' with 'r-mask' in mask filename
+            rmask_file = output_dir+filename.replace('maskbits','image-r-mask') #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is for cadence purposes)
             os.system(f'cp {filename} {rmask_file}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
