@@ -65,7 +65,7 @@ def move_masks(start_dir, output_dir, wise_image_file):
     Run AFTER the *maskbits.fits.fz is converted to .fits and relocated to the OBJIDxxxxx directory
     '''
     
-    for filename in os.listdir(start_dir):
+    for filename in os.listdir(output_dir):
         
         if 'maskbits' in filename:
             rmask_file = filename.replace('maskbits','r-mask')   #replace 'maskbits' with 'r-mask' in mask filename
