@@ -38,7 +38,7 @@ def remove_galaxy(mask_data):
     return mask_data
     
 
-def reproject_mask(maskfile, reffile, outname):
+def reproject_mask(maskfile, reffile):
     '''
     maskfile: the mask to reproject
     reffile: the file with header information for reprojection! 
