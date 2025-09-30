@@ -32,10 +32,8 @@ def remove_galaxy(maskfile):
     hdu = fits.open(maskfile)
     
     #remove 4096 (2**12, corresponds to pixel touching SGA galaxy (https://www.legacysurvey.org/dr10/bitmasks/)
-    hdu[0].data[hdu[0].data == 4096] = 0
-    
     #change 4096 pixels to 0 so that they are ignored.
-    mask_data[mask_mask]=0
+    hdu[0].data[hdu[0].data == 4096] = 0
 
     # write out updated mask
     hdu.writeto(maskfile,overwrite=True)
