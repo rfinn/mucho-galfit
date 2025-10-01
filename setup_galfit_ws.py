@@ -35,10 +35,6 @@ sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
 from galaxies_in_fov import get_galaxies_in_fov
 
-#load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4)
-sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')
-from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
-
 
 ##########################################################################     
 ### FUNCTIONS
@@ -144,8 +140,6 @@ def get_wise_psfs(param_dict, path_to_image_dir):
     for band in range(1,5):
         pull_unwise_psf(path_to_image_dir, coadd_id, band)
     
-    
-
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
 def get_images(objid,ra,dec,output_loc,data_root_dir):
