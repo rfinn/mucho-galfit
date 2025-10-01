@@ -112,11 +112,12 @@ class build_html_coadd():
             print(g)
             self.html.write('<tr>')
             self.html.write('<td>{}</td>'.format(galindex))  
-            print(os.listdir(f'{g}/'))
-            print(glob.glob(f'{g}/*.jpg')[0])
-            jpg_path = glob.glob(f'{g}/*image-LS.jpg')[0]
-            #jpg_path = if '.jpg' in for file in os.listdir(f'{g}/')
-            #jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
+
+            try:
+                jpg_path = glob.glob(f'{g}/*image-LS.jpg')[0]
+            except:
+                print(f'.jpg path not found in {g}/; defaulting to some placeholder path...')
+                jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
             
             self.html.write(f'<td><a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
             
