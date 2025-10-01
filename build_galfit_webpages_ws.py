@@ -409,8 +409,6 @@ class galfit_dir():
             print(f"number of galaxies = {self.ngal}")        
                 
     def get_file_names(self):
-        search_string = '*-image-r.fits'
-        t = glob.glob(search_string)
         
         self.maskimage = glob.glob('*-image-r-mask.fits')[0]
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
@@ -518,6 +516,7 @@ class galfit_dir():
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         
+        print(os.getcwd())
         #we are only running GALFIT on r-band without convolution!
         if band=='r':
             self.galfit = glob.glob("*-{band}-out1.fits")[0]
