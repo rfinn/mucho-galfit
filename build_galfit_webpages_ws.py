@@ -422,6 +422,10 @@ class galfit_dir():
             
     def get_ellipse_params(self):
         """ get ellipse parameters from the header of the mask image  """
+        
+        self.ellipseparams = None
+        return
+        
         try:
             header = fits.getheader(self.maskimage)
             ellipseparams = []
@@ -434,8 +438,6 @@ class galfit_dir():
             print("\nWARNING: mask file was not found!!! ",self.maskimage)
             self.ellipseparams = None
         
-        self.ellipseparams = None
-
             
     def make_png_mask(self):
         # fitsimages and pngimages should be dictionaries
