@@ -112,6 +112,7 @@ class build_html_coadd():
             print(g)
             self.html.write('<tr>')
             self.html.write('<td>{}</td>'.format(galindex))  
+            print(os.listdir(g))
             jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
             
             self.html.write(f'<td><a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
