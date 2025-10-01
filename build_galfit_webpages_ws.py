@@ -434,8 +434,9 @@ class galfit_dir():
             print("\nWARNING: mask file was not found!!! ",self.maskimage)
             self.ellipseparams = None
         
+        self.ellipseparams = None
 
-
+            
     def make_png_mask(self):
         # fitsimages and pngimages should be dictionaries
         # so I am not relying on where they are in the list
@@ -510,8 +511,7 @@ class galfit_dir():
         else:
             os.system(f'rm {path}')
             self.LS_image = wget.download(image_url,out=path)
-            
-    
+
 
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
@@ -556,7 +556,6 @@ class galfit_dir():
         
         pass
     
-
     
 class build_html_cutout():
 
