@@ -113,7 +113,10 @@ class build_html_coadd():
             self.html.write('<tr>')
             self.html.write('<td>{}</td>'.format(galindex))  
             print(os.listdir(f'{g}/'))
-            jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
+            print(glob.glob(f'{g}/*.jpg')[0])
+            jpg_path = glob.glob(f'{g}*.jpg')[0]
+            #jpg_path = if '.jpg' in for file in os.listdir(f'{g}/')
+            #jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
             
             self.html.write(f'<td><a href="{jpg_path}"><img src="{jpg_path}" alt="Missing file {jpg_path}" height="auto" width="50%"></a></td>')
             
