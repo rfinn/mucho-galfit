@@ -114,7 +114,7 @@ class build_html_coadd():
             self.html.write('<td>{}</td>'.format(galindex))  
             print(os.listdir(f'{g}/'))
             print(glob.glob(f'{g}/*.jpg')[0])
-            jpg_path = glob.glob(f'{g}*.jpg')[0]
+            jpg_path = glob.glob(f'{g}/*image-LS.jpg')[0]
             #jpg_path = if '.jpg' in for file in os.listdir(f'{g}/')
             #jpg_path = os.path.join(f'{g}/{g}-image-LS.jpg')
             
