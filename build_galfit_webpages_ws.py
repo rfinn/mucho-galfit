@@ -412,7 +412,7 @@ class galfit_dir():
         search_string = '*-image-r.fits'
         t = glob.glob(search_string)
         
-        self.maskimage = self.objid+'-image-r-mask.fits'
+        self.maskimage = glob.glob('*-image-r-mask.fits')[0]
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
         
         print(self.maskimage)
@@ -481,7 +481,7 @@ class galfit_dir():
         
         #we have self.objid, self.RA, self.DEC (init) and can pull the OBJID image name
         #I am (hopefully) still in the OBJID????? subdirectory!
-        imname = f"{self.objid}-image-W1.fits"   #use W1 image header as referece
+        imname = glob.glob("*-image-W1.fits")[0]   #use W1 image header as referece
         im,header=fits.getdata(imname,header=True)
         
         #define pixscale for url (1 is standard)
