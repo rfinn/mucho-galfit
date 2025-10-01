@@ -17,7 +17,8 @@ main_catalog   /mnt/astrophysics/wisesize/SGA2025-forkim/dr9-north/234/23490p593
 
 phot_catalog   /mnt/astrophysics/wisesize/SGA2025-forkim/dr9-north/234/23490p5933/SGA2025_23490p5933-sample.fits     #full path (including filename) to phot catalog
 
-create_mock_ephot   False                     #if phot_catalog does not exist, create a "placeholder" version
+create_mock_ephot   0                     #if phot_catalog does not exist, create a "placeholder" version
+                                          #use 1 for True, 0 for False
 mock_ephot_name     /mnt/astrophysics/lsdr9-wisesize/wisesize_ephot_mock.fits          #placeholder loc+name
 
 objid_col            OBJID                                 #name of the objid column in the above catalogs

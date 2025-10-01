@@ -539,7 +539,7 @@ if __name__ == '__main__':
     mock_ephot_flag = param_dict['create_mock_ephot']
     maintab = Table.read(param_dict['main_catalog'])
     try:
-        if mock_ephot_flag:
+        if bool(int(mock_ephot_flag)):
             etab = Table.read(param_dict['mock_ephot_name'])
         else:
             etab = Table.read(param_dict['phot_catalog'])
@@ -607,6 +607,7 @@ if __name__ == '__main__':
         # open the galfit output table from rband
         try:
             rgalfit = Table.read(outdir+'wisesize_galfit_r.fits')
+            print(f'length of rgalfit table: {len(rgalfit)}')
         except:
             print(f'need to make output table {outdir}wisesize_galfit_r.fits before running with fixed r-band BA and PA')
             sys.exit()
