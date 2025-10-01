@@ -409,10 +409,10 @@ class galfit_dir():
             print(f"number of galaxies = {self.ngal}")        
                 
     def get_file_names(self):
-        search_string = '*-im-r.fits'
+        search_string = '*-image-r.fits'
         t = glob.glob(search_string)
         
-        self.maskimage = self.objid+'-im-r-mask.fits'
+        self.maskimage = self.objid+'-image-r-mask.fits'
         self.wisemaskimage = self.maskimage.replace('r-mask.fits','wise-mask.fits')
         
         print(self.maskimage)
@@ -481,7 +481,7 @@ class galfit_dir():
         
         #we have self.objid, self.RA, self.DEC (init) and can pull the OBJID image name
         #I am (hopefully) still in the OBJID????? subdirectory!
-        imname = f"{self.objid}-im-W1.fits"   #use W1 image header as referece
+        imname = f"{self.objid}-image-W1.fits"   #use W1 image header as referece
         im,header=fits.getdata(imname,header=True)
         
         #define pixscale for url (1 is standard)
@@ -500,7 +500,7 @@ class galfit_dir():
         imsize=str(int(xsize_arcsec))
         
         #create filename for Legacy Survey image
-        LS_name = imname.replace('im-W1.fits','im-LS.jpg')
+        LS_name = imname.replace('image-W1.fits','image-LS.jpg')
         
         image_url = f'https://www.legacysurvey.org/viewer/cutout.jpg?ra={self.RA}&dec={self.DEC}&layer=ls-dr9&size={imsize}&pixscale={pixscale}'
                 
@@ -658,9 +658,9 @@ class build_html_cutout():
             
             self.html.write(f'<h2>GALFIT {band_header} Modeling </h2>\n')
             if 'W' in band:
-                maskpng = self.cutout.objid+'-im-wise-mask.png'
+                maskpng = self.cutout.objid+'-image-wise-mask.png'
             else:
-                maskpng = self.cutout.objid+'-im-r-mask.png'
+                maskpng = self.cutout.objid+'-image-r-mask.png'
             images = [self.cutout.galimage,self.cutout.galmodel,self.cutout.galresidual_imstretch,\
                       self.cutout.galresidual, self.cutout.pngimages['mask']]
             images = [os.path.basename(i) for i in images]        
