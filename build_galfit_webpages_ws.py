@@ -516,13 +516,12 @@ class galfit_dir():
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         
-        print(os.getcwd())
         #we are only running GALFIT on r-band without convolution!
         if band=='r':
-            self.galfit = glob.glob("*-{band}-out1.fits")[0]
+            self.galfit = glob.glob(f"*-{band}-out1.fits")[0]
         #otherwise, we want to output the convolved results
         else:
-            self.galfit = glob.glob("*-{band}-out2.fits")[0]
+            self.galfit = glob.glob(f"*-{band}-out2.fits")[0]
         
         print(f"looking for galfit file {self.galfit}")
         
