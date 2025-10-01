@@ -31,9 +31,13 @@ import numpy as np
 from astropy.table import Table
 
 #importing mask util functions...
-sys.path.insert(0,'../utils')
 sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
+from galaxies_in_fov import get_galaxies_in_fov
+
+#load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4)
+sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')
+from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
 
 
 ##########################################################################     
@@ -74,9 +78,7 @@ def move_masks(start_dir, output_dir, wise_image_file):
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
             #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
-            
-            print(rmask_file)
-            
+                        
             reproject_mask(rmask_file, wise_image_file)
             
             return
@@ -116,7 +118,34 @@ def radec_to_groupname(ra, dec, prefix=''):
             int(100*np.abs(dec1).item()))
 
     return group_name  
+
+
+def get_wise_psfs(param_dict, path_to_image_dir):
+
+    main_dir = param_dict['main_dir']
+    outdir = main_dir+param_dict['path_to_images']
     
+    #load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4
+    #and save to path_to_image_dir
+    sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')
+    from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
+    
+    #read in tiles. the rest will follow at the bottom of the forthcoming loop
+    tile_path = main_dir+param_dict['tile_path']   #contains COADD IDs and the RA+DEC of tile centers
+    tile_table = read_tiles(tile_path)  
+    
+    #directory of (primary) galaxy
+    path_to_image_dir = outdir+obj_id+'/'
+
+    #get coadd id of (primary) galaxy image
+    coadd_id = get_coadd_id(tile_path, path_to_image_dir, tile_table=tile_table)
+
+    #pulls psf for W1-4 bands
+    for band in range(1,5):
+        pull_unwise_psf(path_to_image_dir, coadd_id, band)
+    
+    
+
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
 def get_images(objid,ra,dec,output_loc,data_root_dir):
@@ -182,6 +211,11 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 
 if __name__ == '__main__':
     
+    
+    ######################
+    ### Parameter File ###
+    ######################
+    
     param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
         
     #create dictionary with keyword and values from param textfile
@@ -202,19 +236,20 @@ if __name__ == '__main__':
     data_root_dir = param_dict['data_root_dir']
     
     main_catalog = param_dict['main_catalog']
-    #phot_catalog = param_dict['phot_catalog']
     
     objid_col = param_dict['objid_col']
-    #primary_group_col = param_dict['primary_group_col']
-    #group_mult_col = param_dict['group_mult_col']
+
     group_name_col = param_dict['group_name_col']
     objname_col = param_dict['objname_col']
 
-    #etab = Table.read(phot_catalog)
     maintab = Table.read(param_dict['main_catalog'])
 
     primary_group_col = param_dict['primary_group_col']
-
+    
+    ############################
+    # Isolate Primary Galaxies #
+    ############################
+    
     #trim to only include primary galaxies; if no such flag exists, assume all galaxies are primary.
     try:
         primary_flag = maintab[primary_group_col]
@@ -222,23 +257,18 @@ if __name__ == '__main__':
         primary_flag = np.ones(len(maintab),dtype=bool)   #all true
 
     maintab = maintab[primary_flag]
-
-    #load functions from pull_unwise_psfs (read tile table, get galaxy image's coadd_id, pull associated psf for W1-4
-    #and save to path_to_image_dir
-    sys.path.append(main_dir+'github/wisesize/unwise_PSFs/')
-    from pull_unwise_psfs import read_tiles, get_coadd_id, pull_unwise_psf
         
-    #read in tiles. the rest will follow at the bottom of the forthcoming loop
-    tile_path = main_dir+param_dict['tile_path']   #contains COADD IDs and the RA+DEC of tile centers
-    tile_table = read_tiles(tile_path)    
+    #############################
+    # Create Primary Galaxy Dirs #
+    ##############################
     
-    #check that outdir exists! if not, create it.
+    #check that outdir (where the individual primary galaxy directories will live) exists! if not, create it.
     if os.path.exists(outdir):
         os.chdir(outdir)
     else:
         os.system(f'mkdir {outdir}')
     
-    # for each galaxy, create a directory
+    # for each primary galaxy, create a directory
     for i in range(len(maintab)):
         
         obj_id = maintab[objid_col][i]
@@ -247,9 +277,10 @@ if __name__ == '__main__':
         objname = maintab[objname_col][i]
         #group_name = etab[group_name_col][i] # this is either the objname, or objname_GROUP for groups
         
-        #if etab[primary_group_col][i] & (etab[group_mult_col][i] > 0): # make directory for primary targets
-        #galpath = outdir+etab[objid_col][i]
+        # if etab[primary_group_col][i] & (etab[group_mult_col][i] > 0): # make directory for primary targets
+        # galpath = outdir+etab[objid_col][i]
         path_to_image_dir = outdir+obj_id+'/'
+        
         # make directory if it doesn't already exist
         if not os.path.exists(path_to_image_dir):
             os.mkdir(path_to_image_dir)
@@ -258,24 +289,19 @@ if __name__ == '__main__':
         #copy images
         get_images(obj_id,ra,dec,outdir,data_root_dir)
         
+        #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
+        get_galaxies_in_fov(maintab, path_to_image_dir)
+        
         ############
         ### PSFs ###
         ############
         
-        #directory of (primary) galaxy
-        path_to_image_dir = outdir+obj_id+'/'
-        
-        #get coadd id of (primary) galaxy image
-        coadd_id = get_coadd_id(tile_path, path_to_image_dir, tile_table=tile_table)
-        
-        #pulls psf for W1-4 bands
-        for band in range(1,5):
-            pull_unwise_psf(path_to_image_dir, coadd_id, band)
-        
+        get_wise_psfs(param_dict, path_to_image_dir)
+
         # for testing
         #if i == 1:
         #    os.chdir(outdir)
         #    sys.exit()
         
-    os.chdir(outdir)
+    os.chdir(outdir)   #return to the main output directory
     

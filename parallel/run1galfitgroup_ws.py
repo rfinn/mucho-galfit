@@ -607,7 +607,6 @@ if __name__ == '__main__':
         # open the galfit output table from rband
         try:
             rgalfit = Table.read(outdir+'wisesize_galfit_r.fits')
-            print(f'length of rgalfit table: {len(rgalfit)}')
         except:
             print(f'need to make output table {outdir}wisesize_galfit_r.fits before running with fixed r-band BA and PA')
             sys.exit()
