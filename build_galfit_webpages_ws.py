@@ -520,9 +520,10 @@ class galfit_dir():
         
         #we are only running GALFIT on r-band without convolution!
         if band=='r':
-            self.galfit = f"{self.objid}-{band}-out1.fits"
+            self.galfit = glob.glob("*-{band}-out1.fits")[0]
+        #otherwise, we want to output the convolved results
         else:
-            self.galfit = f"{self.objid}-{band}-out2.fits"
+            self.galfit = glob.glob("*-{band}-out2.fits")[0]
         
         print(f"looking for galfit file {self.galfit}")
         
