@@ -480,6 +480,7 @@ class galfit_dir():
         
         #first try to pull the .jpg image from the directory; if it does not exist, pull from Viewer
         try:
+            os.system('pwd')
             imname = glob.glob("*image.jpg")[0]
             os.system(f'cp {imname} {self.outdir}/{imname.replace('image.jpg', 'image-LS.jpg')}')
             print("LS image found! Cp'd to {self.outdir}.")
