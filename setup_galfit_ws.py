@@ -183,7 +183,14 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     #masks! rename maskbits to rband mask, remove 4096 (SGA galaxy) mask; create WISE mask
     wise_image = glob.glob(f'{output_dir}*-image-W3.fits')[0]   #will output the image path+filename
     move_masks(data_dir, output_dir, wise_image) 
-
+    
+    #move Legacy Survey Viewer JPG image (if it exists)
+    try:
+        ls_im = glob.glob(f'{data_dir}*image.jpg')[0]
+        os.system(f'cp {ls_im} {output_dir}')
+    except:
+        print(f'LS Viewer image not found in {data_dir}. Skipping.')
+    
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
         invvar_image = f'SGA2025_{group_name}-invvar-{bandpass}.fits'
