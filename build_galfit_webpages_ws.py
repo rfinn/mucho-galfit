@@ -478,6 +478,15 @@ class galfit_dir():
     #pull and download scaled RGB .jpg of OBJID????? galaxy; place in galaxy's subdirectory
     def get_legacy_image(self):
         
+        #first try to pull the .jpg image from the directory; if it does not exist, pull from Viewer
+        imname = glob.glob("*image.jpg")[0]
+        try:
+            os.system(f'cp {imname} {self.outdir}')
+            print("LS image found! Cp'd to {self.outdir}.")
+            return
+        except:
+            print('LS image not found in data directory! pulling from Legacy Survey Viewer website...')      
+                  
         #we have self.objid, self.RA, self.DEC (init) and can pull the OBJID image name
         #I am (hopefully) still in the OBJID????? subdirectory!
         imname = glob.glob("*-image-W1.fits")[0]   #use W1 image header as referece
