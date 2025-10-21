@@ -479,9 +479,9 @@ class galfit_dir():
     def get_legacy_image(self):
         
         #first try to pull the .jpg image from the directory; if it does not exist, pull from Viewer
-        imname = glob.glob("*image.jpg")[0]
         try:
-            os.system(f'cp {imname} {self.outdir}')
+            imname = glob.glob("*image.jpg")[0]
+            os.system(f'cp {imname} {self.outdir}/{imname.replace('image.jpg', 'image-LS.jpg')}')
             print("LS image found! Cp'd to {self.outdir}.")
             return
         except:
