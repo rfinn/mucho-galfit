@@ -130,6 +130,7 @@ def get_maskname(image):
     llist = ['g','r','z']   #'legacy' grz list
     for l in llist:
         if l in image:
+            print('imageeeeeeee',image)
             maskname = image.replace(f"{l}.fits","r-mask.fits")
             print('masknameeeee',maskname)
             return maskname
