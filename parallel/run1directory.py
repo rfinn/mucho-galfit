@@ -10,9 +10,7 @@ import sys
 from astropy.table import Table
 
 # --- Import utility functions ---
-sys.path.insert(0, '../utils')
-sys.path.insert(0, '../')
-sys.path.insert(0, 'utils')
+sys.path.insert(0, '~/github/mucho-galfit/utils')
 from setup_galfit_ws import setup_one_galaxy
 from getprimarydirs import write_primarydirs, find_primaries
 
