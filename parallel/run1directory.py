@@ -11,8 +11,11 @@ from astropy.table import Table
 
 # --- Import utility functions ---
 sys.path.insert(0, 'utils')
-from setup_galfit_ws import setup_one_galaxy, create_OBJIDs
+from setup_galfit_ws import setup_one_galaxy
 from getprimarydirs import write_primarydirs, find_primaries
+
+sys.path.insert(0, '../')
+from merge_ns_catalogs import create_OBJIDs
 
 # --- Read parameter file ---
 param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'

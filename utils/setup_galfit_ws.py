@@ -30,13 +30,14 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
-#import create objid function
-from merge_ns_catalogs import create_OBJIDs
-
 #importing mask util functions...
 sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
 from galaxies_in_fov import get_galaxies_in_fov
+
+#and create OBJIDs
+sys.path.insert(0, '../')
+from merge_ns_catalogs import create_OBJIDs
 
 
 ##########################################################################     
