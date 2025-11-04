@@ -69,7 +69,9 @@ def move_masks(start_dir, output_dir, wise_image_file):
         
         if 'maskbits' in filename:
 
-            rmask_file = output_dir+filename.replace('maskbits','image-r-mask') #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is for cadence purposes)
+            #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is for cadence purposes)
+            rmask_file = os.path.abspath(output_dir+filename.replace('maskbits','image-r-mask'))
+            
             os.system(f'cp {filename} {rmask_file}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
@@ -151,7 +153,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     
     #output_loc is the directory holding the individual galaxy output directories (which GALFIT will be pulling from!)
     #e.g., /mnt/astrophysics/wisesize/mg_output_wisesize/OBJ10000/
-    output_dir = os.path.join(output_loc,objid+'/')
+    output_dir = os.path.abspath(os.path.join(output_loc, objid+'/'))
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
@@ -165,10 +167,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     #ra_slice = f'{np.trunc(ra):03.0f}'
     ra_slice = f'{int(ra):03d}'
         
-    if dec>hemisphere_bound:   #if DEC>bound (in deg), then galaxy is in "north" catalog. else, south catalog.
-        data_dir = f'{data_root_dir}dr11-north/{ra_slice}/'
+    if dec>hemisphere_bound:
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}/')
     if dec<hemisphere_bound:
-        data_dir = f'{data_root_dir}dr11-south/{ra_slice}/'
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}/')
         
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - exiting")
@@ -176,27 +178,27 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
 
     group_name = radec_to_groupname(ra, dec, prefix='')
     
-    data_dir = data_dir+group_name+'/'
+    data_dir = os.path.abspath(data_dir+group_name+'/')
     
     funpack_all(data_dir, output_dir)
     
     #masks! rename maskbits to rband mask, remove 4096 (SGA galaxy) mask; create WISE mask
-    wise_image = glob.glob(f'{output_dir}*-image-W3.fits')[0]   #will output the image path+filename
+    wise_image = os.path.abspath(glob.glob(f'{output_dir}*-image-W3.fits')[0])   #will output the image path+filename
     move_masks(data_dir, output_dir, wise_image) 
     
     #move Legacy Survey Viewer JPG image (if it exists)
     try:
-        ls_im = glob.glob(f'{data_dir}*image.jpg')[0]
+        ls_im = os.path.abspath(glob.glob(f'{data_dir}*image.jpg')[0])
         os.system(f'cp {ls_im} {output_dir}')
     except:
         print(f'LS Viewer image not found in {data_dir}. Skipping.')
     
     #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
     for bandpass in ['g','r','z','W1','W2','W3','W4']:
-        invvar_image = f'SGA2025_{group_name}-invvar-{bandpass}.fits'
+        invvar_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-invvar-{bandpass}.fits'))
+        sigma_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-std-{bandpass}.fits'))
 
-        # check if noise image exists in output_dir, if not make it from invvar 
-        sigma_image = invvar_image.replace('invvar','std')
+        #check if noise image exists in output_dir, if not make it from invvar 
         if not os.path.exists(output_dir+sigma_image):
             try:
                 convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
@@ -216,7 +218,7 @@ def setup_one_galaxy(objid, maintab, param_dict):
     data_root_dir = param_dict['data_root_dir']
     hemisphere_bound = float(param_dict['hemisphere_bound'])
     get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound)
-    get_galaxies_in_fov(maintab, os.path.join(outdir, objid))
+    get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid)))
 
     
     
@@ -346,4 +348,4 @@ if __name__ == '__main__':
     fail_table = Table([maintab[objname_col], fail_flag], names=['PRIMARY_OBJNAME', 'FAIL_FLAG'])
     fail_table.write('dir_failures.fits',overwrite=True)
     print()
-    print(f'fail tble saved to {os.path.join(outdir,'dir_failures.fits')}. True=NO DIRECTORY FOR THAT PRIMARY GALAXY!')
+    print(f'fail table saved to {os.path.join(outdir,'dir_failures.fits')}. True=NO DIRECTORY FOR THAT PRIMARY GALAXY!')
