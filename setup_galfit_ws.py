@@ -201,8 +201,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         # check if noise image exists in output_dir, if not make it from invvar 
         sigma_image = invvar_image.replace('invvar','std')
         if not os.path.exists(output_dir+sigma_image):
-            convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
-
+            try:
+                convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
+            except:
+                print(f'{os.path.join(output_dir,invvar_image)} does not exist! skipping.')
 
     ###############################################################################
     ### END GET IMAGES
