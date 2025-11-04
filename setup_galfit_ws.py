@@ -145,7 +145,7 @@ def get_wise_psfs(param_dict, path_to_image_dir):
     
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
-def get_images(objid,ra,dec,output_loc,data_root_dir):
+def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     ###############################################################################
     ### GET IMAGES
     ###############################################################################
@@ -168,9 +168,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     #ra_slice = f'{np.trunc(ra):03.0f}'
     ra_slice = f'{int(ra):03d}'
         
-    if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog. else, south catalog.
+    if dec>hemisphere_bound:   #if DEC>bound (in deg), then galaxy is in "north" catalog. else, south catalog.
         data_dir = f'{data_root_dir}dr11-north/{ra_slice}/'
-    if dec<32.:
+    if dec<hemisphere_bound:
         data_dir = f'{data_root_dir}dr11-south/{ra_slice}/'
         
     if not os.path.exists(data_dir):
@@ -252,6 +252,8 @@ if __name__ == '__main__':
 
     primary_group_col = param_dict['primary_group_col']
     
+    hemisphere_bound = param_dict['hemisphere_bound']
+    
     ###########################################
     # Check if main catalog has OBJID column. #
     # If not, create one (and save result)! #
@@ -304,7 +306,7 @@ if __name__ == '__main__':
 
         try:
             #copy images
-            get_images(obj_id,ra,dec,outdir,data_root_dir)
+            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound)
         
             #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
             get_galaxies_in_fov(maintab, path_to_image_dir)

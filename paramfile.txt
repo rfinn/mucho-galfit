@@ -28,3 +28,8 @@ primary_group_col    GROUP_PRIMARY                         #name of primary grou
 group_mult_col       GROUP_MULT                            #name of group mult column (num galaxies in group?)
 group_name_col       GROUP_NAME                            #name of group name column
 objname_col          OBJNAME                               #name of objname column
+
+hemisphere_bound     35.03                                 #the division declination (in degrees) between the 
+                                                           #DESI north and south catalogs. if DEC>bound, 
+                                                           #then galaxy is in "north" catalog. 
+                                                           #else, south catalog.
