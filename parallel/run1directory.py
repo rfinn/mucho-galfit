@@ -21,6 +21,10 @@ from merge_ns_catalogs import create_OBJIDs
 param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
 param_dict = {}
 
+print(os.getcwd())
+print('#'*20)
+
+
 with open(param_file) as f:
     for line in f:
         
