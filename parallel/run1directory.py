@@ -14,7 +14,7 @@ sys.path.insert(0, '/mnt/astrophysics/wisesize/github/mucho-galfit/utils')
 from setup_galfit_ws import setup_one_galaxy
 from getprimarydirs import write_primarydirs, find_primaries
 
-sys.path.insert(0, '../')
+sys.path.insert(0, '/mnt/astrophysics/wisesize/github/mucho-galfit')
 from merge_ns_catalogs import create_OBJIDs
 
 # --- Read parameter file ---
