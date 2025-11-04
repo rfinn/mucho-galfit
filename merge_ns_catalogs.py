@@ -18,6 +18,8 @@ def unique_cats(stacked_cat,create_objid=True):
     return unique_cat
     
 def create_OBJIDs(unique_cat):
+    import numpy as np
+    
     formatted_strings = np.array([f"OBJID{num:05}" for num in np.arange(0,len(unique_cat))])
     unique_cat['OBJID'] = formatted_strings  #add the new column
     return unique_cat
