@@ -204,7 +204,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
             try:
                 convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
             except:
-                print(f'{os.path.join(output_dir,invvar_image)} does not exist! skipping.')
+                print(f'{os.path.join(output_dir,invvar_image)} does not exist! skipping sigma image calculation.')
 
     ###############################################################################
     ### END GET IMAGES
@@ -216,8 +216,8 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 ##########################################################################     
 
 if __name__ == '__main__':
-    
-    
+
+
     ######################
     ### Parameter File ###
     ######################
@@ -283,17 +283,18 @@ if __name__ == '__main__':
     else:
         os.system(f'mkdir {outdir}')
     
-    # for each primary galaxy, create a directory
+    #I need to keep some living array of failure modes...
+    #and also print the problems in the terminal so I know WHY they failed
+    fail_flag = np.zeros(len(maintab),dtype=bool)
+    
+    #for each primary galaxy, create a directory
     for i in range(len(maintab)):
         
         obj_id = maintab[objid_col][i]
         ra = maintab['RA'][i]
         dec = maintab['DEC'][i]
         objname = maintab[objname_col][i]
-        #group_name = etab[group_name_col][i] # this is either the objname, or objname_GROUP for groups
-        
-        # if etab[primary_group_col][i] & (etab[group_mult_col][i] > 0): # make directory for primary targets
-        # galpath = outdir+etab[objid_col][i]
+
         path_to_image_dir = outdir+obj_id+'/'
         
         # make directory if it doesn't already exist
@@ -301,15 +302,22 @@ if __name__ == '__main__':
             os.mkdir(path_to_image_dir)
         os.chdir(path_to_image_dir)
 
-        #copy images
-        get_images(obj_id,ra,dec,outdir,data_root_dir)
+        try:
+            #copy images
+            get_images(obj_id,ra,dec,outdir,data_root_dir)
         
-        #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
-        get_galaxies_in_fov(maintab, path_to_image_dir)
+            #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
+            get_galaxies_in_fov(maintab, path_to_image_dir)
         
-        ############
-        ### PSFs ###
-        ############
+        except Exception as e:
+            print(e)
+            fail_flag[i]=True   #galaxy FAILED! mark its failure here
+            continue
+        
+        ########################################
+        ###              [PSFs]              ###
+        ### obsolete; using SGA2025 PSFs now ###
+        ########################################
         
         #get_wise_psfs(param_dict, path_to_image_dir)
 
@@ -320,3 +328,6 @@ if __name__ == '__main__':
         
     os.chdir(outdir)   #return to the main output directory
     
+    #lastly...create table of failures.
+    fail_table = Table([maintab[objname_col], fail_flag], names=['PRIMARY_OBJNAME', 'FAIL_FLAG'])
+    fail_table.write('dir_failures.fits',overwrite=True)
