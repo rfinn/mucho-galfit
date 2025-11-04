@@ -574,7 +574,7 @@ if __name__ == '__main__':
     image = os.path.basename(glob.glob(f'{output_dir}*image-{bandpass}.fits')[0])
     invvar_image = image.replace('image-','invvar-')
     std_image = image.replace('image-','std-')
-    psf_image = image.replace('image-','PSF-')
+    psf_image = image.replace('image-','psf-')
     
     print("image = ",image)
 
@@ -587,8 +587,6 @@ if __name__ == '__main__':
     for obj in objids:
         mindex = etab[objid_col] == obj
         matchflag[mindex] = True 
-
-    
     
     if np.sum(matchflag) < 1:
         print("ERROR: did not find a matching OBJID for ",objid)

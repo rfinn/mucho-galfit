@@ -30,6 +30,9 @@ from astropy.io import fits
 import numpy as np
 from astropy.table import Table
 
+#import create objid function
+from merge_ns_catalogs import create_OBJIDs
+
 #importing mask util functions...
 sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
@@ -236,7 +239,7 @@ if __name__ == '__main__':
     outdir = main_dir+param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
     
-    main_catalog = param_dict['main_catalog']
+    main_catalog_path = param_dict['main_catalog']
     
     objid_col = param_dict['objid_col']
 
@@ -246,6 +249,15 @@ if __name__ == '__main__':
     maintab = Table.read(param_dict['main_catalog'])
 
     primary_group_col = param_dict['primary_group_col']
+    
+    ###########################################
+    # Check if main catalog has OBJID column. #
+    # If not, create one (and save result)! #
+    ###########################################
+    
+    if objid_col not in maintab.columns:
+        maintab = create_OBJIDs(maintab)
+        maintab.write(main_catalog_path, overwrite=True)
     
     ############################
     # Isolate Primary Galaxies #
@@ -297,7 +309,7 @@ if __name__ == '__main__':
         ### PSFs ###
         ############
         
-        get_wise_psfs(param_dict, path_to_image_dir)
+        #get_wise_psfs(param_dict, path_to_image_dir)
 
         # for testing
         #if i == 1:
