@@ -169,9 +169,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
     ra_slice = f'{int(ra):03d}'
         
     if dec>32.:   #if DEC>32 degrees, then galaxy is in "north" catalog. else, south catalog.
-        data_dir = f'{data_root_dir}dr9-north/{ra_slice}/'
+        data_dir = f'{data_root_dir}dr11-north/{ra_slice}/'
     if dec<32.:
-        data_dir = f'{data_root_dir}dr9-south/{ra_slice}/'
+        data_dir = f'{data_root_dir}dr11-south/{ra_slice}/'
         
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - exiting")
