@@ -212,6 +212,18 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     ###############################################################################
 
 
+#for parallelization :-)
+def setup_one_galaxy(objid, maintab, param_dict):
+    row = maintab[maintab[param_dict['objid_col']] == objid][0]
+    ra, dec = row['RA'], row['DEC']
+    outdir = param_dict['main_dir'] + param_dict['path_to_images']
+    data_root_dir = param_dict['data_root_dir']
+    hemisphere_bound = float(param_dict['hemisphere_bound'])
+    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound)
+    get_galaxies_in_fov(maintab, os.path.join(outdir, objid))
+
+    
+    
 ##########################################################################     
 ### END FUNCTIONS
 ##########################################################################     
@@ -249,7 +261,7 @@ if __name__ == '__main__':
     group_name_col = param_dict['group_name_col']
     objname_col = param_dict['objname_col']
 
-    maintab = Table.read(param_dict['main_catalog'])
+    maintab = Table.read(main_catalog_path)
 
     primary_group_col = param_dict['primary_group_col']
     
