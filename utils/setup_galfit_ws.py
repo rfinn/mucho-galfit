@@ -35,10 +35,6 @@ sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
 from galaxies_in_fov import get_galaxies_in_fov
 
-#and create OBJIDs
-sys.path.insert(0, '../')
-from merge_ns_catalogs import create_OBJIDs
-
 
 ##########################################################################     
 ### FUNCTIONS
@@ -273,6 +269,9 @@ if __name__ == '__main__':
     ###########################################
     
     if objid_col not in maintab.columns:
+        sys.path.insert(0, '../')
+        from merge_ns_catalogs import create_OBJIDs
+        
         maintab = create_OBJIDs(maintab)
         maintab.write(main_catalog_path, overwrite=True)
     
