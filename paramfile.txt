@@ -2,11 +2,15 @@
 
 main_dir          /mnt/astrophysics/wisesize/             #mounted dir for input/output images
 path_to_scripts   github/wisesize/mucho-galfit/           #draco path for galfit code, starting from main_dir
-path_to_images    galfit_20251104/                     #output path to image dirs for each galaxy, starting from main_dir
+path_to_images    galfit_20251104/                     #output path to image dirs for each galaxy, 
+                                                       #starting from main_dir
+                                                       
 data_root_dir     /mnt/astrophysics/wisesize/       #where JM images are stored (RA directories)
                                                     #e.g., /mnt/astrophysics/wisesize/SGA2025/
                                                     #exclude dr11-south or dr11-north if those dirs are involved
-tile_path         github/wisesize/unwise_PSFs/tiles.fits  #location of tiles.fits, needed for pulling unWISE PSF images
+                                                    
+tile_path         github/wisesize/unwise_PSFs/tiles.fits  #location of tiles.fits, 
+                                                          #needed for pulling unWISE PSF images
 
 html_outdir       /mnt/astrophysics/wisesize/wisesize_html/  #where website html and .png files will be saved
 
@@ -29,7 +33,7 @@ group_mult_col       GROUP_MULT                            #name of group mult c
 group_name_col       GROUP_NAME                            #name of group name column
 objname_col          OBJNAME                               #name of objname column
 
-hemisphere_bound     35.03                                 #the division declination (in degrees) between the 
+hemisphere_bound     32                                    #the division declination (in degrees) between the 
                                                            #DESI north and south catalogs. if DEC>bound, 
                                                            #then galaxy is in "north" catalog. 
                                                            #else, south catalog.

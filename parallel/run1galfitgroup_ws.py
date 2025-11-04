@@ -5,7 +5,6 @@ GOAL:
 - this program will run galfit on one of JM's group images
 - galfit is run once with generic input parameters, no convolution
 - the output is used as input for a second run, w/convolution enabled
-
 INPUT:
 - group 
 

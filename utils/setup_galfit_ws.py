@@ -256,7 +256,7 @@ if __name__ == '__main__':
     
     ###########################################
     # Check if main catalog has OBJID column. #
-    # If not, create one (and save result)! #
+    #  If not, create one (and save result)!  #
     ###########################################
     
     if objid_col not in maintab.columns:
@@ -333,3 +333,5 @@ if __name__ == '__main__':
     #lastly...create table of failures.
     fail_table = Table([maintab[objname_col], fail_flag], names=['PRIMARY_OBJNAME', 'FAIL_FLAG'])
     fail_table.write('dir_failures.fits',overwrite=True)
+    print()
+    print(f'fail tble saved to {os.path.join(outdir,'dir_failures.fits')}. True=NO DIRECTORY FOR THAT PRIMARY GALAXY!')
