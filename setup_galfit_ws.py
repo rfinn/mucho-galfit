@@ -161,7 +161,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
 
     #data_root_dir is where JM's input_ images are initially stored
     if not os.path.exists(data_root_dir):
-        print(f"could not find data_root_dir - exiting")
+        print(f"could not find data_root_dir {data_root_dir} - exiting")
         sys.exit()
     
     #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
