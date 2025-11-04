@@ -168,9 +168,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     ra_slice = f'{int(ra):03d}'
         
     if dec>hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}/')
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}/')+'/'
     if dec<hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}/')
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}/')+'/'
         
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - exiting")
