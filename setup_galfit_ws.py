@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
     primary_group_col = param_dict['primary_group_col']
     
-    hemisphere_bound = param_dict['hemisphere_bound']
+    hemisphere_bound = float(param_dict['hemisphere_bound'])
     
     ###########################################
     # Check if main catalog has OBJID column. #
