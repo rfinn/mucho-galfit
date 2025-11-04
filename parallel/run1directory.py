@@ -10,11 +10,24 @@ import sys
 from astropy.table import Table
 
 # --- Import utility functions ---
-sys.path.insert(0, '~/github/mucho-galfit/utils')
+#sys.path.insert(0, '~/github/mucho-galfit/utils')
+#from setup_galfit_ws import setup_one_galaxy
+#from getprimarydirs import write_primarydirs, find_primaries
+
+sys.path.insert(0, '../')
+from merge_ns_catalogs import create_OBJIDs
+
+# --- Ensure utils/ is on sys.path, relative to this file’s directory ---
+script_dir = os.path.dirname(os.path.abspath(__file__))
+utils_path = os.path.join(script_dir, 'utils')
+sys.path.insert(0, utils_path)
+
+# --- Import utility functions ---
 from setup_galfit_ws import setup_one_galaxy
 from getprimarydirs import write_primarydirs, find_primaries
 
-sys.path.insert(0, '../')
+# If merge_ns_catalogs.py is one directory above:
+sys.path.insert(0, os.path.join(script_dir, '..'))
 from merge_ns_catalogs import create_OBJIDs
 
 # --- Read parameter file ---
