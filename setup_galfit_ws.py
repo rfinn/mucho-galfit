@@ -174,7 +174,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir):
         data_dir = f'{data_root_dir}dr9-south/{ra_slice}/'
         
     if not os.path.exists(data_dir):
-        print(f"could not find data_dir - exiting")
+        print(f"could not find data_dir {data_dir} - exiting")
         sys.exit()
 
     group_name = radec_to_groupname(ra, dec, prefix='')
