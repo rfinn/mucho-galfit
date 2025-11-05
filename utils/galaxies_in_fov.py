@@ -40,7 +40,7 @@ def get_galaxies_in_fov(gtab, output_dir):
         
         # create a SkyCoord object from RA and DEC of galaxies
         galcoord = SkyCoord(gtab['RA'],gtab['DEC'],frame='icrs',unit='deg')
-        
+        print(output_dir)
         #grab some filename in output_dir with 'image' and 'fits' in the name
         im_path = glob.glob(f'{output_dir}*-image-W3.fits')[0]
         
