@@ -158,6 +158,10 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
 
+    print('#'*10)
+    print(f'HELLO!!!!!! output_dir = {output_dir}')
+    print('#'*10)
+        
     #data_root_dir is where JM's input_ images are initially stored
     if not os.path.exists(data_root_dir):
         print(f"could not find data_root_dir {data_root_dir} - exiting")
@@ -172,13 +176,17 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     if dec<hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}/')
         
+    print('#'*10)
+    print(f'HELLO!!!!!! data_dir = {data_dir}')
+    print('#'*10)
+    
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - exiting")
         sys.exit()
-
+        
     group_name = radec_to_groupname(ra, dec, prefix='')
     
-    data_dir = os.path.abspath(data_dir+group_name+'/')
+    data_dir = os.path.abspath(os.path.join(data_dir, group_name)) #os.path.join ensures the '/' is not ignored.
     
     funpack_all(data_dir, output_dir)
     
@@ -313,6 +321,10 @@ if __name__ == '__main__':
         objname = maintab[objname_col][i]
 
         path_to_image_dir = outdir+obj_id+'/'
+        
+        print('#'*10)
+        print(f'HELLO! path_to_image_dir = {path_to_image_dir}')
+        print('#'*10)
         
         # make directory if it doesn't already exist
         if not os.path.exists(path_to_image_dir):
