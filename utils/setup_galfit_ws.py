@@ -220,7 +220,7 @@ def setup_one_galaxy(objid, maintab, param_dict):
     row = maintab[maintab[param_dict['objid_col']] == objid][0]
     
     ra, dec = row['RA'], row['DEC']
-    group_name = row[param_dict['GROUP_NAME']]
+    group_name = row[param_dict['group_name_col']]
     
     outdir = param_dict['main_dir'] + param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
