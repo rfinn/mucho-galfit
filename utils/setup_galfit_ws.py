@@ -73,9 +73,9 @@ def move_masks(start_dir, output_dir, wise_image_file):
             src = os.path.join(output_dir, filename)
             
             #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is SGA2025 cadence) 
-            dst = os.path.join(output_dir, filename.replace('maskbits', 'image-r-mask'))
+            rmask_file = os.path.join(output_dir, filename.replace('maskbits', 'image-r-mask'))
             
-            os.system(f'cp {src} {dst}') #make copy with new filename!
+            os.system(f'cp {src} {rmask_file}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
             #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
