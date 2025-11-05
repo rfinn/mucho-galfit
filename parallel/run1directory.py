@@ -64,6 +64,7 @@ objid = sys.argv[1]
 
 #setup_one_galaxy(objid, maintab, param_dict)
 
+failure_count=0
 try:
     success = setup_one_galaxy(objid, maintab, param_dict)
     if not success:
