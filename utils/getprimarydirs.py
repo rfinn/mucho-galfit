@@ -9,13 +9,16 @@ import numpy as np
 
 def find_primaries(maintab, primary_group_col, objid_col):
     
+    #firstly...since I am currently testing dr11-south galaxies, restrict DEC to <= 32 degrees
+    decflag = maintab['DEC']<=32.
+    
     #trim to only include primary galaxies; if no such flag exists, assume all galaxies are primary.
     try:
         primary_flag = maintab[primary_group_col]
     except:
         primary_flag = np.ones(len(maintab),dtype=bool)   #all true
 
-    maintab = maintab[primary_flag]
+    maintab = maintab[primary_flag&decflag]
     
     primary_objids = maintab[objid_col]
     

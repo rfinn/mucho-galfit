@@ -61,14 +61,4 @@ if len(sys.argv) < 2:
     sys.exit("Usage: run1directory.py <OBJID>")
 
 objid = sys.argv[1]
-
-#setup_one_galaxy(objid, maintab, param_dict)
-
-failure_count=0
-try:
-    success = setup_one_galaxy(objid, maintab, param_dict)
-    if not success:
-        failure_count += 1
-except:
-    failure_count += 1
-    print(f"Total failures so far: {failure_count}")
+setup_one_galaxy(objid, maintab, param_dict)

@@ -181,7 +181,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
         
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - logging and exiting")
-        return False
+        return
             
     data_dir = os.path.abspath(data_dir + group_name) + '/'
     
@@ -227,7 +227,7 @@ def setup_one_galaxy(objid, maintab, param_dict):
     
     hemisphere_bound = float(param_dict['hemisphere_bound'])
     
-    success = get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
+    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
     get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
     
     return success
@@ -328,7 +328,7 @@ if __name__ == '__main__':
 
         try:
             #copy images
-            _ = get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
+            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
         
             #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
             get_galaxies_in_fov(maintab, path_to_image_dir)
