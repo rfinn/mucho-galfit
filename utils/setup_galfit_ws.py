@@ -174,7 +174,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     if dec>hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
     if dec<hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}) + '/'
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}') + '/'
         
     print('#'*10)
     print(f'HELLO!!!!!! data_dir = {data_dir}')
