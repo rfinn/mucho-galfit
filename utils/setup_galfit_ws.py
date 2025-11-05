@@ -64,19 +64,21 @@ def move_masks(start_dir, output_dir, wise_image_file):
     '''
     Run AFTER the *maskbits.fits.fz is converted to .fits and relocated to the OBJIDxxxxx directory
     '''
-    
+
     for filename in os.listdir(output_dir):
         
         if 'maskbits' in filename:
 
-            #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is for cadence purposes)
-            rmask_file = os.path.abspath(output_dir+filename.replace('maskbits','image-r-mask'))
+            #define the file source (full path)
+            src = os.path.join(output_dir, filename)
             
-            os.system(f'cp {filename} {rmask_file}') #make copy with new filename!
+            #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is SGA2025 cadence) 
+            dst = os.path.join(output_dir, filename.replace('maskbits', 'image-r-mask'))
+            
+            os.system(f'cp {src} {dst}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
             #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
-                        
             reproject_mask(rmask_file, wise_image_file)
             
             return
@@ -289,16 +291,19 @@ if __name__ == '__main__':
 
     maintab = maintab[primary_flag]
         
-    #############################
+    ##############################
     # Create Primary Galaxy Dirs #
     ##############################
     
     #check that outdir (where the individual primary galaxy directories will live) exists! if not, create it.
-    if os.path.exists(outdir):
-        os.chdir(outdir)
-    else:
+    #if os.path.exists(outdir):
+    #    os.chdir(outdir)
+    #else:
+    #    os.system(f'mkdir {outdir}')
+    #    os.chdir(outdir)
+    
+    if not os.path.exists(outdir):
         os.system(f'mkdir {outdir}')
-        os.chdir(outdir)
     
     #I need to keep some living array of failure modes...
     #and also print the problems in the terminal so I know WHY they failed
