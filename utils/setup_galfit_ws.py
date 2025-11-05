@@ -146,7 +146,7 @@ def get_wise_psfs(param_dict, path_to_image_dir):
     
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
-def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
+def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32.):
     ###############################################################################
     ### GET IMAGES
     ###############################################################################
@@ -168,18 +168,20 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
     #ra_slice = f'{np.trunc(ra):03.0f}'
     ra_slice = f'{int(ra):03d}'
-        
+    group_name = radec_to_groupname(ra, dec, prefix='')  #and convert ra, dec to sga2025 group name
+    
+    
     if dec>hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
+        n_s = 'dr11-north'
     if dec<hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}') + '/'
-    
-    if not os.path.exists(data_dir):
-        print(f"could not find data_dir {data_dir} - exiting")
-        sys.exit()
+        n_s = 'dr11-south'
         
-    group_name = radec_to_groupname(ra, dec, prefix='')
-    
+    if not os.path.exists(data_dir):
+        print(f"could not find data_dir {data_dir} - logging and exiting")
+        return objid, ra, dec, group_name, n_s
+            
     data_dir = os.path.abspath(data_dir + group_name) + '/'
     
     funpack_all(data_dir, output_dir)
@@ -215,7 +217,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
 #for parallelization :-)
 def setup_one_galaxy(objid, maintab, param_dict):
     row = maintab[maintab[param_dict['objid_col']] == objid][0]
-    ra, dec = row['RA'], row['DEC']
+    ra, dec = row['RA_INIT'], row['DEC_INIT']
     outdir = param_dict['main_dir'] + param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
     hemisphere_bound = float(param_dict['hemisphere_bound'])
@@ -294,13 +296,6 @@ if __name__ == '__main__':
     ##############################
     # Create Primary Galaxy Dirs #
     ##############################
-    
-    #check that outdir (where the individual primary galaxy directories will live) exists! if not, create it.
-    #if os.path.exists(outdir):
-    #    os.chdir(outdir)
-    #else:
-    #    os.system(f'mkdir {outdir}')
-    #    os.chdir(outdir)
     
     if not os.path.exists(outdir):
         os.system(f'mkdir {outdir}')
