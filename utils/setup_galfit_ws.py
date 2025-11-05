@@ -308,8 +308,8 @@ if __name__ == '__main__':
     for i in range(len(maintab)):
         
         obj_id = maintab[objid_col][i]
-        ra = maintab['RA'][i]
-        dec = maintab['DEC'][i]
+        ra = maintab['RA_INIT'][i]
+        dec = maintab['DEC_INIT'][i]
         objname = maintab[objname_col][i]
 
         path_to_image_dir = outdir+obj_id+'/'
