@@ -59,4 +59,10 @@ if __name__ == '__main__':
     
     primary_galaxies = find_primaries(maintab, primary_group_col, objid_col)
     write_primarydirs(primary_galaxies, destination)
+    print('#'*20)
     print(f'Successfully written {destination}!')
+    print()
+    print(f'This file contains {len(primary_galaxies)} galaxies.')
+    print()
+    print('WARNING: be sure to confirm in getprimarydirs.py that the decflag is not accidentally toggled!')
+    print('#'*20)
