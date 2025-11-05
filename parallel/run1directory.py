@@ -8,6 +8,7 @@ GOAL:
 import os
 import sys
 from astropy.table import Table
+import numpy as np
 
 # --- Import utility functions ---
 sys.path.insert(0, '/mnt/astrophysics/wisesize/github/mucho-galfit/utils')
@@ -21,6 +22,7 @@ from merge_ns_catalogs import create_OBJIDs
 param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
 param_dict = {}
 
+print('#'*20)
 print(os.getcwd())
 print('#'*20)
 
@@ -52,12 +54,20 @@ if param_dict['objid_col'] not in maintab.colnames:
 primary_dirs_file = os.path.join(param_dict['main_dir'], param_dict['path_to_images'], 'PrimaryDirs.txt')
 
 if not os.path.exists(primary_dirs_file):
-    primary_galaxies = find_primaries(maintab, param_dict['primary_group_col'])
-    write_primarydirs(primary_galaxies, primary_dirs_file)
+    sys.exit('Unable to find PrimaryDirs.txt!')
 
 # --- Run GALFIT setup for a single galaxy ---
 if len(sys.argv) < 2:
     sys.exit("Usage: run1directory.py <OBJID>")
 
 objid = sys.argv[1]
-setup_one_galaxy(objid, maintab, param_dict)
+
+#setup_one_galaxy(objid, maintab, param_dict)
+
+try:
+    success = setup_one_galaxy(objid, maintab, param_dict)
+    if not success:
+        failure_count += 1
+except:
+    failure_count += 1
+    print(f"Total failures so far: {failure_count}")
