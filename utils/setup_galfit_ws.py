@@ -153,7 +153,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     
     #output_loc is the directory holding the individual galaxy output directories (which GALFIT will be pulling from!)
     #e.g., /mnt/astrophysics/wisesize/mg_output_wisesize/OBJ10000/
-    output_dir = os.path.abspath(os.path.join(output_loc, objid+'/'))
+    output_dir = os.path.abspath(os.path.join(output_loc, objid)) + '/'
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
@@ -172,9 +172,9 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     ra_slice = f'{int(ra):03d}'
         
     if dec>hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}/')
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
     if dec<hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}/')
+        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}) + '/'
         
     print('#'*10)
     print(f'HELLO!!!!!! data_dir = {data_dir}')
@@ -186,7 +186,7 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
         
     group_name = radec_to_groupname(ra, dec, prefix='')
     
-    data_dir = os.path.abspath(os.path.join(data_dir, group_name)) #os.path.join ensures the '/' is not ignored.
+    data_dir = os.path.abspath(data_dir, group_name) + '/'
     
     funpack_all(data_dir, output_dir)
     
@@ -226,7 +226,7 @@ def setup_one_galaxy(objid, maintab, param_dict):
     data_root_dir = param_dict['data_root_dir']
     hemisphere_bound = float(param_dict['hemisphere_bound'])
     get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound)
-    get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid)))
+    get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
 
     
     
