@@ -30,9 +30,10 @@ mock_ephot_name     /mnt/astrophysics/lsdr9-wisesize/wisesize_ephot_mock.fits   
 objid_col            OBJID                                 #name of the objid column in the above catalogs
 primary_group_col    GROUP_PRIMARY                         #name of primary group flag column
 group_mult_col       GROUP_MULT                            #name of group mult column (num galaxies in group?)
-group_name_col       GROUP_NAME                            #name of group name column
+group_name_col       GROUP_NAME                            #name of group name column, blank if None
+                                                           # (code will try to calculate it automatically based
+                                                           # on SGA2025 cadence)
 objname_col          OBJNAME                               #name of objname column
-groupname_col        GROUP_NAME                            #name of group name column; leave blank if None
 
 hemisphere_bound     32                                    #the division declination (in degrees) between the 
                                                            #DESI north and south catalogs. if DEC>bound, 

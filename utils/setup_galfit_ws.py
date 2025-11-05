@@ -216,13 +216,18 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
 
 #for parallelization :-)
 def setup_one_galaxy(objid, maintab, param_dict):
+    
     row = maintab[maintab[param_dict['objid_col']] == objid][0]
+    
     ra, dec = row['RA'], row['DEC']
     group_name = row[param_dict['GROUP_NAME']]
+    
     outdir = param_dict['main_dir'] + param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
+    
     hemisphere_bound = float(param_dict['hemisphere_bound'])
-    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name)
+    
+    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
     get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
     
     
@@ -268,7 +273,7 @@ if __name__ == '__main__':
     primary_group_col = param_dict['primary_group_col']
     
     hemisphere_bound = float(param_dict['hemisphere_bound'])
-    
+        
     ###########################################
     # Check if main catalog has OBJID column. #
     #  If not, create one (and save result)!  #
@@ -311,6 +316,7 @@ if __name__ == '__main__':
         ra = maintab['RA'][i]
         dec = maintab['DEC'][i]
         objname = maintab[objname_col][i]
+        group_name = maintab[group_name_col][i]
 
         path_to_image_dir = outdir+obj_id+'/'
         
@@ -321,7 +327,7 @@ if __name__ == '__main__':
 
         try:
             #copy images
-            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name)
+            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
         
             #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
             get_galaxies_in_fov(maintab, path_to_image_dir)
