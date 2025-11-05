@@ -157,10 +157,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
     if not os.path.exists(output_dir):
         print("making the output directory ",output_dir)
         os.mkdir(output_dir)
-
-    print('#'*10)
-    print(f'HELLO!!!!!! output_dir = {output_dir}')
-    print('#'*10)
         
     #data_root_dir is where JM's input_ images are initially stored
     if not os.path.exists(data_root_dir):
@@ -175,10 +171,6 @@ def get_images(objid,ra,dec,output_loc,data_root_dir,hemisphere_bound=32.):
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
     if dec<hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}') + '/'
-        
-    print('#'*10)
-    print(f'HELLO!!!!!! data_dir = {data_dir}')
-    print('#'*10)
     
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - exiting")
@@ -321,10 +313,6 @@ if __name__ == '__main__':
         objname = maintab[objname_col][i]
 
         path_to_image_dir = outdir+obj_id+'/'
-        
-        print('#'*10)
-        print(f'HELLO! path_to_image_dir = {path_to_image_dir}')
-        print('#'*10)
         
         # make directory if it doesn't already exist
         if not os.path.exists(path_to_image_dir):
