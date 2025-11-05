@@ -146,7 +146,7 @@ def get_wise_psfs(param_dict, path_to_image_dir):
     
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
-def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32.):
+def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., group_name=None):
     ###############################################################################
     ### GET IMAGES
     ###############################################################################
@@ -168,8 +168,9 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32.):
     #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
     #ra_slice = f'{np.trunc(ra):03.0f}'
     ra_slice = f'{int(ra):03d}'
-    group_name = radec_to_groupname(ra, dec, prefix='')  #and convert ra, dec to sga2025 group name
     
+    if group_name is None:
+        group_name = radec_to_groupname(ra, dec, prefix='')  #and convert ra, dec to sga2025 group name
     
     if dec>hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
@@ -180,7 +181,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32.):
         
     if not os.path.exists(data_dir):
         print(f"could not find data_dir {data_dir} - logging and exiting")
-        return objid, ra, dec, group_name, n_s
+        return
             
     data_dir = os.path.abspath(data_dir + group_name) + '/'
     
@@ -213,17 +214,16 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32.):
     ### END GET IMAGES
     ###############################################################################
 
-
 #for parallelization :-)
 def setup_one_galaxy(objid, maintab, param_dict):
     row = maintab[maintab[param_dict['objid_col']] == objid][0]
-    ra, dec = row['RA_INIT'], row['DEC_INIT']
+    ra, dec = row['RA'], row['DEC']
+    group_name = row[param_dict['GROUP_NAME']]
     outdir = param_dict['main_dir'] + param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
     hemisphere_bound = float(param_dict['hemisphere_bound'])
-    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound)
+    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name)
     get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
-
     
     
 ##########################################################################     
@@ -308,8 +308,8 @@ if __name__ == '__main__':
     for i in range(len(maintab)):
         
         obj_id = maintab[objid_col][i]
-        ra = maintab['RA_INIT'][i]
-        dec = maintab['DEC_INIT'][i]
+        ra = maintab['RA'][i]
+        dec = maintab['DEC'][i]
         objname = maintab[objname_col][i]
 
         path_to_image_dir = outdir+obj_id+'/'
@@ -321,7 +321,7 @@ if __name__ == '__main__':
 
         try:
             #copy images
-            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound)
+            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name)
         
             #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
             get_galaxies_in_fov(maintab, path_to_image_dir)
