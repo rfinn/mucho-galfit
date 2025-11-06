@@ -534,6 +534,8 @@ class galfit_dir():
             print('#'*20)
             print(f'OH NO! *-{band}-out2.fits not found!')
             print('#'*20)
+            self.galimage=None
+            return
         
         print(f"looking for galfit file {self.galfit}")
         
@@ -567,7 +569,7 @@ class galfit_dir():
         else:
             self.galimage = None
         
-        pass
+        return
     
     
 class build_html_cutout():
