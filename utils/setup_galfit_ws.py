@@ -326,12 +326,12 @@ if __name__ == '__main__':
             os.mkdir(path_to_image_dir)
         os.chdir(path_to_image_dir)
 
+        #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
+        get_galaxies_in_fov(maintab, path_to_image_dir)
+        
         try:
             #copy images
             get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
-        
-            #get galaxes in FOV, save to galsFOV.txt in path_to_image_dir
-            get_galaxies_in_fov(maintab, path_to_image_dir)
         
         except Exception as e:
             print(e)

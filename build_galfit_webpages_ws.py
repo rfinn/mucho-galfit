@@ -401,7 +401,7 @@ class galfit_dir():
         
     def get_ngal(self):
         """check to see how many galaxies in FOV  """
-        infile = open('galsFOV-r.txt','r')
+        infile = open('galsFOV.txt','r') if os.path.exists('galsFOV.txt') else open('galsFOV-W3.txt','r')
         mylines = infile.readlines()
         self.ngal = len(mylines)
 
@@ -523,12 +523,17 @@ class galfit_dir():
     def get_galfit_model(self,band='r'):
         ''' read in galfit model and make png '''
         
-        #we are only running GALFIT on r-band without convolution!
-        if band=='r':
-            self.galfit = glob.glob(f"*-{band}-out1.fits")[0]
-        #otherwise, we want to output the convolved results
-        else:
-            self.galfit = glob.glob(f"*-{band}-out2.fits")[0]
+            try:
+            #we are only running GALFIT on r-band without convolution!
+            if band=='r':
+                self.galfit = glob.glob(f"*-{band}-out1.fits")[0]
+            #otherwise, we want to output the convolved results
+            else:
+                self.galfit = glob.glob(f"*-{band}-out2.fits")[0]
+            except:
+                print('#'*20)
+                print(f'OH NO! *-{band}-out2.fits not found!')
+                print('#'*20)
         
         print(f"looking for galfit file {self.galfit}")
         
@@ -587,12 +592,6 @@ class build_html_cutout():
         self.next = next
         self.previous = previous
 
-        
-        # for reference, this is the order of the png images
-        #self.fitsimages = [self.rimage,self.haimage,self.csimage,\
-        #              self.legacy_g,self.legacy_r,self.legacy_z,\
-        #              self.w1,self.w2,self.w3,self.w4]
-
                 
     def build_html(self):
         self.write_header()
@@ -609,7 +608,7 @@ class build_html_cutout():
         
             self.write_galfit_images(band=b)
             self.write_galfit_table(band=b)
-     
+            
         self.write_navigation_links()
         self.close_html()
     
