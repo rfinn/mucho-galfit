@@ -401,7 +401,7 @@ class galfit_dir():
         
     def get_ngal(self):
         """check to see how many galaxies in FOV  """
-        infile = open('galsFOV.txt','r')
+        infile = open('galsFOV-r.txt','r')
         mylines = infile.readlines()
         self.ngal = len(mylines)
 

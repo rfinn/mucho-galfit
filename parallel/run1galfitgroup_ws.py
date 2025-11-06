@@ -37,6 +37,13 @@ python /mnt/astrophysics/wisesize/github/mucho-galfit/run1galfitgroup.py galname
 
 This is called by mksbatchgroups.py for running in parallel.
 
+====================
+
+#additional notes...
+
+# The first pass runs GALFIT with generic parameters, no convolution.
+# The second pass uses r-band BA/PA and convolution.
+# If Sersic n > 6 in round 1, hold n=6 in round 3.
 '''
 import os
 import sys
@@ -49,12 +56,7 @@ from reproject import reproject_interp
 from astropy.table import Table 
 
 homedir = os.getenv("HOME")
-# add in masking from halphagui
-#sys.path.append(homedir+'/github/halphagui/')
 sys.path.append(homedir+'/github/mucho-galfit/parallel/')
-#from maskwrapper import buildmask
-#from run1galfit import get_maskname
-#import run1maskgroup as mg
 
 ### DICTIONARIES
 
@@ -286,8 +288,11 @@ def write_galfit_input(output_dir,image,sigma_image,psf_image,bandpass,xgal=None
     if firstpass:
         # remove any straggler galfit files
         # this ensures that the first pass results are in galfit.01
-        os.system('rm galfit.??')
-
+        try:
+            os.system('rm galfit.??')
+        except:
+            pass
+        
         BA=1
         fitBA = 1
         PA=0
@@ -635,20 +640,6 @@ if __name__ == '__main__':
             rCBA = rgalfit['AR'][matchindex]            
             fixCBA = True
             fixCPA = True
-            
-        #if rgalfit['CNumerical_Error'][matchindex_primary][0]:
-        #    print("not using r-band params b/c they are not reliable")
-        #    rCPA = None
-        #    rCBA = None
-        #    fixCBA = False
-        #    fixCPA = False
-            
-        #else:
-        #    # get the PA and BA for this galaxy
-        #    rCPA = rgalfit['CPA'][matchindex]
-        #    rCBA = rgalfit['CAR'][matchindex]            
-        #    fixCBA = True
-        #    fixCPA = True
     
     else:
         rPA = None
@@ -661,15 +652,16 @@ if __name__ == '__main__':
         fixCPA = False
         
 
-
     # masks are made first with run1maskgroup.py
     # so we just need the correct mask name
     mask_image = get_maskname(image)
         
-    # TODONE: remove previous galfit files if they exist
-    os.system('rm galfit.??')
-    os.system('rm galfit.input?')
-
+    #remove previous galfit files if they exist
+    try:
+        os.system('rm galfit.??')
+        os.system('rm galfit.input?')
+    except:
+        pass
     
     # add code to generate galfit input for first run, no convolution, generic starting point
     #write_galfit_input(output_dir, image, sigma_image,psf_image,bandpass,xgal=None,ygal=None, mask_image=None, firstpass=True):
