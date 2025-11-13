@@ -237,8 +237,9 @@ def setup_one_galaxy(objid, maintab, param_dict):
     
     get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
     get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
-    
-    return success
+    print('#'*20)
+    print('SUCCESS!')
+    print('#'*20)
 
 ##########################################################################     
 ### END FUNCTIONS
