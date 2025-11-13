@@ -84,7 +84,7 @@ def reproject_mask(maskfile, reffile):
     '''
     
     #remove galaxy pixels from mask...will save.
-    remove_galaxy(maskfile)
+    remove_galaxy_SGA2025(maskfile)
     
     with fits.open(maskfile) as hmask, fits.open(reffile) as href:
 

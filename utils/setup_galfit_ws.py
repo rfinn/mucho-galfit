@@ -62,7 +62,10 @@ def funpack_all(start_dir, output_dir):
 #prepare the masks!
 def move_masks(start_dir, output_dir, wise_image_file):
     '''
-    Run AFTER the *ellipse-griz is relocated to the OBJIDxxxxx directory
+    Can run before the *ellipse-griz is relocated to the OBJIDxxxxx directory
+    * note that for group galaxies, there might be more than one ellipse-griz file -- one per galaxy
+    * this will NOT affect the resultant mask, since the SGA galaxies will be removed from the masks regardless.
+        * That is...can just pull the first one found.
     '''
 
     for filename in os.listdir(start_dir):
@@ -73,10 +76,12 @@ def move_masks(start_dir, output_dir, wise_image_file):
                                          #and the SGA photometry!
 
             #define the file source (full path)
-            src = os.path.join(output_dir, filename)
+            src = os.path.join(start_dir, filename)
             
-            #replace 'maskbits' with 'image-r-mask' in mask filename (the 'image-' is SGA2025 cadence) 
-            rmask_file = os.path.join(output_dir, filename.replace('ellipse-griz', 'image-r-mask'))
+            #replace 'image-W3' with 'image-r-mask' for mask filename (the 'image-' is SGA2025 cadence)
+            #this ensures that the file uses the SGAGROUP prefix, not the SGANAME galaxy prefix!
+            basename = os.path.basename(wise_image_file).replace('W3', 'r-mask')
+            rmask_file = os.path.join(output_dir, basename)
             
             os.system(f'cp {src} {rmask_file}') #make copy with new filename!
             
