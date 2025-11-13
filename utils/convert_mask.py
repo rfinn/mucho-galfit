@@ -89,7 +89,7 @@ def reproject_mask(maskfile, reffile):
     with fits.open(maskfile) as hmask, fits.open(reffile) as href:
 
         #reproject using HDU
-        wisemask, footprint = reproject_interp(hmask[0], href[0].header)
+        wisemask, footprint = reproject_interp(hmask[1], href[0].header)
         
         outname = maskfile.replace('r-mask', 'wise-mask')
         
