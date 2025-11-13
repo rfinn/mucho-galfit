@@ -82,8 +82,6 @@ def getunwise(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234',makepl
       - native is 0.262 for legacy; 
       - 2.75 for wise
     """
-
-    # TODO: where do we get the reprocessed unwise images?
     
     downloadwise = True
     # check if images already exist

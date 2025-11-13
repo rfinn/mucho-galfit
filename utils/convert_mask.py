@@ -1,6 +1,6 @@
 '''
 GOAL: CONVERT JM'S SGA2025 BITMASK TO A FORMAT COMPATIBLE WITH GALFIT.
-    - need *maskbits.fits.fz converted to *maskbits.fits
+    - need *ellipse-griz.fits for each galaxy
     - convert to bool mask
     - save as *-r-mask.fits
     -reproject onto WISE pixel scale
@@ -27,7 +27,7 @@ image_resolution = {'FUV':6,'NUV':6,'g':1.5,'r':1.5,'z':1.5,'W1':6.1,'W2':6.4,'W
 minmag2fit = {'FUV':10,'NUV':10,'g':17,'r':17,'z':17,'W1':10,'W2':10,'W3':10,'W4':10}
 
 
-def remove_galaxy(maskfile):
+def remove_galaxy_SGA2020(maskfile):
     
     hdu = fits.open(maskfile)
     
@@ -38,7 +38,37 @@ def remove_galaxy(maskfile):
     # write out updated mask
     hdu.writeto(maskfile,overwrite=True)
 
+    
+def remove_galaxy_SGA2025(maskfile):
+    '''
+    Open maskfile! For SGA2025, should be *-ellipse-griz.fits
+    
+    Note that the maskbits are:
+        - 2^0 --> bright star
+        - 2^1 --> Gaia star
+        - 2^2 --> extended source (galaxy)
+        - 2^3 --> SGA source
+    
+    We want to keep 2^0 and 2^1 pixel masks, as well as 2^2 pixel masks. 
+    We want to REMOVE 2^3 and 2^2+2^3 pixel masks, as these are the 
+        galaxies on which we will run GALFIT modeling.
+    '''
+    
+    #read the maskfile
+    hdu = fits.open(maskfile)
+    
+    #the maskbits are the second extension of the ellipse-griz fits.
+    mask = hdu[1]
+    
+    #create a value flag
+    source_flag = (mask.data == 2**2) | (mask.data == (2**2 + 2**3))
+    
+    #omit from the mask (i.e., set equal to zero)
+    mask.data[source_flag] = 0
+    
+    mask.writeto(maskfile,overwrite=True)   #this will overwrite our copy of the *ellipse-griz.fits file
 
+    
 def reproject_mask(maskfile, reffile):
     '''
     maskfile: the mask to reproject
@@ -60,9 +90,6 @@ def reproject_mask(maskfile, reffile):
 
         #reproject using HDU
         wisemask, footprint = reproject_interp(hmask[0], href[0].header)
-        
-        from matplotlib import pyplot as plt
-        plt.imshow(wisemask)
         
         outname = maskfile.replace('r-mask', 'wise-mask')
         

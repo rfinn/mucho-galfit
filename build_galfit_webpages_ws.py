@@ -294,9 +294,9 @@ def display_galfit_model(galfile,percentile1=.5,percentile2=99.5,p1residual=5,p2
     images = [image,model,residual,residual]   #want one image-stretch, one hard-stretch residual
     titles = ['image','model','residual','residual']
     if mask is not None:
-        print("\nshape of image = ",image.shape)
-        print("shape of mask = ",mask.shape)
-        print()
+        #print("\nshape of image = ",image.shape)
+        #print("shape of mask = ",mask.shape)
+        #print()
         try:
             im = image[~mask]
             res = residual[~mask]
@@ -531,9 +531,12 @@ class galfit_dir():
             else:
                 self.galfit = glob.glob(f"*-{band}-out2.fits")[0]
         except:
-            print('#'*20)
-            print(f'OH NO! *-{band}-out2.fits not found!')
-            print('#'*20)
+            print()
+            print('#'*30)
+            print(f'OH NO! *-{band}-out_.fits not found!')
+            print('#'*30)
+            print()
+            
             self.galimage=None
             return
         
@@ -586,9 +589,7 @@ class build_html_cutout():
             print("outfile = ",outfile)
         objindices = np.arange(len(maincat))
         self.objindex = objindices[maincat['OBJID'] == self.cutout.objid]
-        #print('inside build html')
-        #print('coutdir = ',coutdir)
-        #print('outfile = ',outfile)        
+             
         self.html = open(outfile,'w')
         self.htmlhome = 'index.html'
         self.next = next
@@ -681,8 +682,12 @@ class build_html_cutout():
         
         #aesthetics. :-)
         band_header=f'{band}-band'
-
-        self.html.write(f'<h4>GALFIT Sersic Parameters for {band_header}</h4>\n')                
+        
+        message = f'GALFIT Sersic Parameters for {band_header}'
+        if 'fix' in band_header:
+            message += ' (if fixBA did not run, parameters will be same as above)'
+        
+        self.html.write(f'<h4>{message}</h4>\n')                
         labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
 
 

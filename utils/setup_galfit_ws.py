@@ -62,23 +62,26 @@ def funpack_all(start_dir, output_dir):
 #prepare the masks!
 def move_masks(start_dir, output_dir, wise_image_file):
     '''
-    Run AFTER the *maskbits.fits.fz is converted to .fits and relocated to the OBJIDxxxxx directory
+    Run AFTER the *ellipse-griz is relocated to the OBJIDxxxxx directory
     '''
 
-    for filename in os.listdir(output_dir):
+    for filename in os.listdir(start_dir):
         
-        if 'maskbits' in filename:
+        if 'ellipse-griz' in filename:   #grab the optical ellipse filename
+                                         #for SGA2025, the HDU1 extension contains
+                                         #the full mask. maskbits is only for TRACTOR
+                                         #and the SGA photometry!
 
             #define the file source (full path)
             src = os.path.join(output_dir, filename)
             
-            #replace 'maskbits' with 'image-r-mask' in mask filename (the image- is SGA2025 cadence) 
-            rmask_file = os.path.join(output_dir, filename.replace('maskbits', 'image-r-mask'))
+            #replace 'maskbits' with 'image-r-mask' in mask filename (the 'image-' is SGA2025 cadence) 
+            rmask_file = os.path.join(output_dir, filename.replace('ellipse-griz', 'image-r-mask'))
             
             os.system(f'cp {src} {rmask_file}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
-            #ALSO removes 4096 bitmask -- the SGA galaxy! -- from the mask.
+            #ALSO removes SGA galaxy/galaxies from the mask.
             reproject_mask(rmask_file, wise_image_file)
             
             return
@@ -187,7 +190,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     
     funpack_all(data_dir, output_dir)
     
-    #masks! rename maskbits to rband mask, remove 4096 (SGA galaxy) mask; create WISE mask
+    #masks! rename ellipse-griz to rband mask, remove SGA galaxy mask; create WISE mask
     wise_image = os.path.abspath(glob.glob(f'{output_dir}*-image-W3.fits')[0])   #will output the image path+filename
     move_masks(data_dir, output_dir, wise_image) 
     
@@ -321,7 +324,7 @@ if __name__ == '__main__':
 
         path_to_image_dir = outdir+obj_id+'/'
         
-        # make directory if it doesn't already exist
+        #make directory if it doesn't already exist
         if not os.path.exists(path_to_image_dir):
             os.mkdir(path_to_image_dir)
         os.chdir(path_to_image_dir)
@@ -334,7 +337,7 @@ if __name__ == '__main__':
             get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
         
         except Exception as e:
-            print(e)
+            print('ERRORRRRR:', e)
             fail_flag[i]=True   #galaxy FAILED! mark its failure here
             continue
         
