@@ -481,7 +481,7 @@ class galfit_dir():
         #first try to pull the .jpg image from the directory; if it does not exist, pull from Viewer
         try:
             imname = glob.glob("*image.jpg")[0]
-            os.system(f'cp {imname} {self.outdir}/{imname.replace('image.jpg', 'image-LS.jpg')}')
+            os.system(f"cp {imname} {self.outdir}/{imname.replace('image.jpg', 'image-LS.jpg')}")
             print("LS image found! Cp'd to {self.outdir}.")
             return
         except:
@@ -682,40 +682,34 @@ class build_html_cutout():
         
         #aesthetics. :-)
         band_header=f'{band}-band'
+
+        message = f'GALFIT Sersic Parameters for {band_header}'
+        if 'fix' in band_header:
+            message += ' (if fixBA did not run, parameters will be same as above)'
         
-        try:
+        self.html.write(f'<h4>{message}</h4>\n')                
+        labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
+
+
+        self.html.write('<table width="90%"; table-layout: fixed>\n')
+        self.html.write('<tr>')
+        for l in labels:
+            self.html.write('<th>{}</th>'.format(l))
+        self.html.write('</tr></p>\n')        
         
-            message = f'GALFIT Sersic Parameters for {band_header}'
-            if 'fix' in band_header:
-                message += ' (if fixBA did not run, parameters will be same as above)'
-
-            self.html.write(f'<h4>{message}</h4>\n')                
-            labels=['XC','YC','MAG','RE','N','AR','PA','ERROR','SKY','CHI2NU']
-
-
-            self.html.write('<table width="90%"; table-layout: fixed>\n')
+        
+        sky = self.cutout.results[self.cutout.ngal]
+        chisqnu = self.cutout.results[self.cutout.ngal+1]
+        for i in range(self.cutout.ngal):
+            data = self.cutout.results[i]
             self.html.write('<tr>')
-            for l in labels:
-                self.html.write('<th>{}</th>'.format(l))
-            self.html.write('</tr></p>\n')        
+            for d in data:
+                self.html.write('<td>{}</td>'.format(d))
+            self.html.write('<td>{}</td>'.format(sky))
+            self.html.write('<td>{}</td>'.format(chisqnu))            
+            self.html.write('</tr>\n')
 
-
-            sky = self.cutout.results[self.cutout.ngal]
-            chisqnu = self.cutout.results[self.cutout.ngal+1]
-            for i in range(self.cutout.ngal):
-                data = self.cutout.results[i]
-                self.html.write('<tr>')
-                for d in data:
-                    self.html.write('<td>{}</td>'.format(d))
-                self.html.write('<td>{}</td>'.format(sky))
-                self.html.write('<td>{}</td>'.format(chisqnu))            
-                self.html.write('</tr>\n')
-
-            self.html.write('</table>\n')
-        
-        #if there is a problem (as with r-band), skip.
-        except AttributeError:
-            return
+        self.html.write('</table>\n')
         
 
     def close_html(self):
