@@ -141,10 +141,12 @@ for d in dirlist:
         #print(imheader)
         hdu.close()
         
-        #print(infile1[0])
+        #THIS line replaces the need for np.where(outtab['OBJID'] == objids[i])[0][0] in the loop, which is SLOW.
+        objid_to_row = {oid: idx for idx, oid in enumerate(outtab['OBJID'])}
+        
         for i in range(len(xgal)):
             
-            table_index = np.where(outtab['OBJID'] == objids[i])[0][0]
+            table_index = objid_to_row[objids[i]]
             
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
