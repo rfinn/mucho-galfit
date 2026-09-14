@@ -147,11 +147,8 @@ for d in dirlist:
         for i in range(len(xgal)):
             #table_index = int(objids[i].replace('OBJID',''))
             
-            print(type(objids[i]))
-            print(type(outtab['OBJID'][0]))
-            
-            print("objids[i] =", repr(objids[i]))
-            print("outtab sample =", repr(outtab['OBJID'][0]))
+            print("searching for", repr(objids[i]))
+            print("found?", objids[i] in outtab['OBJID'])
             
             table_index = np.where(outtab['OBJID'] == objids[i])[0][0]
             for h in header[:-2]:
