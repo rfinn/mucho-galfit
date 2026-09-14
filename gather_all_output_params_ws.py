@@ -43,7 +43,7 @@ except:
 print("fixBA = ",fixBA)
 
 param_file = '/mnt/astrophysics/wisesize/github/mucho-galfit/paramfile.txt'
-        
+
 #create dictionary with keyword and values from param textfile
 param_dict={}
 with open(param_file) as f:
@@ -55,7 +55,9 @@ with open(param_file) as f:
         except:
             continue
 
-nobj = len(Table.read(param_dict['main_catalog']))
+tab = Table.read(param_dict['main_catalog'])
+nobj = len(tab)
+objid = tab['OBJID']
 
 # set up table to store galfit output
 header=['XC','YC','MAG','RE','N','AR','PA','SKY','CHI2NU']
@@ -76,7 +78,6 @@ for i in range(len(cheader)):
         cheader_with_err.append(cheader_err[i])
 col1 = ['OBJID']
 
-
 colnames = col1 + hheader_with_err + cheader_with_err
 colnames.append('Numerical_Error')
 colnames.append('CNumerical_Error')
@@ -92,10 +93,7 @@ dtype=['S10',\
 
 #print('length of colnames = ',len(colnames))
 outtab = Table(np.zeros((nobj,len(dtype))),dtype=dtype,names=colnames)
-
-for i in range(nobj):
-    objid = f"OBJID{i:05d}"
-    outtab['OBJID'][i] = objid
+outtab['OBJID'] = objid
 
 # create a dictionary to link the OBJID and row in table?
 topdir = os.getcwd()
@@ -145,14 +143,9 @@ for d in dirlist:
         
         #print(infile1[0])
         for i in range(len(xgal)):
-            #table_index = int(objids[i].replace('OBJID',''))
-            
-            test = outtab['OBJID'] == objids[i]
-            print(type(test))
-            print(test.shape)
-            print(np.sum(test))
             
             table_index = np.where(outtab['OBJID'] == objids[i])[0][0]
+            
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
 
