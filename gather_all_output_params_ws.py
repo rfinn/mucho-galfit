@@ -146,7 +146,7 @@ for d in dirlist:
         #print(infile1[0])
         for i in range(len(xgal)):
             #table_index = int(objids[i].replace('OBJID',''))
-            table_index = np.where(objids == objids[i])[0][0]
+            table_index = np.where(outtab['OBJID'] == objids[i])[0][0]
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
 
