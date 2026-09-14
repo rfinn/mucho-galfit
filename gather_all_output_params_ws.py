@@ -149,6 +149,10 @@ for d in dirlist:
             
             print(type(objids[i]))
             print(type(outtab['OBJID'][0]))
+            
+            print("objids[i] =", repr(objids[i]))
+            print("outtab sample =", repr(outtab['OBJID'][0]))
+            
             table_index = np.where(outtab['OBJID'] == objids[i])[0][0]
             for h in header[:-2]:
                 hkey = f"{i+1}_{h}"
