@@ -41,7 +41,7 @@ def remove_galaxy_SGA2020(maskfile):
     
 def remove_galaxy_SGA2025(maskfile):
     '''
-    Open maskfile! For SGA2025, should be *-ellipse-griz.fits
+    Open maskfile, edit maskfile, save maskfile! For SGA2025, should be *-ellipse-griz.fits
     
     Note that the maskbits are:
         - 2^0 --> bright star
@@ -60,14 +60,14 @@ def remove_galaxy_SGA2025(maskfile):
     #the maskbits are the second extension of the ellipse-griz fits.
     mask = hdu[1]
     
-    #create a value flag
-    source_flag = (mask.data == 2**2) | (mask.data == (2**2 + 2**3))
+    #create a value flag...this will be True if the pixel is an SGA source *or* (SGA source & galaxy).
+    source_flag = (mask.data == 2**3) | (mask.data == (2**2 + 2**3))
     
-    #omit from the mask (i.e., set equal to zero)
+    #omit SGA sources + (SGA source & galaxy) from the mask (i.e., set equal to zero)
     mask.data[source_flag] = 0
     
-    mask.writeto(maskfile,overwrite=True)   #this will overwrite our copy of the *ellipse-griz.fits file
-
+    fits.writeto(maskfile, mask.data, header=mask.header, overwrite=True)
+    
     
 def reproject_mask(maskfile, reffile):
     '''
@@ -89,7 +89,7 @@ def reproject_mask(maskfile, reffile):
     with fits.open(maskfile) as hmask, fits.open(reffile) as href:
 
         #reproject using HDU
-        wisemask, footprint = reproject_interp(hmask[1], href[0].header)
+        wisemask, footprint = reproject_interp(hmask[0], href[0].header)
         
         outname = maskfile.replace('r-mask', 'wise-mask')
         
