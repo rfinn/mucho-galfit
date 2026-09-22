@@ -76,7 +76,7 @@ def crop_save_psf(path_to_psf, psf_image_name, output_dir):
         print('PSF saved!')
         return
     
-    cropped_data = trim_psf_data(data)
+    cropped_data = trim_psf_data(data).data
     
     save_trimmed_psf(cropped_data, header, output_path)
     print('PSF trimmed and saved!')
