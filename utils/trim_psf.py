@@ -27,10 +27,10 @@ def load_fz(im_path):
 
 
 def get_psf_data(hdu):
-    return hdu[1].data
+    return hdu[0].data
 
 def get_psf_header(hdu):
-    return hdu[1].header
+    return hdu[0].header
 
 
 def trim_psf_data(data):
