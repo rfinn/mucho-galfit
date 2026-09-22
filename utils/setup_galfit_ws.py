@@ -214,15 +214,20 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     
     #define invvar and noise filenames; if the std does not exist, then convert invvar to noise and save to output_dir
     for bandpass in ['r','W1','W3']:
-        invvar_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-invvar-{bandpass}.fits.fz'))
-        sigma_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-std-{bandpass}.fits'))
+        invvar_image = f'SGA2025_{group_name}-invvar-{bandpass}.fits.fz'
+        sigma_image = f'SGA2025_{group_name}-std-{bandpass}.fits'
 
         #check if noise image exists in output_dir, if not make it from invvar 
         if not os.path.exists(output_dir+sigma_image):
             try:
                 convert_invvar_noise(os.path.join(data_dir,invvar_image),os.path.join(output_dir,sigma_image))
             except:
-                print(f'{os.path.join(output_dir,invvar_image)} does not exist! skipping sigma image calculation.')
+                print(f'{os.path.join(data_dir,invvar_image)} does not exist! skipping sigma image calculation.')
+        
+        #finally, pull wise PSFs files, crop, save to output directory
+        #ONLY crop if WISE bandpass for now. ignore cropping instruction otherwise
+        psf_image = f'SGA2025_{group_name}-psf-{bandpass}.fits.fz'
+        crop_save_psf(data_dir, psf_image, output_dir)
 
     ###############################################################################
     ### END GET IMAGES
@@ -364,7 +369,7 @@ if __name__ == '__main__':
         #if i == 1:
         #    os.chdir(outdir)
         #    sys.exit()
-        
+    
     os.chdir(outdir)   #return to the main output directory
     
     #lastly...create table of failures.

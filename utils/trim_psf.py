@@ -16,6 +16,7 @@ Steps:
 from astropy.io import fits
 from astropy.nddata import Cutout2D
 import numpy as np
+import glob
 
 def load_fz(im_path):
     '''
@@ -54,15 +55,22 @@ def save_trimmed_psf(cropped_data, header, output_destination):
     hdu.writeto(output_destination, overwrite=True)
     
 
-def crop_save_psf(path_to_psf, output_destination):
+def crop_save_psf(path_to_psf, psf_image_name, output_destination):    
     
-    band = 'W1' if 'W1' in path_to_im else 'W3'
+    full_path = os.path.join(path_to_psf,psf_image_name)
     
-    hdu = load_fz(path_to_im)
+    hdu = load_fz(full_path)
     data = get_psf_data(hdu)
     header = get_psf_header(hdu)
+    
+    #for the moment, ignore cropping instructions for r-band PSF. just save.
+    if ('W1' not in full_path) or ('W3' not in full_path):
+        save_trimmed_psf(data, header, output_destination)
+        print('PSF saved!')
+        return
     
     cropped_data = trim_psf_data(data)
     
     save_trimmed_psf(cropped_data, header, output_destination)
     print('PSF trimmed and saved!')
+    return
