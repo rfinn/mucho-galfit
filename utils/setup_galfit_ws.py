@@ -185,15 +185,19 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     if group_name is None:
         group_name = radec_to_groupname(ra, dec, prefix='')  #convert ra, dec to sga2025 group name
     
-    if dec>=hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
+    north_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
+
+    south_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}') + '/'
+
+    if os.path.exists(os.path.join(north_dir, group_name)):
+        data_dir = north_dir
         n_s = 'dr11-north'
-    if dec<hemisphere_bound:
-        data_dir = os.path.abspath(f'{data_root_dir}dr11-south/{ra_slice}') + '/'
+
+    elif os.path.exists(os.path.join(south_dir, group_name)):
+        data_dir = south_dir
         n_s = 'dr11-south'
-        
-    if not os.path.exists(data_dir):
-        print(f"could not find data_dir {data_dir} - logging and exiting")
+    else:
+        print(f"{group_name} not found in either north or south")
         return
             
     data_dir = os.path.abspath(data_dir + group_name) + '/'
