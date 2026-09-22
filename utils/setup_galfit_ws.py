@@ -34,6 +34,7 @@ from astropy.table import Table
 sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
 from galaxies_in_fov import get_galaxies_in_fov
+from utils.trim_psf import crop_save_psf
 
 
 ##########################################################################     
@@ -55,38 +56,41 @@ def funpack_image(input_, output):
 
 def funpack_all(start_dir, output_dir):
     for filename in os.listdir(start_dir):
-        if '.fz' in filename:
+        if ('.fz' in filename) and ('image' in filename):
             funpack_image(start_dir+filename, output_dir+filename.replace('.fz',''))
 
 
 #prepare the masks!
 def move_masks(start_dir, output_dir, wise_image_file):
     '''
-    Can run before the *ellipse-griz is relocated to the OBJIDxxxxx directory
-    * note that for group galaxies, there might be more than one ellipse-griz file -- one per galaxy
+    AIM: extract r-band galaxy image mask from *ellipse-griz.fits, save and reproject to create WISE mask
+    * note that for group galaxies, there might be more than one ellipse-griz file -- one per galaxy in FOV
     * this will NOT affect the resultant mask, since the SGA galaxies will be removed from the masks regardless.
-        * That is...can just pull the first one found.
+        * That is...can just use the first one found.
     '''
 
     for filename in os.listdir(start_dir):
         
         if 'ellipse-griz' in filename:   #grab the optical ellipse filename
                                          #for SGA2025, the HDU1 extension contains
-                                         #the full mask. maskbits is only for TRACTOR
-                                         #and the SGA photometry!
+                                         #the full mask. the maskbits file is only for
+                                         #TRACTOR and the SGA photometry!
 
-            #define the file source (full path)
+            #define the file source (full path to the *ellipse-griz* file)
             src = os.path.join(start_dir, filename)
             
-            #replace 'image-W3' with 'image-r-mask' for mask filename (the 'image-' is SGA2025 cadence)
+            ### create file name for the r-band mask --> output_dir/basename, NOT start_dir/basename ###
+            #grab W3 image name 'image-W3' with 'image-r-mask' for mask filename (the 'image-' is SGA2025 cadence)
             #this ensures that the file uses the SGAGROUP prefix, not the SGANAME galaxy prefix!
             basename = os.path.basename(wise_image_file).replace('W3', 'r-mask')
             rmask_file = os.path.join(output_dir, basename)
             
+            #make copy of *ellipse-griz* file with the r-band mask filename
+            #as part of the reproject_mask function, this file will actually become the r-band mask only.
             os.system(f'cp {src} {rmask_file}') #make copy with new filename!
             
             #takes r-band mask (maskfile), converts to wise mask (reffile header) with the name outname
-            #ALSO removes SGA galaxy/galaxies from the mask.
+            #ALSO removes any SGA galaxies in FOV from the mask.
             reproject_mask(rmask_file, wise_image_file)
             
             return
@@ -178,7 +182,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     ra_slice = f'{int(ra):03d}'
     
     if group_name is None:
-        group_name = radec_to_groupname(ra, dec, prefix='')  #and convert ra, dec to sga2025 group name
+        group_name = radec_to_groupname(ra, dec, prefix='')  #convert ra, dec to sga2025 group name
     
     if dec>hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
@@ -193,10 +197,12 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
             
     data_dir = os.path.abspath(data_dir + group_name) + '/'
     
+    #move all IMAGE files from parent data directory to the GALFIT ouptut directory, convert from .fits.fz to .fits
     funpack_all(data_dir, output_dir)
     
-    #masks! rename ellipse-griz to rband mask, remove SGA galaxy mask; create WISE mask
-    wise_image = os.path.abspath(glob.glob(f'{output_dir}*-image-W3.fits')[0])   #will output the image path+filename
+    #masks! rename ellipse-griz to rband mask, remove masks of SGA galaxies in FOV; create WISE mask
+    #both r-band and wise masks are saved to output_dir
+    wise_image = os.path.abspath(glob.glob(f'{output_dir}*-image-W3.fits')[0])   #will output the output_dir/filename path
     move_masks(data_dir, output_dir, wise_image) 
     
     #move Legacy Survey Viewer JPG image (if it exists)
@@ -206,15 +212,15 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     except:
         print(f'LS Viewer image not found in {data_dir}. Skipping.')
     
-    #define invvar image names; if the std does not exist, then convert invvar to std and save to output_dir
-    for bandpass in ['g','r','z','W1','W2','W3','W4']:
-        invvar_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-invvar-{bandpass}.fits'))
+    #define invvar and noise filenames; if the std does not exist, then convert invvar to noise and save to output_dir
+    for bandpass in ['r','W1','W3']:
+        invvar_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-invvar-{bandpass}.fits.fz'))
         sigma_image = os.path.abspath(os.path.join(output_dir, f'SGA2025_{group_name}-std-{bandpass}.fits'))
 
         #check if noise image exists in output_dir, if not make it from invvar 
         if not os.path.exists(output_dir+sigma_image):
             try:
-                convert_invvar_noise(os.path.join(output_dir,invvar_image),os.path.join(output_dir,sigma_image))
+                convert_invvar_noise(os.path.join(data_dir,invvar_image),os.path.join(output_dir,sigma_image))
             except:
                 print(f'{os.path.join(output_dir,invvar_image)} does not exist! skipping sigma image calculation.')
 

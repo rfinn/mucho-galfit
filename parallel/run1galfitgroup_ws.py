@@ -234,7 +234,7 @@ def write_galfit_input(output_dir,image,sigma_image,psf_image,bandpass,xgal=None
     * rPA : a list of PA from r-band fits, will have more than one entry for a group image
     * nsersic_flag : boolean to hold n=6 for particular galaxies
     """
- 
+
     if mask_image is not None:
         maskfound = True
     else:
