@@ -56,7 +56,7 @@ def save_trimmed_psf(cropped_data, header, output_destination):
     hdu.writeto(output_destination, overwrite=True)
     
 
-def crop_save_psf(path_to_psf, psf_image_name, output_destination):    
+def crop_save_psf(path_to_psf, psf_image_name, output_dir):    
     
     full_path = os.path.join(path_to_psf,psf_image_name)
     
@@ -64,14 +64,16 @@ def crop_save_psf(path_to_psf, psf_image_name, output_destination):
     data = get_psf_data(hdu)
     header = get_psf_header(hdu)
     
+    output_path = os.path.join(output_dir,psf_image_name.replace('.fz','')
+    
     #for the moment, ignore cropping instructions for r-band PSF. just save.
     if ('W1' not in full_path) or ('W3' not in full_path):
-        save_trimmed_psf(data, header, output_destination)
+        save_trimmed_psf(data, header, output_path)
         print('PSF saved!')
         return
     
     cropped_data = trim_psf_data(data)
     
-    save_trimmed_psf(cropped_data, header, output_destination)
+    save_trimmed_psf(cropped_data, header, output_path)
     print('PSF trimmed and saved!')
     return

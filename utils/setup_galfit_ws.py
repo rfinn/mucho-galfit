@@ -103,8 +103,8 @@ def convert_invvar_noise(invvar_image, noise_image):
     # read in invvar image
     # print('invvar image = ',invvar_image, os.path.basename(invvar_image))
     hdu = fits.open(invvar_image)
-    data = hdu[0].data
-    header = hdu[0].header
+    data = hdu[1].data
+    header = hdu[1].header
     hdu.close()
     
     warnings.simplefilter("ignore", RuntimeWarning)
