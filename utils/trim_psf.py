@@ -59,15 +59,20 @@ def save_trimmed_psf(cropped_data, header, output_destination):
 def crop_save_psf(path_to_psf, psf_image_name, output_dir):    
     
     full_path = os.path.join(path_to_psf,psf_image_name)
+    print(full_path)
     
-    hdu = load_fz(full_path)
-    data = get_psf_data(hdu)
-    header = get_psf_header(hdu)
+    try:
+        hdu = load_fz(full_path)
+        data = get_psf_data(hdu)
+        header = get_psf_header(hdu)
+    except:
+        print(f'{full_path} does not exist!')
+        return
     
     output_path = os.path.join(output_dir,psf_image_name.replace('.fz',''))
     
     #for the moment, ignore cropping instructions for r-band PSF. just save.
-    if ('W1' not in full_path) or ('W3' not in full_path):
+    if ('W1' not in psf_image_name) or ('W3' not in psf_image_name):
         save_trimmed_psf(data, header, output_path)
         print('PSF saved!')
         return
