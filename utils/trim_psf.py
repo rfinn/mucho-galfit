@@ -17,6 +17,7 @@ from astropy.io import fits
 from astropy.nddata import Cutout2D
 import numpy as np
 import glob
+import os
 
 def load_fz(im_path):
     '''
