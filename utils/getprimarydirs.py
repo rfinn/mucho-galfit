@@ -10,7 +10,7 @@ import numpy as np
 def find_primaries(maintab, primary_group_col, objid_col):
     
     #firstly...since I am currently testing dr11-south galaxies, restrict DEC to <= 32 degrees
-    decflag = maintab['DEC']<=32.
+    #decflag = maintab['DEC']<=32.
     
     #trim to only include primary galaxies; if no such flag exists, assume all galaxies are primary.
     try:
@@ -18,7 +18,7 @@ def find_primaries(maintab, primary_group_col, objid_col):
     except:
         primary_flag = np.ones(len(maintab),dtype=bool)   #all true
 
-    maintab = maintab[primary_flag&decflag]
+    maintab = maintab[primary_flag]
     
     primary_objids = maintab[objid_col]
     
@@ -66,6 +66,6 @@ if __name__ == '__main__':
     print()
     print(f'This file contains {len(primary_galaxies)} galaxies.')
     print()
-    print('WARNING: be sure to confirm in getprimarydirs.py that the decflag is not accidentally toggled!')
+    print('WARNING: be sure to confirm in getprimarydirs.py that the decflag is not accidentally toggled! if toggled, only dr11-south galaxies will be included.')
     print('#'*20)
     print('#'*20)
