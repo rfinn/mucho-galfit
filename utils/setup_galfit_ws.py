@@ -34,7 +34,7 @@ from astropy.table import Table
 sys.path.insert(0,'utils')
 from convert_mask import reproject_mask
 from galaxies_in_fov import get_galaxies_in_fov
-from utils.trim_psf import crop_save_psf
+from trim_psf import crop_save_psf
 
 
 ##########################################################################     
