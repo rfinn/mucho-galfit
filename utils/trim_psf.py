@@ -72,7 +72,7 @@ def crop_save_psf(path_to_psf, psf_image_name, output_dir):
     output_path = os.path.join(output_dir,psf_image_name.replace('.fz',''))
     
     #for the moment, ignore cropping instructions for r-band PSF. just save.
-    if ('W1' not in psf_image_name) or ('W3' not in psf_image_name):
+    if ('W1' not in psf_image_name) and ('W3' not in psf_image_name):
         save_trimmed_psf(data, header, output_path)
         print('PSF saved!')
         return
