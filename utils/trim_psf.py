@@ -59,7 +59,6 @@ def save_trimmed_psf(cropped_data, header, output_destination):
 def crop_save_psf(path_to_psf, psf_image_name, output_dir):    
     
     full_path = os.path.join(path_to_psf,psf_image_name)
-    print(full_path)
     
     try:
         hdu = load_fz(full_path)
