@@ -158,7 +158,7 @@ def get_wise_psfs(param_dict, path_to_image_dir):
     
     
 #path_to_repos e.g., /mnt/astrophysics/wisesize/
-def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., group_name=None):
+def get_images(objid, ra, dec, output_loc, data_root_dir, group_name=None):
     ###############################################################################
     ### GET IMAGES
     ###############################################################################
@@ -248,10 +248,8 @@ def setup_one_galaxy(objid, maintab, param_dict):
     
     outdir = param_dict['main_dir'] + param_dict['path_to_images']
     data_root_dir = param_dict['data_root_dir']
-    
-    hemisphere_bound = float(param_dict['hemisphere_bound'])
-    
-    get_images(objid, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
+        
+    get_images(objid, ra, dec, outdir, data_root_dir, group_name=group_name)
     get_galaxies_in_fov(maintab, os.path.abspath(os.path.join(outdir, objid) + '/'))
     print('#'*20)
     print('SUCCESS!')
@@ -297,9 +295,7 @@ if __name__ == '__main__':
     maintab = Table.read(main_catalog_path)
 
     primary_group_col = param_dict['primary_group_col']
-    
-    hemisphere_bound = float(param_dict['hemisphere_bound'])
-        
+            
     ###########################################
     # Check if main catalog has OBJID column. #
     #  If not, create one (and save result)!  #
@@ -356,7 +352,7 @@ if __name__ == '__main__':
         
         try:
             #copy images
-            get_images(obj_id, ra, dec, outdir, data_root_dir, hemisphere_bound, group_name=group_name)
+            get_images(obj_id, ra, dec, outdir, data_root_dir, group_name=group_name)
         
         except Exception as e:
             print('ERRORRRRR:', e)
