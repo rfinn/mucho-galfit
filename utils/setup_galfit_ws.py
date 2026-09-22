@@ -175,6 +175,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     #data_root_dir is where JM's input_ images are initially stored
     if not os.path.exists(data_root_dir):
         print(f"could not find data_root_dir {data_root_dir} - exiting")
+        print(f"galaxy is SGAID={objid}, group_name={radec_to_groupname(ra,dec,prefix='')}")
         sys.exit()
     
     #just pulling the RA directory name...extracts integer from ra, then puts in xxx format (three integer places)
@@ -184,7 +185,7 @@ def get_images(objid, ra, dec, output_loc, data_root_dir, hemisphere_bound=32., 
     if group_name is None:
         group_name = radec_to_groupname(ra, dec, prefix='')  #convert ra, dec to sga2025 group name
     
-    if dec>hemisphere_bound:
+    if dec>=hemisphere_bound:
         data_dir = os.path.abspath(f'{data_root_dir}dr11-north/{ra_slice}') + '/'
         n_s = 'dr11-north'
     if dec<hemisphere_bound:
