@@ -99,7 +99,7 @@ outtab['OBJID'] = objid
 topdir = os.getcwd()
 os.chdir(topdir)
 
-dirlist = glob.glob('OBJID?????')
+dirlist = glob.glob('???????')  #seven charact
 dirlist.sort()  #numerical order :-)
 
 for d in dirlist:
