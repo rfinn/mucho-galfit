@@ -593,6 +593,27 @@ if __name__ == '__main__':
         matchflag[mindex] = True 
     
     if np.sum(matchflag) < 1:
+        
+        
+        
+        
+        print("objid =", repr(objid))
+        print("etab matches =", np.sum(matchindex_primary))
+        print("len(etab) =", len(etab))
+        print("len(rgalfit) =", len(rgalfit))
+
+        print("rgalfit Numerical_Error shape =",
+          len(rgalfit['Numerical_Error'][matchindex_primary]))
+
+        print("matching etab row(s):")
+        print(etab[matchindex_primary][objid_col])
+
+        print("matching rgalfit row(s):")
+        print(rgalfit[matchindex_primary][objid_col])
+        
+        
+        
+        
         print("ERROR: did not find a matching OBJID for ",objid)
 
     # this can now contain multiple ids if this is a group image
