@@ -537,8 +537,6 @@ if __name__ == '__main__':
     group_mult_col = param_dict['group_mult_col']
     group_name_col = param_dict['group_name_col']
     objname_col = param_dict['objname_col']
-    
-    
 
     mock_ephot_flag = param_dict['create_mock_ephot']
     maintab = Table.read(param_dict['main_catalog'])
@@ -589,31 +587,10 @@ if __name__ == '__main__':
     matchflag = np.zeros(len(etab),'bool')   #bool flag for which galaxies are in the "pointing"/image
 
     for obj in objids:
-        mindex = etab[objid_col] == obj
+        mindex = (etab[objid_col] == obj)
         matchflag[mindex] = True 
     
     if np.sum(matchflag) < 1:
-        
-        
-        
-        
-        print("objid =", repr(objid))
-        print("etab matches =", np.sum(matchindex_primary))
-        print("len(etab) =", len(etab))
-        print("len(rgalfit) =", len(rgalfit))
-
-        print("rgalfit Numerical_Error shape =",
-          len(rgalfit['Numerical_Error'][matchindex_primary]))
-
-        print("matching etab row(s):")
-        print(etab[matchindex_primary][objid_col])
-
-        print("matching rgalfit row(s):")
-        print(rgalfit[matchindex_primary][objid_col])
-        
-        
-        
-        
         print("ERROR: did not find a matching OBJID for ",objid)
 
     # this can now contain multiple ids if this is a group image
@@ -635,7 +612,16 @@ if __name__ == '__main__':
             sys.exit()
             
         # check numerical error flag
-        print(rgalfit['Numerical_Error'][matchindex_primary])
+        
+        print("objid =", repr(objid))
+        print("sum(matchindex_primary) =", np.sum(matchindex_primary))
+        print("matchindex_primary =", np.where(matchindex_primary)[0])
+        print("len(rgalfit) =", len(rgalfit))
+        print("len(etab) =", len(etab))
+        print("Numerical_Error values =", rgalfit['Numerical_Error'][matchindex_primary])
+
+        #print(rgalfit['Numerical_Error'][matchindex_primary])
+        
         if rgalfit['Numerical_Error'][matchindex_primary][0]:
             print("not using r-band params b/c they are not reliable")
             rPA = None
