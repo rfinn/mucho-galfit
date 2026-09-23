@@ -2,7 +2,7 @@
 
 main_dir          /mnt/astrophysics/wisesize/             #mounted dir for input/output images
 path_to_scripts   github/wisesize/mucho-galfit/           #draco path for galfit code, starting from main_dir
-path_to_images    galfit_20260922/                     #output path to image dirs for each galaxy, 
+path_to_images    galfit_20260923/                     #output path to image dirs for each galaxy, 
                                                        #starting from main_dir
                                                        
 data_root_dir     /mnt/astro/sga2025/data/       #where JM images are stored (RA directories)
