@@ -612,15 +612,7 @@ if __name__ == '__main__':
             sys.exit()
             
         # check numerical error flag
-        
-        print("objid =", repr(objid))
-        print("sum(matchindex_primary) =", np.sum(matchindex_primary))
-        print("matchindex_primary =", np.where(matchindex_primary)[0])
-        print("len(rgalfit) =", len(rgalfit))
-        print("len(etab) =", len(etab))
-        print("Numerical_Error values =", rgalfit['Numerical_Error'][matchindex_primary])
-
-        #print(rgalfit['Numerical_Error'][matchindex_primary])
+        print(rgalfit['Numerical_Error'][matchindex_primary])
         
         if rgalfit['Numerical_Error'][matchindex_primary][0]:
             print("not using r-band params b/c they are not reliable")
